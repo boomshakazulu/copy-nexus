@@ -1,0 +1,28 @@
+{
+  "name": "copy-nexus",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/boomshakazulu/copy-nexus#readme",
+  "bugs": {
+    "url": "https://github.com/boomshakazulu/copy-nexus/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boomshakazulu/copy-nexus.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js --ignore client",
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\"",
+    "install": "cd server && npm i && cd ../client && npm i",
+    "seed": "cd server && npm run seed",
+    "build": "cd client && npm run build",
+    "render-build": "npm install && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^5.1.0"
+  }
+}
