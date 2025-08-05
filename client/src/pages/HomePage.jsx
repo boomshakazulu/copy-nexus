@@ -25,16 +25,16 @@ export default function HomePage() {
   return (
     <div className="px-4 max-w-3xl mx-auto">
       {/* HERO SECTION */}
-      <section className="flex flex-col md:flex-row items-start justify-between gap-8 mb-16">
+      <section className="flex flex-col md:flex-row items-center sm:items-start justify-between gap-4 sm:gap-8 mb-4 sm:mb-16 ">
         {/* Text */}
         <div className="text-center text-left flex-1">
-          <h1 className="text-7xl font-bold text-[#00294D] leading-tight text-left">
+          <h1 className="text-5xl sm:text-7xl font-bold text-[#00294D] leading-tight text-left">
             COPIER
           </h1>
-          <h1 className="text-7xl font-bold text-[#00294D] leading-tight text-left">
+          <h1 className="text-5xl sm:text-7xl font-bold text-[#00294D] leading-tight text-left">
             STORE
           </h1>
-          <p className="text-3xl mt-2 text-red-600 font-semibold text-left">
+          <p className="text-2xl mt-2 text-red-600 font-semibold text-left">
             Copier Rentals & Sales
           </p>
         </div>
@@ -44,7 +44,7 @@ export default function HomePage() {
           <img
             src="/copier.png"
             alt="Copier"
-            className="w-full h-auto max-h-70 object-contain mx-auto scale-x-[-1]"
+            className="w-full h-auto max-h-80 sm:max-h-70 object-contain mx-auto scale-x-[-1]"
           />
         </div>
       </section>

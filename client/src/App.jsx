@@ -7,7 +7,7 @@ export default function App() {
     <StrictMode>
       <div className="min-h-screen bg-white text-gray-800 font-sans">
         <TopBar />
-        <main className="max-w-6xl mx-auto px-4 py-8">
+        <main className="max-w-6xl mx-auto px-4 py-4">
           <Outlet />
         </main>
       </div>

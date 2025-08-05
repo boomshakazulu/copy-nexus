@@ -29,18 +29,17 @@ export default function TopBar() {
 
   return (
     <header className="bg-white w-full">
-      <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
+      <div className="flex items-center justify-between px-2 sm:px-6 py-2 sm:py-4 max-w-6xl mx-auto">
         {/* Logo */}
         <img
           src="/logo-cropped.png"
           alt="Copy Nexus Logo"
-          className="h-12 sm:h-16 md:h-20 w-auto object-contain"
+          className="h-16 md:h-20 w-auto object-contain"
         />
         <div className="flex gap-2 sm:gap-4 md:gap-6 pl-6 sm:pl-0 text-black font-medium text-sm">
           {/* Top Navigation - always visible */}
           <nav className="flex gap-2 sm:gap-4 md:gap-6 text-black font-medium text-sm">
             <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
             <Link to="/products">Products</Link>
             <Link to="/contact">Contact</Link>
           </nav>
@@ -77,15 +76,16 @@ export default function TopBar() {
             onClick={(e) => e.stopPropagation()}
           >
             <nav className="flex flex-col gap-4 text-black font-medium text-base">
+              <Link to="/about">About</Link>
               <button className="text-left" onClick={() => showLoginModal()}>
                 Login
               </button>
               <button className="text-left" onClick={() => showSignupModal()}>
                 Signup
               </button>
-              <Link to="/biling" onClick={() => setMenuOpen(false)}>
+              {/* <Link to="/biling" onClick={() => setMenuOpen(false)}>
                 Billing
-              </Link>
+              </Link> */}
             </nav>
           </div>
         </div>
