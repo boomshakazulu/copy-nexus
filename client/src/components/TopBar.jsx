@@ -1,9 +1,31 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Menu } from "lucide-react";
 import { Link } from "react-router-dom";
+import LoginModal from "./LoginModal";
+import SignupModal from "./SignupModal";
 
 export default function TopBar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showSignup, setShowSignup] = useState(false);
+
+  //shows login and closes menu on click
+  const showLoginModal = () => {
+    setShowLogin(true);
+    setMenuOpen(false);
+  };
+
+  //shows signup and closes menu on click
+  const showSignupModal = () => {
+    setShowSignup(true);
+    setMenuOpen(false);
+  };
+
+  //function for switching from login to signup modal or visa versa
+  const switchLoginSignup = () => {
+    setShowLogin(!showLogin);
+    setShowSignup(!showSignup);
+  };
 
   return (
     <header className="bg-white w-full">
@@ -24,11 +46,25 @@ export default function TopBar() {
           </nav>
 
           {/* Hamburger menu - always visible */}
-          <button onClick={() => setMenuOpen(true)} className="text-black">
+          <button onClick={() => setMenuOpen(!menuOpen)} className="text-black">
             <Menu className="w-6 h-6" />
           </button>
         </div>
       </div>
+
+      {/* LoginModal */}
+      <LoginModal
+        isOpen={showLogin}
+        onClose={() => setShowLogin(false)}
+        showSignup={() => switchLoginSignup()}
+      />
+
+      {/* SignupModal */}
+      <SignupModal
+        isOpen={showSignup}
+        onClose={() => setShowSignup(false)}
+        showLogin={() => switchLoginSignup()}
+      />
 
       {/* Side Menu (overlay) */}
       {menuOpen && (
@@ -40,18 +76,13 @@ export default function TopBar() {
             className="absolute top-17 right-0 w-64 h-full bg-white p-6 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* <div className="flex justify-end">
-              <button onClick={() => setMenuOpen(false)} className="text-black">
-                <Menu className="w-6 h-6" />
-              </button>
-            </div> */}
             <nav className="flex flex-col gap-4 text-black font-medium text-base">
-              <Link to="/login" onClick={() => setMenuOpen(false)}>
+              <button className="text-left" onClick={() => showLoginModal()}>
                 Login
-              </Link>
-              <Link to="/signup" onClick={() => setMenuOpen(false)}>
+              </button>
+              <button className="text-left" onClick={() => showSignupModal()}>
                 Signup
-              </Link>
+              </button>
               <Link to="/biling" onClick={() => setMenuOpen(false)}>
                 Billing
               </Link>
