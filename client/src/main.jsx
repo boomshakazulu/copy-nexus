@@ -15,6 +15,8 @@ import AboutPage from "./pages/AboutPage";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import Orders from "./pages/admin/Orders";
+import Products from "./pages/admin/Products";
+import Reports from "./pages/admin/Reports";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +42,8 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <Dashboard /> },
           { path: "/admin/orders", element: <Orders /> },
+          { path: "/admin/products", element: <Products /> },
+          { path: "/admin/reports", element: <Reports /> },
         ],
       },
     ],
