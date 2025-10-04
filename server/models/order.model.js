@@ -1,15 +1,14 @@
 const { Schema, model } = require("mongoose");
 
-const money = { type: Number, min: 0, default: 0 };
+const money = { type: Number, min: 0, default: 0 }; // integer COP
 
 const addressSchema = new Schema(
   {
-    line1: { type: String, required: true },
-    line2: String,
-    city: { type: String, required: true },
-    state: String,
-    postalCode: String,
-    country: { type: String, default: "CO" },
+    streetAddress: { type: String, required: true, trim: true },
+    neighborhood: { type: String, trim: true },
+    city: { type: String, required: true, default: "Bogotá D.C.", trim: true },
+    department: { type: String, required: true, trim: true },
+    postalCode: { type: String, trim: true }, // keep just postalCode
   },
   { _id: false }
 );
@@ -17,55 +16,37 @@ const addressSchema = new Schema(
 const lineItemSchema = new Schema(
   {
     product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
-    // snapshot fields
-    name: { type: String, required: true },
-    model: String,
+    name: { type: String, required: true, trim: true }, // snapshot
+    model: { type: String, trim: true },
     qty: { type: Number, min: 1, required: true },
-    unitAmount: { type: Number, min: 0, required: true },
+    unitAmount: { type: Number, min: 0, required: true }, // integer COP
   },
   { _id: false }
-);
-
-const paymentAttemptSchema = new Schema(
-  {
-    provider: { type: String, default: "PayU" },
-    referenceCode: { type: String, required: true }, // unique per attempt
-    amount: money,
-    currency: { type: String, default: "COP" },
-    method: { type: String }, // e.g. VISA, MASTERCARD, PSE, NEQUI
-    installmentsNumber: { type: Number, min: 1 },
-
-    // PayU echoes/ids
-    payUOrderId: String,
-    payUTransactionId: String,
-    state: String,
-    responseCode: String,
-    authorizationCode: String,
-    pendingReason: String,
-    operationDate: Date,
-
-    // webhook/confirmation handling
-    signatureVerified: Boolean,
-    rawWebhook: Schema.Types.Mixed, // store raw payload for audits
-  },
-  { _id: false, timestamps: true }
 );
 
 const orderSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: "User" },
+
     customer: {
       name: { type: String, required: true, trim: true },
       email: { type: String, required: true, lowercase: true, trim: true },
-      phone: { type: String, required: true }, // E.164 like +57...
+      phone: { type: String, required: true, trim: true },
     },
-    shippingAddress: { type: addressSchema, required: true },
-    billingAddress: { type: addressSchema },
 
-    // items & totals
-    items: { type: [lineItemSchema], validate: (v) => v.length > 0 },
+    shippingAddress: { type: addressSchema, required: true },
+
+    items: {
+      type: [lineItemSchema],
+      required: true,
+      validate: {
+        validator: (v) => Array.isArray(v) && v.length > 0,
+        message: "Order must have at least one line item.",
+      },
+    },
+
     amounts: {
-      currency: { type: String, default: "COP" },
+      currency: { type: String, enum: ["COP"], default: "COP" },
       subtotal: money,
       tax: money,
       shipping: money,
@@ -73,31 +54,38 @@ const orderSchema = new Schema(
       total: money,
     },
 
-    // order lifecycle
     status: {
       type: String,
       enum: ["pending", "paid", "failed", "canceled", "refunded", "shipped"],
       default: "pending",
     },
-
-    // payments (one order can have multiple attempts)
-    payments: { type: [paymentAttemptSchema], default: [] },
   },
   { timestamps: true }
 );
 
 // Keep totals in sync
 orderSchema.pre("save", function (next) {
-  const subtotal = this.items.reduce((s, i) => s + i.unitAmount * i.qty, 0);
-  this.amounts.subtotal = subtotal;
-  this.amounts.total =
-    subtotal + this.amounts.tax + this.amounts.shipping - this.amounts.discount;
+  const items = Array.isArray(this.items) ? this.items : [];
+  const subtotal = items.reduce(
+    (s, i) => s + (i.unitAmount || 0) * (i.qty || 0),
+    0
+  );
+
+  this.amounts = this.amounts || {};
+  const tax = this.amounts.tax ?? 0;
+  const shipping = this.amounts.shipping ?? 0;
+  const discount = this.amounts.discount ?? 0;
+
+  this.amounts.subtotal = Math.round(subtotal);
+  this.amounts.total = Math.max(
+    0,
+    Math.round(subtotal + tax + shipping - discount)
+  );
+
   next();
 });
 
-//indexes
 orderSchema.index({ "customer.email": 1, createdAt: -1 });
-orderSchema.index({ "payments.payUTransactionId": 1 }, { sparse: true });
 orderSchema.index({ status: 1, createdAt: -1 });
 
 module.exports = model("Order", orderSchema);
