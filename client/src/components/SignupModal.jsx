@@ -1,7 +1,47 @@
 import { X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { http } from "../utils/axios";
+import Auth from "../utils/auth";
 
 export default function SignupModal({ isOpen, onClose, showLogin }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  useEffect(() => {
+    if (Auth.loggedIn()) {
+      onClose();
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
+
+  const handleSubmit = async (e) => {
+    e?.preventDefault();
+    if (confirmPassword !== password) {
+      setErrorMessage("Passwords don't match, Please try again");
+      console.log(errorMessage);
+    } else {
+      try {
+        const { data } = await http.post("/users/create", {
+          email: email,
+          password: password,
+        });
+        console.log(data);
+        const token = data.token;
+        Auth.login(token);
+        setErrorMessage(null);
+        onClose();
+      } catch (err) {
+        console.log(err);
+        setErrorMessage(
+          "there was a problem creating your account please try again"
+        );
+      }
+    }
+  };
+
   return (
     // <!-- Modal Overlay -->
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
@@ -28,7 +68,7 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
         </h1>
 
         {/* <!-- Form --> */}
-        <form>
+        <form onSubmit={handleSubmit}>
           {/* <!-- Email --> */}
           <div className="mb-4">
             <label className="block text-sm font-semibold text-[#00294D] mb-1">
@@ -38,6 +78,7 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
               type="email"
               placeholder="you@example.com"
               className="w-full px-4 py-2 border rounded text-sm focus:outline-none focus:ring focus:ring-red-100"
+              onChange={(event) => setEmail(event.target.value)}
             />
           </div>
 
@@ -50,6 +91,7 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
               type="password"
               placeholder="Enter password"
               className="w-full px-4 py-2 border rounded text-sm focus:outline-none focus:ring focus:ring-red-100"
+              onChange={(event) => setPassword(event.target.value)}
             />
           </div>
 
@@ -62,6 +104,7 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
               type="password"
               placeholder="Confirm password"
               className="w-full px-4 py-2 border rounded text-sm focus:outline-none focus:ring focus:ring-red-100"
+              onChange={(event) => setConfirmPassword(event.target.value)}
             />
           </div>
 

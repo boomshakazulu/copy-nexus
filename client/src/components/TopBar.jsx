@@ -1,13 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import LoginModal from "./LoginModal";
 import SignupModal from "./SignupModal";
+import Auth from "../utils/auth";
 
 export default function TopBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (Auth.loggedIn()) {
+      return setLoggedIn(true);
+    }
+    setLoggedIn(false);
+  }, []);
 
   //shows login and closes menu on click
   const showLoginModal = () => {
@@ -76,13 +85,27 @@ export default function TopBar() {
             onClick={(e) => e.stopPropagation()}
           >
             <nav className="flex flex-col gap-4 text-black font-medium text-base">
-              <Link to="/about">About</Link>
-              <button className="text-left" onClick={() => showLoginModal()}>
-                Login
-              </button>
-              <button className="text-left" onClick={() => showSignupModal()}>
-                Signup
-              </button>
+              <Link to="/about">About Us</Link>
+              {!loggedIn ? (
+                <div className="flex flex-col gap-4 text-black font-medium text-base">
+                  <button
+                    className="text-left"
+                    onClick={() => showLoginModal()}
+                  >
+                    Login
+                  </button>
+                  <button
+                    className="text-left"
+                    onClick={() => showSignupModal()}
+                  >
+                    Signup
+                  </button>
+                </div>
+              ) : (
+                <button className="text-left" onClick={() => showLoginModal()}>
+                  Logout
+                </button>
+              )}
               {/* <Link to="/biling" onClick={() => setMenuOpen(false)}>
                 Billing
               </Link> */}

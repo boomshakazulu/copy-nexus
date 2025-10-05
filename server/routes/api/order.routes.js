@@ -1,13 +1,11 @@
 const router = require("express").Router();
-const {
-  getOrders,
-  createOrder,
-} = require("../../controllers/order.controller");
+const { createOrder } = require("../../controllers/order.controller");
+
+const { requireAuth, requireRole } = require("../../utils/auth");
 
 const wrap = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 
-router.get("/", wrap(getOrders));
 router.post("/", wrap(createOrder));
 
 module.exports = router;
