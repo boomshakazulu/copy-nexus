@@ -7,38 +7,68 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     if (Auth.loggedIn()) {
       onClose();
     }
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
-    e?.preventDefault();
+    e.preventDefault();
+
+    const emailField = e.target.querySelector('input[type="email"]');
+    const passwordField = e.target.querySelector('input[name="password"]');
+    const confirmField = e.target.querySelector(
+      'input[name="confirmPassword"]'
+    );
+
+    // Always clear any lingering validity before checks
+    emailField.setCustomValidity("");
+    passwordField.setCustomValidity("");
+    confirmField.setCustomValidity("");
+
+    if (!emailField.validity.valid) {
+      emailField.reportValidity();
+      return;
+    }
+
+    if (password.length < 8) {
+      passwordField.setCustomValidity(
+        "Password must be at least 8 characters long."
+      );
+      passwordField.reportValidity();
+      return;
+    }
+
     if (confirmPassword !== password) {
-      setErrorMessage("Passwords don't match, Please try again");
-      console.log(errorMessage);
-    } else {
-      try {
-        const { data } = await http.post("/users/create", {
-          email: email,
-          password: password,
-        });
-        console.log(data);
-        const token = data.token;
-        Auth.login(token);
-        setErrorMessage(null);
-        onClose();
-      } catch (err) {
-        console.log(err);
-        setErrorMessage(
-          "there was a problem creating your account please try again"
-        );
+      confirmField.setCustomValidity("Passwords do not match.");
+      confirmField.reportValidity();
+      return;
+    }
+
+    try {
+      const { data } = await http.post("/users/create", { email, password });
+      Auth.login(data.token);
+      onClose();
+    } catch (err) {
+      console.error(err);
+
+      const msg = err.message || "";
+
+      if (msg.includes("email already registered")) {
+        emailField.setCustomValidity("This email is already registered.");
+        emailField.reportValidity();
+        return;
       }
+
+      // fallback for other unknown errors
+      emailField.setCustomValidity(
+        "There was a problem creating your account."
+      );
+      emailField.reportValidity();
     }
   };
 
@@ -76,9 +106,11 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
             </label>
             <input
               type="email"
+              name="email"
               placeholder="you@example.com"
               className="w-full px-4 py-2 border rounded text-sm focus:outline-none focus:ring focus:ring-red-100"
               onChange={(event) => setEmail(event.target.value)}
+              onInput={(e) => e.target.setCustomValidity("")}
             />
           </div>
 
@@ -89,9 +121,11 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
             </label>
             <input
               type="password"
+              name="password"
               placeholder="Enter password"
               className="w-full px-4 py-2 border rounded text-sm focus:outline-none focus:ring focus:ring-red-100"
               onChange={(event) => setPassword(event.target.value)}
+              onInput={(e) => e.target.setCustomValidity("")}
             />
           </div>
 
@@ -102,9 +136,11 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
             </label>
             <input
               type="password"
+              name="confirmPassword"
               placeholder="Confirm password"
               className="w-full px-4 py-2 border rounded text-sm focus:outline-none focus:ring focus:ring-red-100"
               onChange={(event) => setConfirmPassword(event.target.value)}
+              onInput={(e) => e.target.setCustomValidity("")}
             />
           </div>
 

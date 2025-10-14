@@ -60,19 +60,21 @@ export default function TopBar() {
         </div>
       </div>
 
-      {/* LoginModal */}
-      <LoginModal
-        isOpen={showLogin}
-        onClose={() => setShowLogin(false)}
-        showSignup={() => switchLoginSignup()}
-      />
+      <>
+        {/* LoginModal */}
+        <LoginModal
+          isOpen={showLogin}
+          onClose={() => setShowLogin(false)}
+          showSignup={() => switchLoginSignup()}
+        />
 
-      {/* SignupModal */}
-      <SignupModal
-        isOpen={showSignup}
-        onClose={() => setShowSignup(false)}
-        showLogin={() => switchLoginSignup()}
-      />
+        {/* SignupModal */}
+        <SignupModal
+          isOpen={showSignup}
+          onClose={() => setShowSignup(false)}
+          showLogin={() => switchLoginSignup()}
+        />
+      </>
 
       {/* Side Menu (overlay) */}
       {menuOpen && (
@@ -102,11 +104,11 @@ export default function TopBar() {
                   </button>
                 </div>
               ) : (
-                <button className="text-left" onClick={() => showLoginModal()}>
+                <button className="text-left" onClick={() => Auth.logout()}>
                   Logout
                 </button>
               )}
-              {/* <Link to="/biling" onClick={() => setMenuOpen(false)}>
+              {/* <Link to="/billing" onClick={() => setMenuOpen(false)}>
                 Billing
               </Link> */}
             </nav>
