@@ -10,9 +10,16 @@ export default function TopBar() {
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (Auth.loggedIn()) {
+      if (Auth.isAdmin()) {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+
       return setLoggedIn(true);
     }
     setLoggedIn(false);
@@ -108,6 +115,7 @@ export default function TopBar() {
                   Logout
                 </button>
               )}
+              {isAdmin && <Link to="/admin">Admin</Link>}
               {/* <Link to="/billing" onClick={() => setMenuOpen(false)}>
                 Billing
               </Link> */}

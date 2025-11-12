@@ -11,11 +11,10 @@ const userSchema = new Schema(
       lowercase: true,
       match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/],
     },
-    // store only the hash
     passwordHash: {
       type: String,
-      select: false, // must opt-in when querying for login
-      required: true,
+      select: false,
+      required: true, // OK to keep required now that we set it before validate
     },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     resetToken: { type: String, default: null },
@@ -24,22 +23,20 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-// Accept a virtual plain-text password setter
-userSchema
-  .virtual("password")
-  .set(function (plain) {
-    this._plainPassword = plain;
-  })
-  .get(function () {
-    return undefined;
-  });
+// Virtual for plain password
+userSchema.virtual("password")
+  .set(function (plain) { this._plainPassword = plain; })
+  .get(function () { return undefined; });
 
-// Hash on create/save if a plain password was provided or hash changed
-userSchema.pre("save", async function (next) {
+/**
+ * IMPORTANT: pre('validate') so passwordHash is set BEFORE validation
+ */
+userSchema.pre("validate", async function (next) {
   try {
-    if (this._plainPassword) {
+    if (this._plainPassword != null) {
       if (this._plainPassword.length < 8) {
-        throw new Error("Password must be at least 8 characters");
+        this.invalidate("password", "Password must be at least 8 characters");
+        return next();
       }
       this.passwordHash = await bcrypt.hash(this._plainPassword, 10);
     }
@@ -49,44 +46,34 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// Handle updates that pass { password: "plain" } or {$set:{password:"plain"}}
+// Query updates: hash if { password: 'plain' } is provided
 async function hashPasswordInUpdate(query) {
   const update = query.getUpdate() || {};
-  const $set = update.$set || update;
+  const set = update.$set ?? update;
 
-  const plain = $set.password;
+  const plain = set.password;
   if (!plain) return;
 
-  if (plain.length < 8)
+  if (plain.length < 8) {
     throw new Error("Password must be at least 8 characters");
-  const hash = await bcrypt.hash(plain, 10);
+  }
 
-  // write hash to passwordHash and remove plain password
-  ($set.$set || $set).passwordHash = hash;
-  delete $set.password;
-  if (update.$set) update.$set = $set;
+  const hash = await bcrypt.hash(plain, 10);
+  set.passwordHash = hash;
+  delete set.password;
+
+  if (update.$set) update.$set = set;
   query.setUpdate(update);
 }
 
 userSchema.pre("findOneAndUpdate", async function (next) {
-  try {
-    await hashPasswordInUpdate(this);
-    next();
-  } catch (e) {
-    next(e);
-  }
+  try { await hashPasswordInUpdate(this); next(); } catch (e) { next(e); }
 });
 
 userSchema.pre("updateOne", async function (next) {
-  try {
-    await hashPasswordInUpdate(this);
-    next();
-  } catch (e) {
-    next(e);
-  }
+  try { await hashPasswordInUpdate(this); next(); } catch (e) { next(e); }
 });
 
-// Compare candidate password to hash
 userSchema.methods.isCorrectPassword = function (password) {
   return bcrypt.compare(password, this.passwordHash);
 };

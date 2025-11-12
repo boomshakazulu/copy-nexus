@@ -1,7 +1,47 @@
 import { Mail, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { http } from "../utils/axios";
+import Auth from "../utils/auth";
 
 export default function LoginModal({ isOpen, onClose, showSignup }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    if (Auth.loggedIn()) {
+      onClose();
+    }
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const passwordField = e.target.querySelector('input[name="password"]');
+
+    passwordField.setCustomValidity("");
+
+    if (email && password) {
+      try {
+        const { data } = await http.post("/users/login", { email, password });
+        if (data.token) {
+          Auth.login(data.token);
+        }
+      } catch (err) {
+        const msg = err.message || "";
+
+        if (msg.includes("Invalid credentials")) {
+          passwordField.setCustomValidity("Invalid Username or password");
+          passwordField.reportValidity();
+          return;
+        } else {
+          passwordField.setCustomValidity("There was a problem logging in.");
+          passwordField.reportValidity();
+        }
+      }
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -27,7 +67,7 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
         </h1>
 
         {/* Form */}
-        <form>
+        <form onSubmit={handleSubmit}>
           <label className="block text-[#00294D] font-semibold mb-1">
             Email address
           </label>
@@ -37,8 +77,10 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
             </span>
             <input
               type="email"
+              name="email"
               className="w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
               placeholder="you@example.com"
+              onChange={(event) => setEmail(event.target.value)}
             />
           </div>
 
@@ -47,8 +89,11 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
           </label>
           <input
             type="password"
+            name="password"
             className="w-full mb-6 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
             placeholder="••••••••"
+            onChange={(event) => setPassword(event.target.value)}
+            onInput={(e) => e.target.setCustomValidity("")}
           />
 
           <button

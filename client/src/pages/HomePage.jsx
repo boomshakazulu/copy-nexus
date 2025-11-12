@@ -8,16 +8,16 @@ const features = [
       "Lorem ipsum dolor ag met, consectetuer adipiscing eli. Augdet quam ult amet.",
   },
   {
-    title: "TONER",
+    title: "PARTS & ACCESSORIES",
     icon: "/toner-icon.png",
     description:
-      "Lorem ipsum dolor amet, consectetuer adipiscing. Augdet quam ult amet.",
+      "Lorem ipsum dolor amet, consectetuer adipiscing. Augide quam ult ame.",
   },
   {
-    title: "PARTS",
+    title: "MAINTENANCE",
     icon: "/parts-icon.png",
     description:
-      "Lorem ipsum dolor amet, consectetuer adipiscing. Augide quam ult ame.",
+      "Lorem ipsum dolor amet, consectetuer adipiscing. Augdet quam ult amet.",
   },
 ];
 
