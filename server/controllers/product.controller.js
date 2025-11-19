@@ -12,7 +12,7 @@ module.exports = {
       q, // name contains
       model, // copier model prefix search
       category, // "copier" | "part" | "toner"
-      visibility, // default "active"
+      visibility,
       inStock, // "true"/"false"
       rentable, // "true"/"false"
       minPrice, // filter by purchasePrice
@@ -41,7 +41,9 @@ module.exports = {
     const filter = {};
 
     // visibility default
-    filter.visibility = visibility || "active";
+    if (visibility) {
+      filter.visibility = visibility;
+    }
 
     if (category) filter.category = category;
 

@@ -1,21 +1,24 @@
-import React from "react";
+import { Link } from "react-router-dom";
 
 const features = [
   {
     title: "COPIERS",
     icon: "/copier-icon.png",
+    to: "/products",
     description:
       "Lorem ipsum dolor ag met, consectetuer adipiscing eli. Augdet quam ult amet.",
   },
   {
     title: "PARTS & ACCESSORIES",
     icon: "/toner-icon.png",
+    to: "/parts",
     description:
       "Lorem ipsum dolor amet, consectetuer adipiscing. Augide quam ult ame.",
   },
   {
     title: "MAINTENANCE",
     icon: "/parts-icon.png",
+    to: "/maintenance",
     description:
       "Lorem ipsum dolor amet, consectetuer adipiscing. Augdet quam ult amet.",
   },
@@ -51,9 +54,10 @@ export default function HomePage() {
 
       {/* PRODUCT FEATURES */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {features.map((feature, i) => (
-          <div
-            key={i}
+        {features.map((feature) => (
+          <Link
+            key={feature.to}
+            to={feature.to}
             className="bg-white rounded-xl shadow-lg p-6 text-center"
           >
             <img
@@ -65,7 +69,7 @@ export default function HomePage() {
               {feature.title}
             </h3>
             <p className="text-sm text-gray-600 mt-2">{feature.description}</p>
-          </div>
+          </Link>
         ))}
       </section>
     </div>

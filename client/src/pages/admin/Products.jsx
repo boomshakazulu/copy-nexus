@@ -1,66 +1,94 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AddProductModal from "../../components/admin/AddProductModal";
 import ProductCard from "../../components/ProductCard";
+import { http } from "../../utils/axios";
 
 export default function Products() {
-  const [items, setItems] = useState([
-    {
-      id: 1,
-      name: "Canon",
-      subtitle: "imageRUNNER 2425",
-      purchasePrice: 3200000,
-      rentPrice: 150000,
-      status: "in",
-      img: "/copier.png",
-    },
-    {
-      id: 2,
-      name: "Cyan Toner",
-      subtitle: "",
-      purchasePrice: 75000,
-      rentPrice: null,
-      status: "in",
-      img: "/toner-cyan.png",
-    },
-    {
-      id: 3,
-      name: "Drum Unit",
-      subtitle: "",
-      purchasePrice: 90000,
-      rentPrice: null,
-      status: "out",
-      img: "/drum.png",
-    },
-    {
-      id: 4,
-      name: "Kyocera ECOSYS",
-      subtitle: "M4125idn",
-      purchasePrice: 2700000,
-      rentPrice: 130000,
-      status: "in",
-      img: "/copier.png",
-    },
-    {
-      id: 5,
-      name: "Yellow toner",
-      subtitle: "",
-      purchasePrice: 50000,
-      rentPrice: null,
-      status: "in",
-      img: "/toner-yellow.svg",
-    },
-    {
-      id: 6,
-      name: "Feed Roller",
-      subtitle: "",
-      purchasePrice: 30000,
-      rentPrice: null,
-      status: "in",
-      img: "/feed-roller.png",
-    },
-  ]);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [copiers, setCopiers] = useState([]);
 
-  const [showAdd, setShowAdd] = useState(false);
+  const [items, setItems] = useState({
+    data: [],
+    pagination: { total: 0, page: 1, limit: 20, hasNext: false },
+    sort: { field: "createdAt", order: "desc" },
+    filter: {},
+  });
+
+  const fetchCopiers = async () => {
+    try {
+      const copiers = await http.get("/products", {
+        params: {
+          category: "copier",
+          search: "canon",
+          limit: 20,
+        },
+      });
+      console.log(copiers.data);
+      if (copiers.data) {
+        setItems(copiers.data);
+        setCopiers(copiers.data.data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCopiers();
+  }, []);
+
+  const handleProduct = async (product) => {
+    if (product) {
+      if (product.isNew) {
+        try {
+          const res = await http.post("/products", product);
+          const savedProduct = res.data;
+          ("");
+          if (savedProduct.category === "copier") {
+            setCopiers((prev) => {
+              if (!prev) {
+                return [savedProduct];
+              }
+              return [savedProduct, ...prev];
+            });
+          }
+
+          setItems((prev) => {
+            if (!prev) {
+              // Just in case items was null initially
+              return {
+                data: [savedProduct],
+                pagination: { total: 1, page: 1, limit: 20, hasNext: false },
+                sort: { field: "createdAt", order: "desc" },
+                filter: {},
+              };
+            }
+
+            const prevData = prev.data || [];
+            const prevPagination = prev.pagination || {};
+            const limit = prevPagination.limit ?? 20;
+            const newTotal = (prevPagination.total ?? prevData.length) + 1;
+
+            return {
+              ...prev,
+              data: [savedProduct, ...prevData],
+              pagination: {
+                ...prevPagination,
+                total: newTotal,
+                hasNext: newTotal > limit,
+              },
+            };
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        return;
+      }
+    } else {
+      return;
+    }
+  };
 
   return (
     <div className="bg-white p-6 rounded w-full h-full">
@@ -70,7 +98,7 @@ export default function Products() {
           Products
         </h1>
         <button
-          onClick={() => setShowAdd(true)}
+          onClick={() => setIsAddOpen(true)}
           className="bg-[#00294D] hover:bg-[#003B66] text-white px-5 py-2 rounded-lg text-sm font-semibold shadow-sm"
         >
           + Add Product
@@ -79,17 +107,20 @@ export default function Products() {
 
       {/* …filters + search… */}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {items.map((p) => (
-          <ProductCard key={p.id} {...p} />
-        ))}
-      </div>
+      {items.data && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {items.data.map((p) => (
+            <ProductCard key={p._id} {...p} />
+          ))}
+        </div>
+      )}
 
       {/* Modal */}
       <AddProductModal
-        isOpen={showAdd}
-        onClose={() => setShowAdd(false)}
-        onSubmit={(product) => setItems((prev) => [product, ...prev])}
+        isOpen={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
+        onSubmit={handleProduct}
+        copierOptions={copiers}
       />
     </div>
   );

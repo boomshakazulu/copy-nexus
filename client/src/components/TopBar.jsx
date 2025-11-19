@@ -115,7 +115,16 @@ export default function TopBar() {
                   Logout
                 </button>
               )}
-              {isAdmin && <Link to="/admin">Admin</Link>}
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  onClick={(e) => {
+                    (e.stopPropagation(), setMenuOpen(false));
+                  }}
+                >
+                  Admin
+                </Link>
+              )}
               {/* <Link to="/billing" onClick={() => setMenuOpen(false)}>
                 Billing
               </Link> */}

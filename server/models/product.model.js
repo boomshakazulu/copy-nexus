@@ -9,11 +9,19 @@ const productSchema = new Schema(
     subtitle: {
       type: String,
     },
-    copierModel: {
+    model: {
+      type: String,
+    },
+    model_norm: {
+      type: String,
+      index: true,
+    },
+    compatibleCopiers: {
       type: [String],
       default: [],
+      index: true,
     },
-    copierModel_norm: {
+    compatibleCopiers_norm: {
       type: [String],
       default: [],
       index: true,
@@ -78,7 +86,8 @@ const normMany = (v) =>
 
 // keep normalized in sync
 productSchema.pre("save", function (next) {
-  this.copierModel_norm = normMany(this.copierModel);
+  this.model_norm = normOne(this.model);
+  this.compatibleCopiers_norm = normMany(this.compatibleCopiers);
   next();
 });
 
@@ -86,15 +95,27 @@ productSchema.pre("findOneAndUpdate", function (next) {
   const u = this.getUpdate() || {};
   const $set = u.$set || u;
 
-  if ($set.copierModel != null) {
-    $set.copierModel_norm = normMany($set.copierModel);
-    if (u.$set) u.$set = $set;
-    else Object.assign(u, $set);
-    this.setUpdate(u);
+  if ($set.model != null) {
+    $set.model_norm = normOne($set.model);
   }
+
+  if ($set.compatibleCopiers != null) {
+    $set.compatibleCopiers_norm = normMany($set.compatibleCopiers);
+  }
+
+  if (u.$set) u.$set = $set;
+  else Object.assign(u, $set);
+
+  this.setUpdate(u);
   next();
 });
 
-productSchema.index({ name: 1, category: 1, visibility: 1 });
+productSchema.index({
+  name: 1,
+  category: 1,
+  visibility: 1,
+  model_norm: 1,
+  compatibleCopiers_norm: 1,
+});
 
 module.exports = model("Product", productSchema);

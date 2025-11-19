@@ -5,16 +5,14 @@ export default function ProductCard({
   subtitle,
   purchasePrice,
   rentPrice,
-  status,
-  img,
+  inStock,
+  images,
 }) {
-  const inStock = status === "in";
-
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
       {/* Image */}
       <div className="mb-4 grid place-items-center rounded-lg bg-[#F8FAFC] p-6">
-        <img src={img} alt={name} className="h-28 object-contain" />
+        <img src={images[0]} alt={name} className="h-28 object-contain" />
       </div>
 
       {/* Title & subtitle */}
