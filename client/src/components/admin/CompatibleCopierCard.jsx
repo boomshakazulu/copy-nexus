@@ -1,7 +1,7 @@
 export default function CompatibleCopierCard({ copier, checked, onToggle }) {
-  const { name, modelNumber, subtitle, images } = copier;
+  const { name, model, subtitle, images } = copier;
 
-  const displayModel = modelNumber || subtitle || "No model number";
+  const displayModel = model || subtitle || "No model number";
 
   return (
     <li
