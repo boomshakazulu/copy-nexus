@@ -2,10 +2,13 @@ import { useState, useEffect } from "react";
 import AddProductModal from "../../components/admin/AddProductModal";
 import ProductCard from "../../components/ProductCard";
 import { http } from "../../utils/axios";
+import EditProductModal from "../../components/admin/EditProductModal";
 
 export default function Products() {
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [copiers, setCopiers] = useState([]);
+  const [thisProduct, setThisProduct] = useState(null);
 
   const [items, setItems] = useState({
     data: [],
@@ -36,6 +39,21 @@ export default function Products() {
   useEffect(() => {
     fetchCopiers();
   }, []);
+
+  const openEditModal = async (p) => {
+    setThisProduct(p);
+    setIsEditOpen(true);
+  };
+
+  const handleEditProduct = async (updatedProduct) => {
+    if (updatedProduct) {
+      try {
+        console.log(updatedProduct);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
 
   const handleProduct = async (product) => {
     if (product) {
@@ -110,17 +128,30 @@ export default function Products() {
       {items.data && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.data.map((p) => (
-            <ProductCard key={p._id} {...p} />
+            <button
+              className="pointer-events-auto"
+              onClick={() => openEditModal(p)}
+              key={p._id}
+            >
+              <ProductCard {...p} />
+            </button>
           ))}
         </div>
       )}
 
-      {/* Modal */}
+      {/* Modals */}
       <AddProductModal
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
         onSubmit={handleProduct}
         copierOptions={copiers}
+      />
+      <EditProductModal
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        onSubmit={handleEditProduct}
+        copierOptions={copiers}
+        thisProduct={thisProduct}
       />
     </div>
   );
