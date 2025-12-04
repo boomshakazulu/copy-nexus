@@ -186,7 +186,7 @@ export default function AddProductModal({
               {/* Subtitle / Model */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-[#00294D] mb-1">
-                  Subtitle / Model
+                  Subtitle
                 </label>
                 <input
                   value={subtitle}
@@ -357,7 +357,6 @@ export default function AddProductModal({
                               copier={c}
                               checked={checked}
                               onToggle={() => toggleCompatibleCopier(id)}
-                              images={c.images[0]}
                             />
                           );
                         })}
