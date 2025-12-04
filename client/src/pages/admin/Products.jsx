@@ -2,10 +2,14 @@ import { useState, useEffect } from "react";
 import AddProductModal from "../../components/admin/AddProductModal";
 import ProductCard from "../../components/ProductCard";
 import { http } from "../../utils/axios";
+import EditProductModal from "../../components/admin/EditProductModal";
+import auth from "../../utils/auth";
 
 export default function Products() {
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [copiers, setCopiers] = useState([]);
+  const [thisProduct, setThisProduct] = useState(null);
 
   const [items, setItems] = useState({
     data: [],
@@ -19,8 +23,6 @@ export default function Products() {
       const copiers = await http.get("/products", {
         params: {
           category: "copier",
-          search: "canon",
-          limit: 20,
         },
       });
       console.log(copiers.data);
@@ -37,18 +39,65 @@ export default function Products() {
     fetchCopiers();
   }, []);
 
+  const openEditModal = async (p) => {
+    setThisProduct(p);
+    setIsEditOpen(true);
+  };
+
+  const handleEditProduct = async (updatedProduct) => {
+    if (updatedProduct) {
+      try {
+        const token = auth.getToken();
+        const res = await http.put("/admin/product", updatedProduct, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        const saved = res.data;
+
+        if (saved) {
+          setItems((prev) => {
+            if (!prev || !Array.isArray(prev.data)) {
+              // nothing to update, keep previous state
+              return prev;
+            }
+
+            const updatedData = prev.data.map((p) =>
+              p._id === saved._id ? { ...p, ...saved } : p
+            );
+
+            return {
+              ...prev,
+              data: updatedData,
+            };
+          });
+
+          console.log(res.data);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
+
   const handleProduct = async (product) => {
     if (product) {
       if (product.isNew) {
         try {
-          const res = await http.post("/products", product);
+          const token = auth.getToken();
+          const res = await http.post("/admin/product", product, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
           const savedProduct = res.data;
           ("");
           if (savedProduct.category === "copier") {
             setCopiers((prev) => {
-              if (!prev) {
-                return [savedProduct];
-              }
+              if (!prev) return [savedProduct];
               return [savedProduct, ...prev];
             });
           }
@@ -110,17 +159,30 @@ export default function Products() {
       {items.data && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.data.map((p) => (
-            <ProductCard key={p._id} {...p} />
+            <button
+              className="pointer-events-auto"
+              onClick={() => openEditModal(p)}
+              key={p._id}
+            >
+              <ProductCard {...p} />
+            </button>
           ))}
         </div>
       )}
 
-      {/* Modal */}
+      {/* Modals */}
       <AddProductModal
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
         onSubmit={handleProduct}
         copierOptions={copiers}
+      />
+      <EditProductModal
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        onSubmit={handleEditProduct}
+        copierOptions={copiers}
+        thisProduct={thisProduct}
       />
     </div>
   );

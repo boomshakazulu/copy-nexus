@@ -5,17 +5,18 @@ import RichTextField from "./RichTextField";
 import CompatibleCopierCard from "./CompatibleCopierCard";
 import Auth from "../../utils/auth";
 
-export default function AddProductModal({
+export default function EditProductModal({
   isOpen,
   onClose,
   onSubmit,
   copierOptions = [], // ← array of copiers from DB
+  thisProduct,
 }) {
   const [name, setName] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [model, setModel] = useState("");
   const [category, setCategory] = useState("copier"); // copiers | parts | toner
-  const [inStock, setInStock] = useState(true); // in | out
+  const [inStock, setInStock] = useState(true);
   const [description, setDescription] = useState("");
   const [visibility, setVisibility] = useState("active");
 
@@ -27,7 +28,7 @@ export default function AddProductModal({
   const [editingRent, setEditingRent] = useState(false);
 
   // Compatible copiers (for parts/toner)
-  const [compatibleCopiers, setCompatibleCopiers] = useState([]); // array of copier ids
+  const [compatibleCopiers, setCompatibleCopiers] = useState([]);
 
   // Images
   const [images, setImages] = useState([]); // array of URLs
@@ -36,21 +37,21 @@ export default function AddProductModal({
 
   useEffect(() => {
     if (isOpen) {
-      setName("");
-      setSubtitle("");
-      setModel("");
-      setCategory("copier");
-      setInStock(true);
-      setPurchasePrice("");
-      setRentable(true);
-      setRentPrice("");
-      setImages([]);
+      setName(thisProduct.name || "");
+      setSubtitle(thisProduct.subtitle || "");
+      setModel(thisProduct.model || "");
+      setCategory(thisProduct.Category || "copier");
+      setInStock(thisProduct.inStock || true);
+      setPurchasePrice(thisProduct.purchasePrice?.toString() || "");
+      setRentable(thisProduct.rentable || true);
+      setRentPrice(thisProduct.rentPrice?.toString() || "");
+      setImages(thisProduct.images || []);
       setNewImageUrl("");
-      setDescription("");
-      setCompatibleCopiers([]);
-      setVisibility("active");
+      setDescription(thisProduct.description || "");
+      setCompatibleCopiers(thisProduct.compatibleCopiers || []);
+      setVisibility(thisProduct.visibility || "active");
     }
-  }, [isOpen]);
+  }, [isOpen, thisProduct]);
 
   if (!isOpen) return null;
 
@@ -80,7 +81,8 @@ export default function AddProductModal({
     e.preventDefault();
     if (!canSave || !Auth.isAdmin()) return;
 
-    const product = {
+    const updatedProduct = {
+      _id: thisProduct._id,
       isNew: true,
       name: name.trim(),
       subtitle: subtitle.trim(),
@@ -95,7 +97,7 @@ export default function AddProductModal({
       compatibleCopiers: category === "copier" ? [] : compatibleCopiers,
     };
 
-    onSubmit?.(product);
+    onSubmit?.(updatedProduct);
     onClose?.();
   };
 
@@ -156,7 +158,7 @@ export default function AddProductModal({
         <div className="w-full max-w-2xl max-h-[90vh] rounded-xl bg-white shadow-xl flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between border-b px-6 py-4">
-            <h2 className="text-xl font-bold text-[#00294D]">Add Product</h2>
+            <h2 className="text-xl font-bold text-[#00294D]">Edit Product</h2>
             <button
               onClick={onClose}
               className="p-2 rounded hover:bg-gray-100"
@@ -256,8 +258,8 @@ export default function AddProductModal({
                   onChange={(e) => setInStock(e.target.value)}
                   className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
                 >
-                  <option value={true}>In Stock</option>
-                  <option value={false}>Out of Stock</option>
+                  <option value="in">In Stock</option>
+                  <option value="out">Out of Stock</option>
                 </select>
                 <span className="block text-sm font-semibold text-[#00294D] mb-1 mt-4">
                   Visibility

@@ -25,12 +25,12 @@ export default function ProductCard({
 
       {/* Prices */}
       <div className="mb-4 space-y-1">
-        <div className="text-lg font-bold text-[#00294D]">
+        <div className="text-lg font-bold text-[#00294D] text-nowrap">
           Purchase:{" "}
           <span className="font-extrabold">{formatCOP(purchasePrice)}</span>
         </div>
         {rentPrice && (
-          <div className="text-sm font-semibold text-[#555]">
+          <div className="text-sm font-semibold text-[#555] text-nowrap">
             Rent:{" "}
             <span className="font-bold text-[#00294D]">
               {formatCOP(rentPrice)}
