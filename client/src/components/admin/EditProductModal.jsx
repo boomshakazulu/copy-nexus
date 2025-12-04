@@ -16,8 +16,9 @@ export default function EditProductModal({
   const [subtitle, setSubtitle] = useState("");
   const [model, setModel] = useState("");
   const [category, setCategory] = useState("copier"); // copiers | parts | toner
-  const [inStock, setInStock] = useState(true); // in | out
+  const [inStock, setInStock] = useState(true);
   const [description, setDescription] = useState("");
+  const [visibility, setVisibility] = useState("active");
 
   // COP fields + editing flags
   const [purchasePrice, setPurchasePrice] = useState("");
@@ -27,7 +28,7 @@ export default function EditProductModal({
   const [editingRent, setEditingRent] = useState(false);
 
   // Compatible copiers (for parts/toner)
-  const [compatibleCopiers, setCompatibleCopiers] = useState([]); // array of copier ids
+  const [compatibleCopiers, setCompatibleCopiers] = useState([]);
 
   // Images
   const [images, setImages] = useState([]); // array of URLs
@@ -48,6 +49,7 @@ export default function EditProductModal({
       setNewImageUrl("");
       setDescription(thisProduct.description || "");
       setCompatibleCopiers(thisProduct.compatibleCopiers || []);
+      setVisibility(thisProduct.visibility || "active");
     }
   }, [isOpen, thisProduct]);
 
@@ -80,6 +82,7 @@ export default function EditProductModal({
     if (!canSave || !Auth.isAdmin()) return;
 
     const updatedProduct = {
+      _id: thisProduct._id,
       isNew: true,
       name: name.trim(),
       subtitle: subtitle.trim(),
@@ -88,7 +91,7 @@ export default function EditProductModal({
       purchasePrice: Number(purchasePrice),
       rentPrice: rentable ? Number(rentPrice) : null,
       inStock,
-      visibility: "active",
+      visibility,
       category,
       images,
       compatibleCopiers: category === "copier" ? [] : compatibleCopiers,
@@ -257,6 +260,17 @@ export default function EditProductModal({
                 >
                   <option value="in">In Stock</option>
                   <option value="out">Out of Stock</option>
+                </select>
+                <span className="block text-sm font-semibold text-[#00294D] mb-1 mt-4">
+                  Visibility
+                </span>
+                <select
+                  value={visibility}
+                  onChange={(e) => setVisibility(e.target.value)}
+                  className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
+                >
+                  <option value="active">Active</option>
+                  <option value="archived">Archived</option>
                 </select>
               </div>
 

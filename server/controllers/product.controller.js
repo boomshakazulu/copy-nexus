@@ -116,6 +116,20 @@ module.exports = {
 
   async createProduct(req, res) {
     const product = await Product.create(req.body);
-    return res.status(201).json(product);
+    return res.status(201).json(product, { runValidators: true });
+  },
+  async updateProduct(req, res) {
+    const { _id, ...updates } = req.body;
+
+    const product = await Product.findByIdAndUpdate(_id, updates, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    return res.status(200).json(product);
   },
 };

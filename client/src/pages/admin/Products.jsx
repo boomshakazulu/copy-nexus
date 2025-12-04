@@ -3,6 +3,7 @@ import AddProductModal from "../../components/admin/AddProductModal";
 import ProductCard from "../../components/ProductCard";
 import { http } from "../../utils/axios";
 import EditProductModal from "../../components/admin/EditProductModal";
+import auth from "../../utils/auth";
 
 export default function Products() {
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -22,8 +23,6 @@ export default function Products() {
       const copiers = await http.get("/products", {
         params: {
           category: "copier",
-          search: "canon",
-          limit: 20,
         },
       });
       console.log(copiers.data);
@@ -48,7 +47,35 @@ export default function Products() {
   const handleEditProduct = async (updatedProduct) => {
     if (updatedProduct) {
       try {
-        console.log(updatedProduct);
+        const token = auth.getToken();
+        const res = await http.put("/admin/product", updatedProduct, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        const saved = res.data;
+
+        if (saved) {
+          setItems((prev) => {
+            if (!prev || !Array.isArray(prev.data)) {
+              // nothing to update, keep previous state
+              return prev;
+            }
+
+            const updatedData = prev.data.map((p) =>
+              p._id === saved._id ? { ...p, ...saved } : p
+            );
+
+            return {
+              ...prev,
+              data: updatedData,
+            };
+          });
+
+          console.log(res.data);
+        }
       } catch (err) {
         console.log(err);
       }
@@ -59,14 +86,18 @@ export default function Products() {
     if (product) {
       if (product.isNew) {
         try {
-          const res = await http.post("/products", product);
+          const token = auth.getToken();
+          const res = await http.post("/admin/product", product, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
           const savedProduct = res.data;
           ("");
           if (savedProduct.category === "copier") {
             setCopiers((prev) => {
-              if (!prev) {
-                return [savedProduct];
-              }
+              if (!prev) return [savedProduct];
               return [savedProduct, ...prev];
             });
           }

@@ -17,6 +17,7 @@ export default function AddProductModal({
   const [category, setCategory] = useState("copier"); // copiers | parts | toner
   const [inStock, setInStock] = useState(true); // in | out
   const [description, setDescription] = useState("");
+  const [visibility, setVisibility] = useState("active");
 
   // COP fields + editing flags
   const [purchasePrice, setPurchasePrice] = useState("");
@@ -47,6 +48,7 @@ export default function AddProductModal({
       setNewImageUrl("");
       setDescription("");
       setCompatibleCopiers([]);
+      setVisibility("active");
     }
   }, [isOpen]);
 
@@ -87,7 +89,7 @@ export default function AddProductModal({
       purchasePrice: Number(purchasePrice),
       rentPrice: rentable ? Number(rentPrice) : null,
       inStock,
-      visibility: "active",
+      visibility,
       category,
       images,
       compatibleCopiers: category === "copier" ? [] : compatibleCopiers,
@@ -254,8 +256,19 @@ export default function AddProductModal({
                   onChange={(e) => setInStock(e.target.value)}
                   className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
                 >
-                  <option value="in">In Stock</option>
-                  <option value="out">Out of Stock</option>
+                  <option value={true}>In Stock</option>
+                  <option value={false}>Out of Stock</option>
+                </select>
+                <span className="block text-sm font-semibold text-[#00294D] mb-1 mt-4">
+                  Visibility
+                </span>
+                <select
+                  value={visibility}
+                  onChange={(e) => setVisibility(e.target.value)}
+                  className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
+                >
+                  <option value="active">Active</option>
+                  <option value="archived">Archived</option>
                 </select>
               </div>
 
