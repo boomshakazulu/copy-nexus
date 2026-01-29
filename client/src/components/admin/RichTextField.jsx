@@ -1,11 +1,10 @@
 import React from "react";
+import { useI18n } from "../../i18n";
 
-export default function RichTextField({
-  value,
-  onChange,
-  placeholder = "Write a description…",
-}) {
+export default function RichTextField({ value, onChange, placeholder }) {
+  const { t } = useI18n();
   const ref = React.useRef(null);
+  const resolvedPlaceholder = placeholder ?? t("admin.richText.placeholder");
 
   // Use deprecated execCommand for simplicity (works fine for basic formatting)
   const exec = (cmd, arg = null) => {
@@ -14,7 +13,7 @@ export default function RichTextField({
   };
 
   const addLink = () => {
-    const url = prompt("Enter URL:");
+    const url = prompt(t("admin.richText.enterUrl"));
     if (!url) return;
     exec("createLink", url);
   };
@@ -55,21 +54,21 @@ export default function RichTextField({
           onClick={() => exec("insertUnorderedList")}
           className="rounded border px-2 py-1 text-sm hover:bg-gray-50"
         >
-          • List
+          {t("admin.richText.unorderedList")}
         </button>
         <button
           type="button"
           onClick={() => exec("insertOrderedList")}
           className="rounded border px-2 py-1 text-sm hover:bg-gray-50"
         >
-          1. List
+          {t("admin.richText.orderedList")}
         </button>
         <button
           type="button"
           onClick={addLink}
           className="rounded border px-2 py-1 text-sm hover:bg-gray-50"
         >
-          Link
+          {t("admin.richText.link")}
         </button>
         <span className="mx-1 h-4 w-px bg-gray-300" />
         <button
@@ -77,7 +76,7 @@ export default function RichTextField({
           onClick={clear}
           className="rounded border px-2 py-1 text-sm hover:bg-gray-50"
         >
-          Clear
+          {t("admin.richText.clear")}
         </button>
       </div>
 
@@ -90,7 +89,7 @@ export default function RichTextField({
         onBlur={(e) => onChange(e.currentTarget.innerHTML)}
         // keep editor synced when opening modal with existing value
         dangerouslySetInnerHTML={{ __html: value || "" }}
-        data-placeholder={placeholder}
+        data-placeholder={resolvedPlaceholder}
         style={{ whiteSpace: "pre-wrap" }}
       />
       <style>{`

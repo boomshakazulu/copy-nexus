@@ -4,8 +4,10 @@ import ProductCard from "../../components/ProductCard";
 import { http } from "../../utils/axios";
 import EditProductModal from "../../components/admin/EditProductModal";
 import auth from "../../utils/auth";
+import { useI18n } from "../../i18n";
 
 export default function Products() {
+  const { t } = useI18n();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [copiers, setCopiers] = useState([]);
@@ -144,13 +146,13 @@ export default function Products() {
       {/* Header */}
       <div className="flex flex-wrap justify-between items-center mb-6">
         <h1 className="text-4xl font-extrabold tracking-tight text-[#00294D]">
-          Products
+          {t("admin.products.title")}
         </h1>
         <button
           onClick={() => setIsAddOpen(true)}
           className="bg-[#00294D] hover:bg-[#003B66] text-white px-5 py-2 rounded-lg text-sm font-semibold shadow-sm"
         >
-          + Add Product
+          {t("admin.products.addProduct")}
         </button>
       </div>
 
@@ -160,7 +162,7 @@ export default function Products() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.data.map((p) => (
             <button
-              className="pointer-events-auto"
+              className="pointer-events-auto h-full"
               onClick={() => openEditModal(p)}
               key={p._id}
             >

@@ -4,18 +4,20 @@ import { formatCOP } from "../../utils/helpers";
 import RichTextField from "./RichTextField";
 import CompatibleCopierCard from "./CompatibleCopierCard";
 import Auth from "../../utils/auth";
+import { useI18n } from "../../i18n";
 
 export default function AddProductModal({
   isOpen,
   onClose,
   onSubmit,
-  copierOptions = [], // ← array of copiers from DB
+  copierOptions = [],
 }) {
+  const { t } = useI18n();
   const [name, setName] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [model, setModel] = useState("");
-  const [category, setCategory] = useState("copier"); // copiers | parts | toner
-  const [inStock, setInStock] = useState(true); // in | out
+  const [category, setCategory] = useState("copier");
+  const [inStock, setInStock] = useState(true);
   const [description, setDescription] = useState("");
   const [visibility, setVisibility] = useState("active");
 
@@ -27,11 +29,11 @@ export default function AddProductModal({
   const [editingRent, setEditingRent] = useState(false);
 
   // Compatible copiers (for parts/toner)
-  const [compatibleCopiers, setCompatibleCopiers] = useState([]); // array of copier ids
+  const [compatibleCopiers, setCompatibleCopiers] = useState([]);
 
   // Images
-  const [images, setImages] = useState([]); // array of URLs
-  const [newImageUrl, setNewImageUrl] = useState(""); // input below previews
+  const [images, setImages] = useState([]);
+  const [newImageUrl, setNewImageUrl] = useState("");
   const dragIndexRef = useRef(null);
 
   useEffect(() => {
@@ -85,8 +87,9 @@ export default function AddProductModal({
       name: name.trim(),
       subtitle: subtitle.trim(),
       model,
-      description: description, // ← rich HTML
+      description,
       purchasePrice: Number(purchasePrice),
+      rentable,
       rentPrice: rentable ? Number(rentPrice) : null,
       inStock,
       visibility,
@@ -135,11 +138,17 @@ export default function AddProductModal({
     dragIndexRef.current = null;
   };
 
-  //Compatible copiers checkbox toggle
+  // Compatible copiers checkbox toggle
   const toggleCompatibleCopier = (id) => {
     setCompatibleCopiers((prev) =>
       prev.includes(id) ? prev.filter((cId) => cId !== id) : [...prev, id]
     );
+  };
+
+  const categoryLabels = {
+    copier: t("admin.forms.categories.copier"),
+    part: t("admin.forms.categories.part"),
+    toner: t("admin.forms.categories.toner"),
   };
 
   return (
@@ -156,11 +165,13 @@ export default function AddProductModal({
         <div className="w-full max-w-2xl max-h-[90vh] rounded-xl bg-white shadow-xl flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between border-b px-6 py-4">
-            <h2 className="text-xl font-bold text-[#00294D]">Add Product</h2>
+            <h2 className="text-xl font-bold text-[#00294D]">
+              {t("admin.forms.addProductTitle")}
+            </h2>
             <button
               onClick={onClose}
               className="p-2 rounded hover:bg-gray-100"
-              aria-label="Close"
+              aria-label={t("admin.forms.close")}
             >
               <X className="w-5 h-5" />
             </button>
@@ -175,57 +186,56 @@ export default function AddProductModal({
               {/* Name */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-[#00294D] mb-1">
-                  Name
+                  {t("admin.forms.name")}
                 </label>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
-                  placeholder="e.g., Canon imageRUNNER 2425"
+                  placeholder={t("admin.forms.namePlaceholder")}
                 />
               </div>
 
               {/* Subtitle / Model */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-[#00294D] mb-1">
-                  Subtitle
+                  {t("admin.forms.subtitle")}
                 </label>
                 <input
                   value={subtitle}
                   onChange={(e) => setSubtitle(e.target.value)}
                   className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
-                  placeholder="Optional (e.g., M4125idn)"
+                  placeholder={t("admin.forms.subtitlePlaceholder")}
                 />
               </div>
               {/* Model */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-[#00294D] mb-1">
-                  Model Number
+                  {t("admin.forms.modelNumber")}
                 </label>
                 <input
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
                   className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
-                  placeholder="required(e.g., M4125idn)"
+                  placeholder={t("admin.forms.modelPlaceholder")}
                 />
               </div>
 
               {/* Description (rich text) */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-[#00294D] mb-1">
-                  Description
+                  {t("admin.forms.description")}
                 </label>
                 <RichTextField value={description} onChange={setDescription} />
                 <p className="mt-1 text-xs text-gray-500">
-                  Use bold, italic, lists, and links. You can paste
-                  text—formatting will be preserved.
+                  {t("admin.forms.descriptionHint")}
                 </p>
               </div>
 
               {/* Category */}
               <div>
                 <span className="block text-sm font-semibold text-[#00294D] mb-1">
-                  Category
+                  {t("admin.forms.category")}
                 </span>
                 <div className="flex items-center gap-4">
                   {["copier", "part", "toner"].map((c) => (
@@ -240,7 +250,7 @@ export default function AddProductModal({
                         checked={category === c}
                         onChange={() => handleCategoryChange(c)}
                       />
-                      <span className="capitalize">{c}</span>
+                      <span>{categoryLabels[c]}</span>
                     </label>
                   ))}
                 </div>
@@ -249,33 +259,33 @@ export default function AddProductModal({
               {/* Stock */}
               <div>
                 <span className="block text-sm font-semibold text-[#00294D] mb-1">
-                  Stock
+                  {t("admin.forms.stock")}
                 </span>
                 <select
-                  value={inStock}
-                  onChange={(e) => setInStock(e.target.value)}
+                  value={String(inStock)}
+                  onChange={(e) => setInStock(e.target.value === "true")}
                   className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
                 >
-                  <option value={true}>In Stock</option>
-                  <option value={false}>Out of Stock</option>
+                  <option value="true">{t("admin.forms.inStock")}</option>
+                  <option value="false">{t("admin.forms.outOfStock")}</option>
                 </select>
                 <span className="block text-sm font-semibold text-[#00294D] mb-1 mt-4">
-                  Visibility
+                  {t("admin.forms.visibility")}
                 </span>
                 <select
                   value={visibility}
                   onChange={(e) => setVisibility(e.target.value)}
                   className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
                 >
-                  <option value="active">Active</option>
-                  <option value="archived">Archived</option>
+                  <option value="active">{t("admin.forms.active")}</option>
+                  <option value="archived">{t("admin.forms.archived")}</option>
                 </select>
               </div>
 
               {/* Purchase Price (COP) */}
               <div>
                 <label className="block text-sm font-semibold text-[#00294D] mb-1">
-                  Purchase Price (COP)
+                  {t("admin.forms.purchasePrice")}
                 </label>
                 <input
                   type="text"
@@ -311,7 +321,7 @@ export default function AddProductModal({
                       htmlFor="rentable"
                       className="text-sm text-[#00294D] font-semibold"
                     >
-                      Available for Rent
+                      {t("admin.forms.rentable")}
                     </label>
                   </div>
 
@@ -322,7 +332,7 @@ export default function AddProductModal({
                     } transition-opacity`}
                   >
                     <label className="block text-sm font-semibold text-[#00294D] mb-1">
-                      Rent Price (COP / month)
+                      {t("admin.forms.rentPrice")}
                     </label>
                     <input
                       type="text"
@@ -349,18 +359,17 @@ export default function AddProductModal({
               {category !== "copier" && (
                 <div className="md:col-span-2">
                   <label className="block text-sm font-semibold text-[#00294D] mb-1">
-                    Compatible Copiers
+                    {t("admin.forms.compatibleCopiers")}
                   </label>
 
                   <div className="max-h-64 overflow-y-auto rounded border border-gray-300">
                     {copierOptions.length === 0 ? (
                       <div className="px-3 py-2 text-sm text-gray-500">
-                        No copiers found.
+                        {t("admin.forms.noCopiers")}
                       </div>
                     ) : (
                       <ul className="divide-y divide-gray-200">
                         {copierOptions.map((c) => {
-                          // if your backend uses _id, you can swap to c._id here
                           const id = c.id ?? c._id;
                           const checked = compatibleCopiers.includes(id);
 
@@ -377,7 +386,7 @@ export default function AddProductModal({
                     )}
                   </div>
                   <p className="mt-1 text-xs text-gray-500">
-                    Tap to add or remove compatible copiers.
+                    {t("admin.forms.compatibleHint")}
                   </p>
                 </div>
               )}
@@ -385,7 +394,7 @@ export default function AddProductModal({
               {/* Images: previews + add another URL */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-[#00294D] mb-2">
-                  Images
+                  {t("admin.forms.images")}
                 </label>
 
                 {/* Thumbs */}
@@ -399,7 +408,7 @@ export default function AddProductModal({
                         onDragStart={onDragStart(idx)}
                         onDragOver={onDragOver}
                         onDrop={onDrop(idx)}
-                        title="Drag to reorder"
+                        title={t("admin.forms.dragToReorder")}
                       >
                         {/* img */}
                         <img
@@ -415,8 +424,8 @@ export default function AddProductModal({
                           type="button"
                           onClick={() => removeImage(idx)}
                           className="absolute -top-2 -right-2 rounded-full bg-white shadow p-1 hover:bg-gray-50"
-                          aria-label="Remove image"
-                          title="Remove image"
+                          aria-label={t("admin.forms.removeImage")}
+                          title={t("admin.forms.removeImage")}
                         >
                           <X className="h-4 w-4 text-gray-700" />
                         </button>
@@ -432,7 +441,7 @@ export default function AddProductModal({
                     value={newImageUrl}
                     onChange={(e) => setNewImageUrl(e.target.value)}
                     className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
-                    placeholder="https://image-url.jpg"
+                    placeholder={t("admin.forms.imageUrlPlaceholder")}
                   />
                   <button
                     type="button"
@@ -440,13 +449,12 @@ export default function AddProductModal({
                     className="rounded bg-[#00294D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#003B66] disabled:opacity-50"
                     disabled={!newImageUrl.trim()}
                   >
-                    Add
+                    {t("admin.forms.addImage")}
                   </button>
                 </div>
 
                 <p className="mt-1 text-xs text-gray-500">
-                  Drag thumbnails to change order. First image becomes the
-                  product’s primary image.
+                  {t("admin.forms.dragHint")}
                 </p>
               </div>
             </div>
@@ -458,14 +466,14 @@ export default function AddProductModal({
                 onClick={onClose}
                 className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold hover:bg-gray-50"
               >
-                Cancel
+                {t("admin.forms.cancel")}
               </button>
               <button
                 type="submit"
                 disabled={!canSave}
                 className="rounded-lg bg-[#00294D] px-5 py-2 text-sm font-semibold text-white hover:bg-[#003B66] disabled:opacity-50"
               >
-                Save Product
+                {t("admin.forms.saveProduct")}
               </button>
             </div>
           </form>

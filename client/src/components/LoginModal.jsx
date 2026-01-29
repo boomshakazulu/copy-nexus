@@ -2,8 +2,10 @@ import { Mail, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { http } from "../utils/axios";
 import Auth from "../utils/auth";
+import { useI18n } from "../i18n";
 
 export default function LoginModal({ isOpen, onClose, showSignup }) {
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -32,13 +34,13 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
         const msg = err.message || "";
 
         if (msg.includes("Invalid credentials")) {
-          passwordField.setCustomValidity("Invalid Username or password");
+          passwordField.setCustomValidity(t("auth.errors.invalidCredentials"));
           passwordField.reportValidity();
           return;
-        } else {
-          passwordField.setCustomValidity("There was a problem logging in.");
-          passwordField.reportValidity();
         }
+
+        passwordField.setCustomValidity(t("auth.errors.loginProblem"));
+        passwordField.reportValidity();
       }
     }
   };
@@ -57,19 +59,19 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
         {/* Logo */}
         <img
           src="/logo-cropped.png"
-          alt="Copy Nexus Logo"
+          alt={t("common.logoAlt")}
           className="h-20 mx-auto mb-6"
         />
 
         {/* Title */}
         <h1 className="text-3xl font-bold text-[#00294D] text-center mb-6">
-          Login
+          {t("auth.loginTitle")}
         </h1>
 
         {/* Form */}
         <form onSubmit={handleSubmit}>
           <label className="block text-[#00294D] font-semibold mb-1">
-            Email address
+            {t("auth.emailAddress")}
           </label>
           <div className="relative mb-4">
             <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
@@ -79,19 +81,19 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
               type="email"
               name="email"
               className="w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
-              placeholder="you@example.com"
+              placeholder={t("auth.emailPlaceholder")}
               onChange={(event) => setEmail(event.target.value)}
             />
           </div>
 
           <label className="block text-[#00294D] font-semibold mb-1">
-            Password
+            {t("auth.password")}
           </label>
           <input
             type="password"
             name="password"
             className="w-full mb-6 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
-            placeholder="••••••••"
+            placeholder={t("auth.passwordMask")}
             onChange={(event) => setPassword(event.target.value)}
             onInput={(e) => e.target.setCustomValidity("")}
           />
@@ -100,13 +102,13 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
             type="submit"
             className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-md"
           >
-            Log in
+            {t("auth.loginButton")}
           </button>
 
           <p className="mt-4 text-center text-sm text-gray-700">
-            Don’t have an account?{" "}
+            {t("auth.noAccount")}{" "}
             <button className="text-[#00294D] font-bold" onClick={showSignup}>
-              Sign up
+              {t("auth.signUpLink")}
             </button>
           </p>
         </form>

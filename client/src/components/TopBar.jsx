@@ -1,12 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import LoginModal from "./LoginModal";
 import SignupModal from "./SignupModal";
 import Auth from "../utils/auth";
+import { useI18n } from "../i18n";
 
 export default function TopBar() {
+  const { lang, setLang, t } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const langRef = useRef(null);
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
@@ -23,6 +27,17 @@ export default function TopBar() {
       return setLoggedIn(true);
     }
     setLoggedIn(false);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (langRef.current && !langRef.current.contains(event.target)) {
+        setLangOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   //shows login and closes menu on click
@@ -49,16 +64,53 @@ export default function TopBar() {
         {/* Logo */}
         <img
           src="/logo-cropped.png"
-          alt="Copy Nexus Logo"
+          alt={t("common.logoAlt")}
           className="h-16 md:h-20 w-auto object-contain"
         />
         <div className="flex gap-2 sm:gap-4 md:gap-6 pl-6 sm:pl-0 text-black font-medium text-sm">
           {/* Top Navigation - always visible */}
           <nav className="flex gap-2 sm:gap-4 md:gap-6 text-black font-medium text-sm">
-            <Link to="/">Home</Link>
-            <Link to="/products">Products</Link>
-            <Link to="/contact">Contact</Link>
+            <Link to="/">{t("nav.home")}</Link>
+            <Link to="/copiers">{t("nav.copiers")}</Link>
+            <Link to="/contact">{t("nav.contact")}</Link>
           </nav>
+
+          <div className="relative" ref={langRef}>
+            <button
+              type="button"
+              aria-label={t("language.label")}
+              onClick={() => setLangOpen((open) => !open)}
+              className="flex h-8 w-10 items-center justify-center rounded-md border border-gray-300 bg-white"
+            >
+              {lang === "es-419" ? <ColombiaFlag /> : <UsaFlag />}
+            </button>
+            {langOpen && (
+              <div className="absolute right-0 mt-2 w-24 rounded-md border border-gray-200 bg-white shadow-lg z-50">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLang("en");
+                    setLangOpen(false);
+                  }}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50"
+                >
+                  <UsaFlag />
+                  <span className="text-xs">EN</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLang("es-419");
+                    setLangOpen(false);
+                  }}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50"
+                >
+                  <ColombiaFlag />
+                  <span className="text-xs">ES</span>
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Hamburger menu - always visible */}
           <button onClick={() => setMenuOpen(!menuOpen)} className="text-black">
@@ -94,25 +146,25 @@ export default function TopBar() {
             onClick={(e) => e.stopPropagation()}
           >
             <nav className="flex flex-col gap-4 text-black font-medium text-base">
-              <Link to="/about">About Us</Link>
+              <Link to="/about">{t("nav.about")}</Link>
               {!loggedIn ? (
                 <div className="flex flex-col gap-4 text-black font-medium text-base">
                   <button
                     className="text-left"
                     onClick={() => showLoginModal()}
                   >
-                    Login
+                    {t("nav.login")}
                   </button>
                   <button
                     className="text-left"
                     onClick={() => showSignupModal()}
                   >
-                    Signup
+                    {t("nav.signup")}
                   </button>
                 </div>
               ) : (
                 <button className="text-left" onClick={() => Auth.logout()}>
-                  Logout
+                  {t("nav.logout")}
                 </button>
               )}
               {isAdmin && (
@@ -122,7 +174,7 @@ export default function TopBar() {
                     (e.stopPropagation(), setMenuOpen(false));
                   }}
                 >
-                  Admin
+                  {t("nav.admin")}
                 </Link>
               )}
               {/* <Link to="/billing" onClick={() => setMenuOpen(false)}>
@@ -133,5 +185,39 @@ export default function TopBar() {
         </div>
       )}
     </header>
+  );
+}
+
+function UsaFlag() {
+  return (
+    <svg
+      width="22"
+      height="14"
+      viewBox="0 0 22 14"
+      aria-hidden="true"
+      className="rounded-sm border border-gray-200"
+    >
+      <rect width="22" height="14" fill="#B22234" />
+      <rect y="2" width="22" height="2" fill="#FFFFFF" />
+      <rect y="6" width="22" height="2" fill="#FFFFFF" />
+      <rect y="10" width="22" height="2" fill="#FFFFFF" />
+      <rect width="9" height="8" fill="#3C3B6E" />
+    </svg>
+  );
+}
+
+function ColombiaFlag() {
+  return (
+    <svg
+      width="22"
+      height="14"
+      viewBox="0 0 22 14"
+      aria-hidden="true"
+      className="rounded-sm border border-gray-200"
+    >
+      <rect width="22" height="7" fill="#FCD116" />
+      <rect y="7" width="22" height="3.5" fill="#003893" />
+      <rect y="10.5" width="22" height="3.5" fill="#CE1126" />
+    </svg>
   );
 }

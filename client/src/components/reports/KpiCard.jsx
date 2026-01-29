@@ -8,9 +8,20 @@ const toneMap = {
   amber: "bg-[#FFF6D9]",
 };
 
-export default function KpiCard({ label, value, tone = "yellow", isMoney }) {
-  const Icon =
-    label === "Total Sales" ? DollarSign : label === "Orders" ? FileText : Tag;
+const iconMap = {
+  sales: DollarSign,
+  orders: FileText,
+  aov: Tag,
+};
+
+export default function KpiCard({
+  label,
+  value,
+  tone = "yellow",
+  isMoney,
+  kind = "sales",
+}) {
+  const Icon = iconMap[kind] || Tag;
 
   // --- Decide when to use short notation (K / MM) ---
   const [isNarrow, setIsNarrow] = useState(false);

@@ -1,0 +1,249 @@
+{
+  "language": {
+    "label": "Language",
+    "english": "English",
+    "spanishLatam": "Spanish (LatAm)"
+  },
+  "common": {
+    "logoAlt": "Copy Nexus Logo",
+    "copierImageAlt": "Copier"
+  },
+  "nav": {
+    "home": "Home",
+    "copiers": "Copiers",
+    "contact": "Contact",
+    "about": "About",
+    "admin": "Admin",
+    "login": "Login",
+    "signup": "Signup",
+    "logout": "Logout"
+  },
+  "home": {
+    "titleLine1": "COPIER",
+    "titleLine2": "STORE",
+    "subtitle": "Copier Rentals & Sales",
+    "features": {
+      "copiersTitle": "COPIERS",
+      "copiersDesc": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Augdet quam ult amet.",
+      "partsTitle": "PARTS & ACCESSORIES",
+      "partsDesc": "Lorem ipsum dolor amet, consectetuer adipiscing. Augide quam ult ame.",
+      "maintenanceTitle": "MAINTENANCE",
+      "maintenanceDesc": "Lorem ipsum dolor amet, consectetuer adipiscing. Augdet quam ult amet."
+    }
+  },
+  "copiers": {
+    "title": "Copiers for Sale",
+    "subtitle": "Browse our available copiers and compare rental and purchase options.",
+    "filterAll": "All Copiers",
+    "filterColor": "Color",
+    "filterMono": "Mono",
+    "filterHighVolume": "High Volume",
+    "searchPlaceholder": "Search by model number"
+  },
+  "productsPage": {
+    "title": "Products",
+    "category": "Category",
+    "copiers": "Copiers",
+    "parts": "Parts",
+    "toner": "Toner",
+    "searchPlaceholder": "Search by model number"
+  },
+  "product": {
+    "loading": "Loading product details...",
+    "loadFailed": "Failed to load product.",
+    "notFound": "Product not found.",
+    "backToListings": "Back to Listings",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "prev": "Prev",
+    "next": "Next",
+    "price": "Price",
+    "rent": "Rent",
+    "buyNow": "Buy Now"
+  },
+  "productCard": {
+    "purchase": "Purchase",
+    "rent": "Rent",
+    "inStock": "in Stock",
+    "outOfStock": "Out of Stock"
+  },
+  "about": {
+    "title": "Copy Nexus",
+    "subtitle": "Your trusted source for copiers and supplies",
+    "description1": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+    "description2": "Providing Colombia's businesses with reliable copying solutions for all your needs.",
+    "features": {
+      "quality": "Quality Products",
+      "service": "Excellent Service",
+      "team": "Experienced Team"
+    }
+  },
+  "contact": {
+    "title": "Get in touch with us",
+    "subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    "addressLabel": "Address",
+    "addressValue": "123 Main St, Bogota",
+    "phoneLabel": "Phone",
+    "phoneValue": "+57 123 4567880",
+    "emailLabel": "Email",
+    "emailValue": "info@copynexus.co",
+    "formTitle": "Contact Form",
+    "name": "Name",
+    "email": "Email",
+    "message": "Message",
+    "send": "Send Message"
+  },
+  "auth": {
+    "loginTitle": "Login",
+    "loginButton": "Log in",
+    "signupTitle": "Sign Up",
+    "signupButton": "Sign up",
+    "emailAddress": "Email address",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "passwordPlaceholder": "Enter password",
+    "confirmPasswordPlaceholder": "Confirm password",
+    "emailPlaceholder": "you@example.com",
+    "passwordMask": "********",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "signUpLink": "Sign up",
+    "loginLink": "Log in",
+    "errors": {
+      "invalidCredentials": "Invalid username or password.",
+      "loginProblem": "There was a problem logging in.",
+      "passwordLength": "Password must be at least 8 characters long.",
+      "passwordMismatch": "Passwords do not match.",
+      "emailTaken": "This email is already registered.",
+      "signupProblem": "There was a problem creating your account."
+    }
+  },
+  "admin": {
+    "admin": "Admin",
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "products": "Products",
+      "orders": "Orders",
+      "reports": "Reports"
+    },
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu",
+    "dashboard": {
+      "totalOrders": "Total Orders",
+      "totalSales": "Total Sales",
+      "totalRenters": "Total Renters",
+      "recentOrders": "Recent Orders",
+      "orderId": "Order ID",
+      "customer": "Customer",
+      "date": "Date",
+      "status": "Status",
+      "statusShipped": "SHIPPED",
+      "statusPending": "PENDING",
+      "dateToday": "Today",
+      "dateYesterday": "Yesterday",
+      "dateApr21": "Apr 21, 2024",
+      "dateApr20": "Apr 20, 2024",
+      "dateApr19": "Apr 19, 2024",
+      "dateApr18": "Apr 18, 2024",
+      "dateApr17": "Apr 17, 2024"
+    },
+    "orders": {
+      "title": "Orders",
+      "searchPlaceholder": "Search orders",
+      "noOrders": "No orders found.",
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {current} of {total}"
+    },
+    "products": {
+      "title": "Products",
+      "addProduct": "+ Add Product"
+    },
+    "reports": {
+      "title": "Reports",
+      "dateFrom": "Jan 1, 2024",
+      "dateTo": "Mar 31, 2024",
+      "kpis": {
+        "totalSales": "Total Sales",
+        "orders": "Orders",
+        "avgOrderValue": "Avg Order Value"
+      },
+      "salesByCategory": "Sales by Category",
+      "salesOverTime": "Sales Over Time",
+      "topProducts": "Top Products",
+      "category": "Category",
+      "sales": "Sales",
+      "categories": {
+        "copiers": "Copiers",
+        "toner": "Toner",
+        "parts": "Parts"
+      },
+      "months": {
+        "jan": "Jan",
+        "feb": "Feb",
+        "mar": "Mar",
+        "apr": "Apr",
+        "may": "May"
+      },
+      "sampleProducts": {
+        "copierA": "Copier Model A",
+        "tonerX": "Toner Cartridge X",
+        "copierB": "Copier Model B",
+        "drumQ": "Drum Unit Q"
+      }
+    },
+    "forms": {
+      "addProductTitle": "Add Product",
+      "editProductTitle": "Edit Product",
+      "name": "Name",
+      "namePlaceholder": "e.g., Canon imageRUNNER 2425",
+      "subtitle": "Subtitle",
+      "subtitlePlaceholder": "Optional (e.g., M4125idn)",
+      "modelNumber": "Model Number",
+      "modelPlaceholder": "required (e.g., M4125idn)",
+      "description": "Description",
+      "descriptionHint": "Use bold, italic, lists, and links. You can paste text - formatting will be preserved.",
+      "category": "Category",
+      "categories": {
+        "copier": "Copier",
+        "part": "Part",
+        "toner": "Toner"
+      },
+      "stock": "Stock",
+      "inStock": "In Stock",
+      "outOfStock": "Out of Stock",
+      "visibility": "Visibility",
+      "active": "Active",
+      "archived": "Archived",
+      "purchasePrice": "Purchase Price (COP)",
+      "rentable": "Available for Rent",
+      "rentPrice": "Rent Price (COP / month)",
+      "compatibleCopiers": "Compatible Copiers",
+      "noCopiers": "No copiers found.",
+      "compatibleHint": "Tap to add or remove compatible copiers.",
+      "images": "Images",
+      "close": "Close",
+      "dragToReorder": "Drag to reorder",
+      "removeImage": "Remove image",
+      "imageUrlPlaceholder": "https://image-url.jpg",
+      "addImage": "Add",
+      "dragHint": "Drag thumbnails to change order. First image becomes the product's primary image.",
+      "cancel": "Cancel",
+      "saveProduct": "Save Product"
+    },
+    "compatibility": {
+      "modelLabel": "Model:",
+      "noModel": "No model number",
+      "imageAlt": "Copier image",
+      "unnamed": "Unnamed copier"
+    },
+    "richText": {
+      "placeholder": "Write a description...",
+      "enterUrl": "Enter URL:",
+      "unorderedList": "List",
+      "orderedList": "Numbered List",
+      "link": "Link",
+      "clear": "Clear"
+    }
+  }
+}
