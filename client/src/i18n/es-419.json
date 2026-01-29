@@ -1,0 +1,249 @@
+{
+  "language": {
+    "label": "Idioma",
+    "english": "Ingles",
+    "spanishLatam": "Espanol (LatAm)"
+  },
+  "common": {
+    "logoAlt": "Logo de Copy Nexus",
+    "copierImageAlt": "Copiadora"
+  },
+  "nav": {
+    "home": "Inicio",
+    "copiers": "Copiadoras",
+    "contact": "Contacto",
+    "about": "Acerca de",
+    "admin": "Admin",
+    "login": "Iniciar sesion",
+    "signup": "Registrarse",
+    "logout": "Cerrar sesion"
+  },
+  "home": {
+    "titleLine1": "COPIADORA",
+    "titleLine2": "TIENDA",
+    "subtitle": "Renta y venta de copiadoras",
+    "features": {
+      "copiersTitle": "COPIADORAS",
+      "copiersDesc": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Augdet quam ult amet.",
+      "partsTitle": "PARTES Y ACCESORIOS",
+      "partsDesc": "Lorem ipsum dolor amet, consectetuer adipiscing. Augide quam ult ame.",
+      "maintenanceTitle": "MANTENIMIENTO",
+      "maintenanceDesc": "Lorem ipsum dolor amet, consectetuer adipiscing. Augdet quam ult amet."
+    }
+  },
+  "copiers": {
+    "title": "Copiadoras en venta",
+    "subtitle": "Explora nuestras copiadoras disponibles y compara opciones de renta y compra.",
+    "filterAll": "Todas las copiadoras",
+    "filterColor": "Color",
+    "filterMono": "Mono",
+    "filterHighVolume": "Alto volumen",
+    "searchPlaceholder": "Buscar por modelo"
+  },
+  "productsPage": {
+    "title": "Productos",
+    "category": "Categoria",
+    "copiers": "Copiadoras",
+    "parts": "Partes",
+    "toner": "Toner",
+    "searchPlaceholder": "Buscar por modelo"
+  },
+  "product": {
+    "loading": "Cargando detalles del producto...",
+    "loadFailed": "No se pudo cargar el producto.",
+    "notFound": "Producto no encontrado.",
+    "backToListings": "Volver a listados",
+    "inStock": "En stock",
+    "outOfStock": "Agotado",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "price": "Precio",
+    "rent": "Renta",
+    "buyNow": "Comprar ahora"
+  },
+  "productCard": {
+    "purchase": "Compra",
+    "rent": "Renta",
+    "inStock": "En stock",
+    "outOfStock": "Agotado"
+  },
+  "about": {
+    "title": "Copy Nexus",
+    "subtitle": "Tu fuente confiable de copiadoras y suministros",
+    "description1": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+    "description2": "Brindamos a las empresas de Colombia soluciones de copiado confiables para todas sus necesidades.",
+    "features": {
+      "quality": "Productos de calidad",
+      "service": "Servicio excelente",
+      "team": "Equipo con experiencia"
+    }
+  },
+  "contact": {
+    "title": "Ponte en contacto con nosotros",
+    "subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    "addressLabel": "Direccion",
+    "addressValue": "Calle Principal 123, Bogota",
+    "phoneLabel": "Telefono",
+    "phoneValue": "+57 123 4567880",
+    "emailLabel": "Correo",
+    "emailValue": "info@copynexus.co",
+    "formTitle": "Formulario de contacto",
+    "name": "Nombre",
+    "email": "Correo",
+    "message": "Mensaje",
+    "send": "Enviar mensaje"
+  },
+  "auth": {
+    "loginTitle": "Iniciar sesion",
+    "loginButton": "Iniciar sesion",
+    "signupTitle": "Registrarse",
+    "signupButton": "Registrarse",
+    "emailAddress": "Correo electronico",
+    "password": "Contrasena",
+    "confirmPassword": "Confirmar contrasena",
+    "passwordPlaceholder": "Ingresar contrasena",
+    "confirmPasswordPlaceholder": "Confirmar contrasena",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "passwordMask": "********",
+    "noAccount": "No tienes una cuenta?",
+    "haveAccount": "Ya tienes una cuenta?",
+    "signUpLink": "Registrarse",
+    "loginLink": "Iniciar sesion",
+    "errors": {
+      "invalidCredentials": "Usuario o contrasena invalidos.",
+      "loginProblem": "Hubo un problema al iniciar sesion.",
+      "passwordLength": "La contrasena debe tener al menos 8 caracteres.",
+      "passwordMismatch": "Las contrasenas no coinciden.",
+      "emailTaken": "Este correo ya esta registrado.",
+      "signupProblem": "Hubo un problema al crear tu cuenta."
+    }
+  },
+  "admin": {
+    "admin": "Admin",
+    "sidebar": {
+      "dashboard": "Panel",
+      "products": "Productos",
+      "orders": "Pedidos",
+      "reports": "Reportes"
+    },
+    "closeMenu": "Cerrar menu",
+    "openMenu": "Abrir menu",
+    "dashboard": {
+      "totalOrders": "Pedidos totales",
+      "totalSales": "Ventas totales",
+      "totalRenters": "Arrendatarios totales",
+      "recentOrders": "Pedidos recientes",
+      "orderId": "ID de pedido",
+      "customer": "Cliente",
+      "date": "Fecha",
+      "status": "Estado",
+      "statusShipped": "ENVIADO",
+      "statusPending": "PENDIENTE",
+      "dateToday": "Hoy",
+      "dateYesterday": "Ayer",
+      "dateApr21": "21 Abr 2024",
+      "dateApr20": "20 Abr 2024",
+      "dateApr19": "19 Abr 2024",
+      "dateApr18": "18 Abr 2024",
+      "dateApr17": "17 Abr 2024"
+    },
+    "orders": {
+      "title": "Pedidos",
+      "searchPlaceholder": "Buscar pedidos",
+      "noOrders": "No se encontraron pedidos.",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "page": "Pagina {current} de {total}"
+    },
+    "products": {
+      "title": "Productos",
+      "addProduct": "+ Agregar producto"
+    },
+    "reports": {
+      "title": "Reportes",
+      "dateFrom": "1 Ene 2024",
+      "dateTo": "31 Mar 2024",
+      "kpis": {
+        "totalSales": "Ventas totales",
+        "orders": "Pedidos",
+        "avgOrderValue": "Valor promedio"
+      },
+      "salesByCategory": "Ventas por categoria",
+      "salesOverTime": "Ventas en el tiempo",
+      "topProducts": "Productos principales",
+      "category": "Categoria",
+      "sales": "Ventas",
+      "categories": {
+        "copiers": "Copiadoras",
+        "toner": "Toner",
+        "parts": "Partes"
+      },
+      "months": {
+        "jan": "Ene",
+        "feb": "Feb",
+        "mar": "Mar",
+        "apr": "Abr",
+        "may": "May"
+      },
+      "sampleProducts": {
+        "copierA": "Copiadora Modelo A",
+        "tonerX": "Cartucho de toner X",
+        "copierB": "Copiadora Modelo B",
+        "drumQ": "Unidad de tambor Q"
+      }
+    },
+    "forms": {
+      "addProductTitle": "Agregar producto",
+      "editProductTitle": "Editar producto",
+      "name": "Nombre",
+      "namePlaceholder": "ej., Canon imageRUNNER 2425",
+      "subtitle": "Subtitulo",
+      "subtitlePlaceholder": "Opcional (ej., M4125idn)",
+      "modelNumber": "Numero de modelo",
+      "modelPlaceholder": "requerido (ej., M4125idn)",
+      "description": "Descripcion",
+      "descriptionHint": "Usa negritas, cursiva, listas y enlaces. Puedes pegar texto - el formato se mantiene.",
+      "category": "Categoria",
+      "categories": {
+        "copier": "Copiadora",
+        "part": "Parte",
+        "toner": "Toner"
+      },
+      "stock": "Stock",
+      "inStock": "En stock",
+      "outOfStock": "Agotado",
+      "visibility": "Visibilidad",
+      "active": "Activo",
+      "archived": "Archivado",
+      "purchasePrice": "Precio de compra (COP)",
+      "rentable": "Disponible para renta",
+      "rentPrice": "Precio de renta (COP / mes)",
+      "compatibleCopiers": "Copiadoras compatibles",
+      "noCopiers": "No se encontraron copiadoras.",
+      "compatibleHint": "Toca para agregar o quitar copiadoras compatibles.",
+      "images": "Imagenes",
+      "close": "Cerrar",
+      "dragToReorder": "Arrastra para reordenar",
+      "removeImage": "Eliminar imagen",
+      "imageUrlPlaceholder": "https://url-imagen.jpg",
+      "addImage": "Agregar",
+      "dragHint": "Arrastra miniaturas para cambiar el orden. La primera imagen sera la principal.",
+      "cancel": "Cancelar",
+      "saveProduct": "Guardar producto"
+    },
+    "compatibility": {
+      "modelLabel": "Modelo:",
+      "noModel": "Sin numero de modelo",
+      "imageAlt": "Imagen de copiadora",
+      "unnamed": "Copiadora sin nombre"
+    },
+    "richText": {
+      "placeholder": "Escribe una descripcion...",
+      "enterUrl": "Ingresa URL:",
+      "unorderedList": "Lista",
+      "orderedList": "Lista numerada",
+      "link": "Enlace",
+      "clear": "Limpiar"
+    }
+  }
+}

@@ -1,7 +1,10 @@
+import { useI18n } from "../../i18n";
+
 export default function CompatibleCopierCard({ copier, checked, onToggle }) {
+  const { t } = useI18n();
   const { name, model, subtitle, images } = copier;
 
-  const displayModel = model || subtitle || "No model number";
+  const displayModel = model || subtitle || t("admin.compatibility.noModel");
 
   return (
     <li
@@ -20,7 +23,7 @@ export default function CompatibleCopierCard({ copier, checked, onToggle }) {
         <div className="h-12 w-12 rounded border border-gray-200 overflow-hidden bg-gray-100 shrink-0">
           <img
             src={images[0] || "/placeholder.png"}
-            alt={name || "Copier image"}
+            alt={name || t("admin.compatibility.imageAlt")}
             className="h-full w-full object-cover"
             onError={(e) => {
               e.currentTarget.src = "/placeholder.png";
@@ -30,9 +33,11 @@ export default function CompatibleCopierCard({ copier, checked, onToggle }) {
 
         <div className="flex flex-col">
           <span className="text-sm font-semibold text-[#00294D]">
-            {name || "Unnamed copier"}
+            {name || t("admin.compatibility.unnamed")}
           </span>
-          <span className="text-xs text-gray-600">Model: {displayModel}</span>
+          <span className="text-xs text-gray-600">
+            {t("admin.compatibility.modelLabel")} {displayModel}
+          </span>
         </div>
       </div>
     </li>

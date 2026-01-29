@@ -6,29 +6,31 @@ import {
   FileText,
   BarChart,
 } from "lucide-react";
+import { useI18n } from "../../i18n";
 
 export default function AdminSidebar({ isOpen, onClose }) {
+  const { t } = useI18n();
   const { pathname } = useLocation();
 
   const links = [
     {
       to: "/admin",
-      label: "Dashboard",
+      label: t("admin.sidebar.dashboard"),
       icon: <LayoutDashboard className="h-5 w-5" />,
     },
     {
       to: "/admin/products",
-      label: "Products",
+      label: t("admin.sidebar.products"),
       icon: <ShoppingCart className="h-5 w-5" />,
     },
     {
       to: "/admin/orders",
-      label: "Orders",
+      label: t("admin.sidebar.orders"),
       icon: <FileText className="h-5 w-5" />,
     },
     {
       to: "/admin/reports",
-      label: "Reports",
+      label: t("admin.sidebar.reports"),
       icon: <BarChart className="h-5 w-5" />,
     },
   ];
@@ -60,7 +62,7 @@ export default function AdminSidebar({ isOpen, onClose }) {
         <button
           onClick={onClose}
           className="md:hidden self-end -mr-2 mb-4 p-2 rounded hover:bg-gray-100"
-          aria-label="Close menu"
+          aria-label={t("admin.closeMenu")}
         >
           <X className="h-5 w-5" />
         </button>

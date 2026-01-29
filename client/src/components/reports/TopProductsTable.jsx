@@ -1,14 +1,17 @@
 import { formatCOP } from "../../utils/helpers";
 
+import { useI18n } from "../../i18n";
+
 export default function TopProductsTable({ rows = [] }) {
+  const { t } = useI18n();
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200">
       <table className="min-w-full text-sm text-gray-900">
         <thead className="bg-white font-bold text-left">
           <tr>
-            <th className="px-6 py-4">Top Products</th>
-            <th className="px-6 py-4">Category</th>
-            <th className="px-6 py-4">Sales</th>
+            <th className="px-6 py-4">{t("admin.reports.topProducts")}</th>
+            <th className="px-6 py-4">{t("admin.reports.category")}</th>
+            <th className="px-6 py-4">{t("admin.reports.sales")}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">

@@ -1,4 +1,5 @@
 import { formatCOP } from "../utils/helpers";
+import { useI18n } from "../i18n";
 
 export default function ProductCard({
   name,
@@ -7,9 +8,11 @@ export default function ProductCard({
   rentPrice,
   inStock,
   images,
+  rentable,
 }) {
+  const { t } = useI18n();
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
       {/* Image */}
       <div className="mb-4 grid place-items-center rounded-lg bg-[#F8FAFC] p-6">
         <img src={images[0]} alt={name} className="h-28 object-contain" />
@@ -26,12 +29,12 @@ export default function ProductCard({
       {/* Prices */}
       <div className="mb-4 space-y-1">
         <div className="text-lg font-bold text-[#00294D] text-nowrap">
-          Purchase:{" "}
+          {t("productCard.purchase")}:{" "}
           <span className="font-extrabold">{formatCOP(purchasePrice)}</span>
         </div>
-        {rentPrice && (
+        {rentable && rentPrice && (
           <div className="text-sm font-semibold text-[#555] text-nowrap">
-            Rent:{" "}
+            {t("productCard.rent")}:{" "}
             <span className="font-bold text-[#00294D]">
               {formatCOP(rentPrice)}
             </span>
@@ -41,11 +44,11 @@ export default function ProductCard({
 
       {/* Stock Badge */}
       <span
-        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+        className={`mt-auto rounded-full px-3 py-1 text-xs font-semibold max-w-20 text-center ${
           inStock ? "bg-[#1B5E20] text-white" : "bg-[#E53935] text-white"
         }`}
       >
-        {inStock ? "in Stock" : "Out of Stock"}
+        {inStock ? t("productCard.inStock") : t("productCard.outOfStock")}
       </span>
     </div>
   );

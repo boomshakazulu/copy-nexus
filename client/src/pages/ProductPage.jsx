@@ -1,8 +1,10 @@
 import ProductCard from "../components/ProductCard";
 import { Search, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useI18n } from "../i18n";
 
 export default function Products() {
+  const { t } = useI18n();
   const products = [
     {
       id: 1,
@@ -65,16 +67,16 @@ export default function Products() {
       {/* Header */}
       <div className="flex flex-row flex-wrap justify-between items-center mb-10 gap-6">
         <h1 className="text-4xl pb-4 font-extrabold text-[#00294D]">
-          Products
+          {t("productsPage.title")}
         </h1>
 
         <div className="flex flex-wrap justify-between items-center gap-4 w-full">
           <div className="relative">
             <select className="appearance-none bg-[#FFCB05] text-[#00294D] font-semibold px-4 py-2 pr-10 rounded-md focus:outline-none">
-              <option>Category</option>
-              <option>Copiers</option>
-              <option>Parts</option>
-              <option>Toner</option>
+              <option>{t("productsPage.category")}</option>
+              <option>{t("productsPage.copiers")}</option>
+              <option>{t("productsPage.parts")}</option>
+              <option>{t("productsPage.toner")}</option>
             </select>
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#00294D] pointer-events-none" />
           </div>
@@ -82,7 +84,7 @@ export default function Products() {
           <div className="relative w-full sm:w-72">
             <input
               type="text"
-              placeholder="Search by model number"
+              placeholder={t("productsPage.searchPlaceholder")}
               className="w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
             />
             <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />

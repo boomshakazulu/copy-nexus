@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Menu } from "lucide-react";
 import Sidebar from "../../components/admin/Sidebar";
 import { Outlet } from "react-router-dom";
+import { useI18n } from "../../i18n";
 
 export default function AdminLayout() {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
 
   return (
@@ -17,11 +19,13 @@ export default function AdminLayout() {
         <main className="flex-1">
           {/* Mobile top bar to open the drawer */}
           <div className="md:hidden p-4 border-b border-gray-200 flex items-center justify-between">
-            <span className="text-[#00294D] font-bold">Admin</span>
+            <span className="text-[#00294D] font-bold">
+              {t("admin.admin")}
+            </span>
             <button
               onClick={() => setOpen(true)}
               className="p-2 rounded hover:bg-gray-100"
-              aria-label="Open menu"
+              aria-label={t("admin.openMenu")}
             >
               <Menu className="h-5 w-5" />
             </button>

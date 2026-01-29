@@ -1,30 +1,29 @@
 import { Link } from "react-router-dom";
-
-const features = [
-  {
-    title: "COPIERS",
-    icon: "/copier-icon.png",
-    to: "/products",
-    description:
-      "Lorem ipsum dolor ag met, consectetuer adipiscing eli. Augdet quam ult amet.",
-  },
-  {
-    title: "PARTS & ACCESSORIES",
-    icon: "/toner-icon.png",
-    to: "/parts",
-    description:
-      "Lorem ipsum dolor amet, consectetuer adipiscing. Augide quam ult ame.",
-  },
-  {
-    title: "MAINTENANCE",
-    icon: "/parts-icon.png",
-    to: "/maintenance",
-    description:
-      "Lorem ipsum dolor amet, consectetuer adipiscing. Augdet quam ult amet.",
-  },
-];
+import { useI18n } from "../i18n";
 
 export default function HomePage() {
+  const { t } = useI18n();
+  const features = [
+    {
+      title: t("home.features.copiersTitle"),
+      icon: "/copier-icon.png",
+      to: "/copiers",
+      description: t("home.features.copiersDesc"),
+    },
+    {
+      title: t("home.features.partsTitle"),
+      icon: "/toner-icon.png",
+      to: "/parts",
+      description: t("home.features.partsDesc"),
+    },
+    {
+      title: t("home.features.maintenanceTitle"),
+      icon: "/parts-icon.png",
+      to: "/maintenance",
+      description: t("home.features.maintenanceDesc"),
+    },
+  ];
+
   return (
     <div className="px-4 max-w-3xl mx-auto">
       {/* HERO SECTION */}
@@ -32,13 +31,13 @@ export default function HomePage() {
         {/* Text */}
         <div className="text-center text-left flex-1">
           <h1 className="text-5xl sm:text-7xl font-bold text-[#00294D] leading-tight text-left">
-            COPIER
+            {t("home.titleLine1")}
           </h1>
           <h1 className="text-5xl sm:text-7xl font-bold text-[#00294D] leading-tight text-left">
-            STORE
+            {t("home.titleLine2")}
           </h1>
           <p className="text-2xl mt-2 text-red-600 font-semibold text-left">
-            Copier Rentals & Sales
+            {t("home.subtitle")}
           </p>
         </div>
 
@@ -46,7 +45,7 @@ export default function HomePage() {
         <div className="bg-yellow-400 p-4 rounded-md flex-1 max-w-xs">
           <img
             src="/copier.png"
-            alt="Copier"
+            alt={t("common.copierImageAlt")}
             className="w-full h-auto max-h-80 sm:max-h-70 object-contain mx-auto scale-x-[-1]"
           />
         </div>

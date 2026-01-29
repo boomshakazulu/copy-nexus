@@ -1,14 +1,16 @@
+import { useI18n } from "../i18n";
+
 export default function ContactPage() {
+  const { t } = useI18n();
+
   return (
     <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-2 gap-10">
-      {/* <!-- Left side --> */}
+      {/* Left side */}
       <div>
-        <h2 className="text-3xl font-semibold mb-2">Get in touch with us</h2>
-        <p className="text-gray-600 mb-8">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-        </p>
+        <h2 className="text-3xl font-semibold mb-2">{t("contact.title")}</h2>
+        <p className="text-gray-600 mb-8">{t("contact.subtitle")}</p>
 
-        {/* <!-- Address --> */}
+        {/* Address */}
         <div className="flex items-start gap-4 mb-6">
           <div className="bg-yellow-400 p-2 rounded-full">
             <svg
@@ -21,12 +23,14 @@ export default function ContactPage() {
             </svg>
           </div>
           <div>
-            <h3 className="font-bold text-[#00294D]">Address</h3>
-            <p className="text-gray-700">123 Main St, Bogotá</p>
+            <h3 className="font-bold text-[#00294D]">
+              {t("contact.addressLabel")}
+            </h3>
+            <p className="text-gray-700">{t("contact.addressValue")}</p>
           </div>
         </div>
 
-        {/* <!-- Phone --> */}
+        {/* Phone */}
         <div className="flex items-start gap-4 mb-6">
           <div className="bg-red-500 p-2 rounded-full">
             <svg
@@ -38,12 +42,14 @@ export default function ContactPage() {
             </svg>
           </div>
           <div>
-            <h3 className="font-bold text-[#00294D]">Phone</h3>
-            <p className="text-gray-700">+57 123 4567880</p>
+            <h3 className="font-bold text-[#00294D]">
+              {t("contact.phoneLabel")}
+            </h3>
+            <p className="text-gray-700">{t("contact.phoneValue")}</p>
           </div>
         </div>
 
-        {/* <!-- Email --> */}
+        {/* Email */}
         <div className="flex items-start gap-4">
           <div className="bg-yellow-400 p-2 rounded-full">
             <svg
@@ -55,21 +61,23 @@ export default function ContactPage() {
             </svg>
           </div>
           <div>
-            <h3 className="font-bold text-[#00294D]">Email</h3>
-            <p className="text-gray-700">info@copynexus.co</p>
+            <h3 className="font-bold text-[#00294D]">
+              {t("contact.emailLabel")}
+            </h3>
+            <p className="text-gray-700">{t("contact.emailValue")}</p>
           </div>
         </div>
       </div>
 
-      {/* <!-- Right side (Form) --> */}
+      {/* Right side (Form) */}
       <div className="bg-white border rounded-xl p-6 shadow-sm">
         <h3 className="text-xl font-semibold mb-6 text-[#00294D]">
-          Contact Form
+          {t("contact.formTitle")}
         </h3>
         <form className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Name
+              {t("contact.name")}
             </label>
             <input
               type="text"
@@ -78,7 +86,7 @@ export default function ContactPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Email
+              {t("contact.email")}
             </label>
             <input
               type="email"
@@ -87,7 +95,7 @@ export default function ContactPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Message
+              {t("contact.message")}
             </label>
             <textarea
               rows="4"
@@ -98,7 +106,7 @@ export default function ContactPage() {
             type="submit"
             className="bg-red-500 text-white font-semibold px-6 py-2 rounded-md hover:bg-red-600 transition"
           >
-            Send Message
+            {t("contact.send")}
           </button>
         </form>
       </div>

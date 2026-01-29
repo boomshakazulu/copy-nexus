@@ -7,11 +7,13 @@ import {
 } from "react-router-dom";
 import App from "./App";
 import "./index.css";
+import { I18nProvider } from "./i18n";
 
 import HomePage from "./pages/HomePage";
 import ContactPage from "./pages/ContactPage";
 import AboutPage from "./pages/AboutPage";
-import ProductPage from "./pages/ProductPage";
+import CopiersPage from "./pages/CopiersPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
 
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
@@ -38,8 +40,12 @@ const router = createBrowserRouter([
         element: <AboutPage />,
       },
       {
-        path: "/products",
-        element: <ProductPage />,
+        path: "/copiers",
+        element: <CopiersPage />,
+      },
+      {
+        path: "/products/:id",
+        element: <ProductDetailPage />,
       },
       {
         path: "/admin",
@@ -57,6 +63,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <I18nProvider>
+      <RouterProvider router={router} />
+    </I18nProvider>
   </React.StrictMode>
 );
