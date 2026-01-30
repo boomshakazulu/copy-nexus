@@ -12,6 +12,7 @@ export default function Products() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [copiers, setCopiers] = useState([]);
   const [thisProduct, setThisProduct] = useState(null);
+  const [activeCategory, setActiveCategory] = useState("copier");
 
   const [items, setItems] = useState({
     data: [],
@@ -20,17 +21,28 @@ export default function Products() {
     filter: {},
   });
 
-  const fetchCopiers = async () => {
+  const fetchProducts = async (category) => {
     try {
-      const copiers = await http.get("/products", {
+      const res = await http.get("/products", {
         params: {
-          category: "copier",
+          category,
         },
       });
-      console.log(copiers.data);
-      if (copiers.data) {
-        setItems(copiers.data);
-        setCopiers(copiers.data.data);
+      if (res.data) {
+        setItems(res.data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const fetchCopierOptions = async () => {
+    try {
+      const res = await http.get("/products", {
+        params: { category: "copier" },
+      });
+      if (res.data) {
+        setCopiers(res.data.data || []);
       }
     } catch (err) {
       console.log(err);
@@ -38,7 +50,11 @@ export default function Products() {
   };
 
   useEffect(() => {
-    fetchCopiers();
+    fetchProducts(activeCategory);
+  }, [activeCategory]);
+
+  useEffect(() => {
+    fetchCopierOptions();
   }, []);
 
   const openEditModal = async (p) => {
@@ -108,7 +124,7 @@ export default function Products() {
             if (!prev) {
               // Just in case items was null initially
               return {
-                data: [savedProduct],
+                data: savedProduct.category === activeCategory ? [savedProduct] : [],
                 pagination: { total: 1, page: 1, limit: 20, hasNext: false },
                 sort: { field: "createdAt", order: "desc" },
                 filter: {},
@@ -118,11 +134,14 @@ export default function Products() {
             const prevData = prev.data || [];
             const prevPagination = prev.pagination || {};
             const limit = prevPagination.limit ?? 20;
-            const newTotal = (prevPagination.total ?? prevData.length) + 1;
+            const shouldAdd = savedProduct.category === activeCategory;
+            const newTotal = shouldAdd
+              ? (prevPagination.total ?? prevData.length) + 1
+              : prevPagination.total ?? prevData.length;
 
             return {
               ...prev,
-              data: [savedProduct, ...prevData],
+              data: shouldAdd ? [savedProduct, ...prevData] : prevData,
               pagination: {
                 ...prevPagination,
                 total: newTotal,
@@ -154,6 +173,27 @@ export default function Products() {
         >
           {t("admin.products.addProduct")}
         </button>
+      </div>
+
+      <div className="mb-6 flex flex-wrap gap-2">
+        {[
+          { key: "copier", label: t("admin.forms.categories.copier") },
+          { key: "part", label: t("admin.forms.categories.part") },
+          { key: "toner", label: t("admin.forms.categories.toner") },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setActiveCategory(tab.key)}
+            className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+              activeCategory === tab.key
+                ? "bg-[#00294D] text-white"
+                : "bg-gray-100 text-[#00294D] hover:bg-gray-200"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* …filters + search… */}

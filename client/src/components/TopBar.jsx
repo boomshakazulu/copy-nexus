@@ -62,11 +62,13 @@ export default function TopBar() {
     <header className="bg-white w-full">
       <div className="flex items-center justify-between px-2 sm:px-6 py-2 sm:py-4 max-w-6xl mx-auto">
         {/* Logo */}
-        <img
-          src="/logo-cropped.png"
-          alt={t("common.logoAlt")}
-          className="h-16 md:h-20 w-auto object-contain"
-        />
+        <Link to="/" className="shrink-0">
+          <img
+            src="/logo-sas.png"
+            alt={t("common.logoAlt")}
+            className="h-16 md:h-20 w-auto object-contain"
+          />
+        </Link>
         <div className="flex gap-2 sm:gap-4 md:gap-6 pl-6 sm:pl-0 text-black font-medium text-sm">
           {/* Top Navigation - always visible */}
           <nav className="flex gap-2 sm:gap-4 md:gap-6 text-black font-medium text-sm">

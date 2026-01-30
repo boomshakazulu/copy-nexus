@@ -46,8 +46,16 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="relative bg-white w-full max-w-md rounded-lg shadow-xl p-8">
+    <div className="fixed inset-0 z-50">
+      <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
+      <div
+        className="relative mx-auto flex h-full w-full max-w-md items-center justify-center p-4"
+        onClick={onClose}
+      >
+        <div
+          className="relative w-full bg-white rounded-lg shadow-xl p-8"
+          onClick={(e) => e.stopPropagation()}
+        >
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -58,7 +66,7 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
 
         {/* Logo */}
         <img
-          src="/logo-cropped.png"
+          src="/logo-sas.png"
           alt={t("common.logoAlt")}
           className="h-20 mx-auto mb-6"
         />
@@ -112,6 +120,7 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
             </button>
           </p>
         </form>
+        </div>
       </div>
     </div>
   );

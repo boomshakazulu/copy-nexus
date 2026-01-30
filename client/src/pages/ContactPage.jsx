@@ -30,15 +30,16 @@ export default function ContactPage() {
           </div>
         </div>
 
-        {/* Phone */}
+        {/* WhatsApp */}
         <div className="flex items-start gap-4 mb-6">
-          <div className="bg-red-500 p-2 rounded-full">
+          <div className="bg-green-500 p-2 rounded-full">
             <svg
               className="w-6 h-6 text-white"
-              fill="currentColor"
               viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
             >
-              <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1.003 1.003 0 011.11-.21c1.2.49 2.51.76 3.86.76.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.29 21 3 13.71 3 5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.35.26 2.66.76 3.86.15.37.06.8-.21 1.11l-2.43 2.43z" />
+              <path d="M20.52 3.48A11.84 11.84 0 0012 0C5.39 0 0 5.38 0 12c0 2.12.55 4.2 1.6 6.05L0 24l6.17-1.6A11.94 11.94 0 0012 24c6.62 0 12-5.38 12-12 0-3.2-1.25-6.2-3.48-8.52zm-8.52 18.3c-1.91 0-3.8-.51-5.46-1.48l-.39-.23-3.66.95.98-3.57-.26-.4A9.78 9.78 0 012.22 12c0-5.4 4.39-9.79 9.78-9.79 2.62 0 5.08 1.02 6.94 2.87A9.77 9.77 0 0121.8 12c0 5.39-4.4 9.78-9.8 9.78zm5.36-7.3c-.29-.14-1.72-.85-1.98-.95-.27-.1-.47-.14-.67.14-.2.29-.77.95-.95 1.15-.17.2-.35.22-.64.07-.29-.14-1.2-.44-2.3-1.41-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.35.44-.52.14-.17.2-.29.29-.49.1-.2.05-.37-.02-.52-.07-.14-.67-1.6-.92-2.2-.24-.58-.48-.5-.67-.5h-.58c-.2 0-.52.07-.8.37-.27.29-1.04 1.01-1.04 2.47s1.07 2.86 1.22 3.06c.14.2 2.1 3.2 5.1 4.48.71.31 1.26.5 1.69.64.71.23 1.36.2 1.88.12.57-.09 1.72-.7 1.97-1.38.24-.67.24-1.25.17-1.38-.07-.12-.27-.2-.57-.34z" />
             </svg>
           </div>
           <div>
@@ -64,7 +65,12 @@ export default function ContactPage() {
             <h3 className="font-bold text-[#00294D]">
               {t("contact.emailLabel")}
             </h3>
-            <p className="text-gray-700">{t("contact.emailValue")}</p>
+            <a
+              href={`mailto:${t("contact.emailValue")}`}
+              className="text-gray-700 hover:underline"
+            >
+              {t("contact.emailValue")}
+            </a>
           </div>
         </div>
       </div>
@@ -86,11 +92,25 @@ export default function ContactPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              {t("contact.email")}
+              {t("contact.contactMethod")}
+            </label>
+            <select
+              className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              defaultValue="email"
+            >
+              <option value="email">{t("contact.contactEmail")}</option>
+              <option value="whatsappText">{t("contact.contactWhatsappText")}</option>
+              <option value="whatsappCall">{t("contact.contactWhatsappCall")}</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              {t("contact.contactValue")}
             </label>
             <input
-              type="email"
+              type="text"
               className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              placeholder={t("contact.contactPlaceholder")}
             />
           </div>
           <div>

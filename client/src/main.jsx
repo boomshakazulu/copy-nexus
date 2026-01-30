@@ -14,6 +14,8 @@ import ContactPage from "./pages/ContactPage";
 import AboutPage from "./pages/AboutPage";
 import CopiersPage from "./pages/CopiersPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import PartsAccessoriesPage from "./pages/PartsAccessoriesPage";
+import MaintenancePage from "./pages/MaintenancePage";
 
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
@@ -42,6 +44,14 @@ const router = createBrowserRouter([
       {
         path: "/copiers",
         element: <CopiersPage />,
+      },
+      {
+        path: "/parts",
+        element: <PartsAccessoriesPage />,
+      },
+      {
+        path: "/maintenance",
+        element: <MaintenancePage />,
       },
       {
         path: "/products/:id",

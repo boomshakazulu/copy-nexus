@@ -167,14 +167,14 @@ export default function ProductDetailPage() {
 
           <div className="rounded-xl border border-gray-200 p-4">
             <div className="text-lg font-bold text-[#00294D]">
-              {t("product.price")}:{" "}
+              {t("product.price")}: {" "}
               <span className="font-extrabold">
                 {formatCOP(copier.purchasePrice)}
               </span>
             </div>
             {copier.rentable && copier.rentPrice && (
               <div className="text-sm font-semibold text-[#555] mt-1">
-                {t("product.rent")}:{" "}
+                {t("product.rent")}: {" "}
                 <span className="font-bold text-[#00294D]">
                   {formatCOP(copier.rentPrice)}
                 </span>

@@ -9,6 +9,12 @@ export default function ProductCard({
   inStock,
   images,
   rentable,
+  description,
+  showPrice = true,
+  showStock = true,
+  showDescription = false,
+  showAddToCart = false,
+  onAddToCart,
 }) {
   const { t } = useI18n();
   return (
@@ -26,30 +32,50 @@ export default function ProductCard({
         <p className="text-sm text-gray-500 -mt-0.5 mb-2">{subtitle}</p>
       )}
 
+      {showDescription && description && (
+        <div
+          className="text-sm text-gray-600 mb-3 line-clamp-3"
+          dangerouslySetInnerHTML={{ __html: description }}
+        />
+      )}
+
       {/* Prices */}
-      <div className="mb-4 space-y-1">
-        <div className="text-lg font-bold text-[#00294D] text-nowrap">
-          {t("productCard.purchase")}:{" "}
-          <span className="font-extrabold">{formatCOP(purchasePrice)}</span>
-        </div>
-        {rentable && rentPrice && (
-          <div className="text-sm font-semibold text-[#555] text-nowrap">
-            {t("productCard.rent")}:{" "}
-            <span className="font-bold text-[#00294D]">
-              {formatCOP(rentPrice)}
-            </span>
+      {showPrice && (
+        <div className="mb-4 space-y-1">
+          <div className="text-lg font-bold text-[#00294D] text-nowrap">
+            {t("productCard.purchase")}:{" "}
+            <span className="font-extrabold">{formatCOP(purchasePrice)}</span>
           </div>
-        )}
-      </div>
+          {rentable && rentPrice && (
+            <div className="text-sm font-semibold text-[#555] text-nowrap">
+              {t("productCard.rent")}:{" "}
+              <span className="font-bold text-[#00294D]">
+                {formatCOP(rentPrice)}
+              </span>
+            </div>
+          )}
+          {showAddToCart && (
+            <button
+              type="button"
+              onClick={onAddToCart}
+              className="mt-3 w-full rounded-lg bg-[#00294D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#003B66]"
+            >
+              Add to cart
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Stock Badge */}
-      <span
-        className={`mt-auto rounded-full px-3 py-1 text-xs font-semibold max-w-20 text-center ${
-          inStock ? "bg-[#1B5E20] text-white" : "bg-[#E53935] text-white"
-        }`}
-      >
-        {inStock ? t("productCard.inStock") : t("productCard.outOfStock")}
-      </span>
+      {showStock && (
+        <span
+          className={`mt-auto rounded-full px-3 py-1 text-xs font-semibold max-w-20 text-center ${
+            inStock ? "bg-[#1B5E20] text-white" : "bg-[#E53935] text-white"
+          }`}
+        >
+          {inStock ? t("productCard.inStock") : t("productCard.outOfStock")}
+        </span>
+      )}
     </div>
   );
 }
