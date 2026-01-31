@@ -1,16 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { http } from "../utils/axios";
 import { formatCOP } from "../utils/helpers";
 import { useI18n } from "../i18n";
+import { useCart } from "../context/CartContext";
 
 export default function ProductDetailPage() {
   const { t } = useI18n();
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { addItem, removeItem } = useCart();
   const [copier, setCopier] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeImage, setActiveImage] = useState(0);
+  const [cartModalOpen, setCartModalOpen] = useState(false);
+  const [cartMode, setCartMode] = useState("buy");
 
   const images = useMemo(() => {
     if (!copier?.images || copier.images.length === 0) return ["/copier.png"];
@@ -74,6 +79,28 @@ export default function ProductDetailPage() {
       </div>
     );
   }
+
+  const handleAddToCart = (mode) => {
+    const itemId = copier?._id ?? copier?.id;
+    if (!itemId) return;
+    removeItem(itemId);
+    addItem({
+      _id: itemId,
+      name: copier.name,
+      subtitle: copier.subtitle,
+      model: copier.model,
+      purchasePrice: mode === "rent" ? copier.rentPrice : copier.purchasePrice,
+      rentPrice: copier.rentPrice,
+      inStock: copier.inStock,
+      images: copier.images,
+      rentable: copier.rentable,
+      description: copier.description,
+      cartMode: mode,
+      quantity: 1,
+    });
+    setCartMode(mode);
+    setCartModalOpen(true);
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
@@ -176,7 +203,7 @@ export default function ProductDetailPage() {
               <div className="text-sm font-semibold text-[#555] mt-1">
                 {t("product.rent")}: {" "}
                 <span className="font-bold text-[#00294D]">
-                  {formatCOP(copier.rentPrice)}
+                  {formatCOP(copier.rentPrice)} {t("product.perMonth")}
                 </span>
               </div>
             )}
@@ -190,17 +217,65 @@ export default function ProductDetailPage() {
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-            <button className="w-full bg-[#00294D] hover:bg-[#003B66] text-white px-5 py-2 rounded-lg text-sm font-semibold shadow-sm">
+            <button
+              type="button"
+              onClick={() => handleAddToCart("buy")}
+              className="w-full bg-[#00294D] hover:bg-[#003B66] text-white px-5 py-2 rounded-lg text-sm font-semibold shadow-sm"
+            >
               {t("product.buyNow")}
             </button>
             {copier.rentable && (
-              <button className="w-full bg-[#FFCB05] hover:bg-[#F2B700] text-[#00294D] px-5 py-2 rounded-lg text-sm font-semibold shadow-sm">
+              <button
+                type="button"
+                onClick={() => handleAddToCart("rent")}
+                className="w-full bg-[#FFCB05] hover:bg-[#F2B700] text-[#00294D] px-5 py-2 rounded-lg text-sm font-semibold shadow-sm"
+              >
                 {t("product.rent")}
               </button>
             )}
           </div>
         </div>
       </div>
+
+      {cartModalOpen && (
+        <div className="fixed inset-0 z-50">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setCartModalOpen(false)}
+          />
+          <div className="absolute inset-0 grid place-items-center p-4">
+            <div className="w-full max-w-md rounded-2xl bg-white shadow-xl border border-gray-100 p-6">
+              <h2 className="text-xl font-bold text-[#00294D] mb-2">
+                {t("cart.modalTitle")}
+              </h2>
+              <p className="text-sm text-gray-600 mb-6">
+                {cartMode === "rent"
+                  ? t("cart.modalBodyRent")
+                  : t("cart.modalBodyBuy")}
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCartModalOpen(false);
+                    navigate("/cart");
+                  }}
+                  className="w-full rounded-lg bg-[#00294D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#003B66]"
+                >
+                  {t("cart.modalCheckout")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCartModalOpen(false)}
+                  className="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-[#00294D] hover:bg-gray-50"
+                >
+                  {t("cart.modalContinue")}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,9 +1,13 @@
 import { formatCOP } from "../utils/helpers";
 import { useI18n } from "../i18n";
+import { useCart } from "../context/CartContext";
 
 export default function ProductCard({
+  _id,
+  id,
   name,
   subtitle,
+  model,
   purchasePrice,
   rentPrice,
   inStock,
@@ -17,6 +21,30 @@ export default function ProductCard({
   onAddToCart,
 }) {
   const { t } = useI18n();
+  const { addItem, isInCart } = useCart();
+  const itemId = _id ?? id ?? null;
+  const inCart = itemId ? isInCart(itemId) : false;
+  const handleAddToCart = () => {
+    if (onAddToCart) {
+      onAddToCart();
+      return;
+    }
+    if (!itemId) return;
+    addItem({
+      _id: itemId,
+      name,
+      subtitle,
+      model,
+      purchasePrice,
+      rentPrice,
+      inStock,
+      images,
+      rentable,
+      description,
+      cartMode: "buy",
+      quantity: 1,
+    });
+  };
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
       {/* Image */}
@@ -50,17 +78,22 @@ export default function ProductCard({
             <div className="text-sm font-semibold text-[#555] text-nowrap">
               {t("productCard.rent")}:{" "}
               <span className="font-bold text-[#00294D]">
-                {formatCOP(rentPrice)}
+                {formatCOP(rentPrice)} {t("productCard.perMonth")}
               </span>
             </div>
           )}
           {showAddToCart && (
             <button
               type="button"
-              onClick={onAddToCart}
-              className="mt-3 w-full rounded-lg bg-[#00294D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#003B66]"
+              onClick={handleAddToCart}
+              disabled={inCart}
+              className={`mt-3 w-full rounded-lg px-4 py-2 text-sm font-semibold text-white ${
+                inCart
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-[#00294D] hover:bg-[#003B66]"
+              }`}
             >
-              Add to cart
+              {inCart ? t("cart.addedToCart") : t("cart.addToCart")}
             </button>
           )}
         </div>
