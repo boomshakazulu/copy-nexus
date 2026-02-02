@@ -14,12 +14,18 @@ import ContactPage from "./pages/ContactPage";
 import AboutPage from "./pages/AboutPage";
 import CopiersPage from "./pages/CopiersPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import PartsAccessoriesPage from "./pages/PartsAccessoriesPage";
+import MaintenancePage from "./pages/MaintenancePage";
 
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import Orders from "./pages/admin/Orders";
 import Products from "./pages/admin/Products";
 import Reports from "./pages/admin/Reports";
+import AdminGuard from "./components/admin/AdminGuard";
+import CartPage from "./pages/CartPage";
+import OrderConfirmationPage from "./pages/OrderConfirmationPage";
+import { CartProvider } from "./context/CartContext";
 
 const router = createBrowserRouter([
   {
@@ -44,18 +50,38 @@ const router = createBrowserRouter([
         element: <CopiersPage />,
       },
       {
+        path: "/parts",
+        element: <PartsAccessoriesPage />,
+      },
+      {
+        path: "/maintenance",
+        element: <MaintenancePage />,
+      },
+      {
         path: "/products/:id",
         element: <ProductDetailPage />,
       },
       {
         path: "/admin",
-        element: <AdminLayout />,
+        element: (
+          <AdminGuard>
+            <AdminLayout />
+          </AdminGuard>
+        ),
         children: [
           { index: true, element: <Dashboard /> },
           { path: "/admin/orders", element: <Orders /> },
           { path: "/admin/products", element: <Products /> },
           { path: "/admin/reports", element: <Reports /> },
         ],
+      },
+      {
+        path: "/cart",
+        element: <CartPage />,
+      },
+      {
+        path: "/order-confirmation",
+        element: <OrderConfirmationPage />,
       },
     ],
   },
@@ -64,7 +90,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <I18nProvider>
-      <RouterProvider router={router} />
+      <CartProvider>
+        <RouterProvider router={router} />
+      </CartProvider>
     </I18nProvider>
   </React.StrictMode>
 );

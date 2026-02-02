@@ -6,17 +6,96 @@
   },
   "common": {
     "logoAlt": "Logo de Copy Nexus",
-    "copierImageAlt": "Copiadora"
+    "copierImageAlt": "Copiadora",
+    "contactMethodLabel": "Metodo de contacto preferido",
+    "contactMethodPlaceholder": "Selecciona metodo de contacto",
+    "contactMethods": {
+      "email": "Correo",
+      "whatsappText": "Mensaje por WhatsApp",
+      "whatsappCall": "Llamada por WhatsApp"
+    }
   },
   "nav": {
     "home": "Inicio",
     "copiers": "Copiadoras",
     "contact": "Contacto",
     "about": "Acerca de",
+    "cart": "Carrito",
+    "parts": "Partes y accesorios",
+    "maintenance": "Mantenimiento",
     "admin": "Admin",
     "login": "Iniciar sesion",
     "signup": "Registrarse",
-    "logout": "Cerrar sesion"
+    "logout": "Cerrar sesion",
+    "menu": "Menu"
+  },
+  "cart": {
+    "title": "Carrito",
+    "subtitle": "Revisa tus productos y solicita una cotizacion cuando estes listo.",
+    "empty": "Tu carrito esta vacio.",
+    "remove": "Quitar",
+    "addToCart": "Agregar al carrito",
+    "addedToCart": "Agregado al carrito",
+    "keepShopping": "Seguir comprando",
+    "item": "Articulo del carrito",
+    "summary": "Resumen",
+    "items": "Articulos",
+    "total": "Total estimado",
+    "checkout": "Solicitar cotizacion",
+    "checkoutHint": "Confirmaremos disponibilidad y precio antes de finalizar.",
+    "quantity": "Cant.",
+    "purchase": "Compra",
+    "rental": "Renta",
+    "modalTitle": "Agregado al carrito",
+    "modalBodyBuy": "Quieres ir al checkout o seguir comprando?",
+    "modalBodyRent": "Tu renta fue agregada. Ir al checkout o seguir comprando?",
+    "modalCheckout": "Ir al checkout",
+    "modalContinue": "Seguir comprando",
+    "form": {
+      "title": "Solicitar cotizacion",
+      "subtitle": "Deja tus datos y la direccion de entrega para finalizar la cotizacion.",
+      "name": "Nombre completo",
+    "email": "Correo",
+    "phone": "Telefono",
+    "idType": "Tipo de documento",
+    "idNumber": "Numero de documento",
+    "street": "Direccion",
+    "neighborhood": "Barrio (opcional)",
+    "city": "Ciudad",
+    "department": "Departamento",
+    "postalCode": "Codigo postal (opcional)",
+    "notes": "Notas o solicitudes adicionales (opcional)",
+    "departmentPlaceholder": "Selecciona departamento",
+    "cityPlaceholder": "Selecciona ciudad",
+    "idTypePlaceholder": "Selecciona tipo de documento",
+    "idTypes": {
+      "cc": "Cedula de ciudadania (CC)",
+      "ce": "Cedula de extranjeria (CE)",
+      "nit": "NIT",
+      "ti": "Tarjeta de identidad (TI)",
+      "pas": "Pasaporte"
+    },
+      "submit": "Enviar solicitud",
+      "submitting": "Enviando...",
+      "cancel": "Cancelar",
+      "noItems": "Agrega al menos un articulo antes de solicitar.",
+      "submitFailed": "No se pudo enviar la solicitud.",
+      "submitSuccess": "Solicitud recibida. Te contactaremos pronto."
+    }
+  },
+  "orderConfirmation": {
+    "title": "Gracias por tu pedido",
+    "subtitle": "Recibimos tu solicitud y la estamos preparando.",
+    "contactIntro": "Te contactaremos pronto usando tu metodo de contacto preferido:",
+    "contactMethods": {
+      "default": "el metodo que proporcionaste"
+    },
+    "emailIntro": "Te enviaremos un correo de confirmacion a",
+    "emailFrom": "desde support@copynexus.co.",
+    "emailFallback": "tu correo electronico",
+    "spamHint": "Si no lo ves pronto, revisa la carpeta de spam o correo no deseado.",
+    "safelistHint": "Recomendamos agregar support@copynexus.co a tu lista de remitentes seguros.",
+    "cta": "Volver al inicio"
   },
   "home": {
     "titleLine1": "COPIADORA",
@@ -24,11 +103,11 @@
     "subtitle": "Renta y venta de copiadoras",
     "features": {
       "copiersTitle": "COPIADORAS",
-      "copiersDesc": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Augdet quam ult amet.",
+      "copiersDesc": "Copiadoras confiables para equipos ocupados, con precios claros y soporte local rápido.",
       "partsTitle": "PARTES Y ACCESORIOS",
-      "partsDesc": "Lorem ipsum dolor amet, consectetuer adipiscing. Augide quam ult ame.",
+      "partsDesc": "Partes y accesorios originales, compatibles con tu modelo y listos cuando los necesites.",
       "maintenanceTitle": "MANTENIMIENTO",
-      "maintenanceDesc": "Lorem ipsum dolor amet, consectetuer adipiscing. Augdet quam ult amet."
+      "maintenanceDesc": "Cuidado preventivo, reparaciones rápidas y cotizaciones claras."
     }
   },
   "copiers": {
@@ -40,13 +119,64 @@
     "filterHighVolume": "Alto volumen",
     "searchPlaceholder": "Buscar por modelo"
   },
-  "productsPage": {
-    "title": "Productos",
-    "category": "Categoria",
-    "copiers": "Copiadoras",
-    "parts": "Partes",
-    "toner": "Toner",
-    "searchPlaceholder": "Buscar por modelo"
+  "partsPage": {
+    "title": "Partes y accesorios",
+    "subtitle": "Selecciona tu copiadora para ver partes compatibles.",
+    "selectLabel": "Selecciona tu copiadora",
+    "selectTitle": "Elige una copiadora",
+    "selectedLabel": "Copiadora seleccionada",
+    "close": "Cerrar",
+    "otherOption": "Otras opciones",
+    "otherSubtitle": "No encuentras tu copiadora? Contáctanos.",
+    "selectPlaceholder": "Elige una copiadora",
+    "selectPrompt": "Selecciona una copiadora para ver las partes disponibles.",
+    "noCopiers": "No hay copiadoras disponibles.",
+    "tonerTitle": "Toner",
+    "partsTitle": "Partes",
+    "noToner": "No hay toner disponible para esta copiadora.",
+    "noParts": "No hay partes disponibles para esta copiadora.",
+    "loading": "Cargando partes...",
+    "loadFailed": "No se pudieron cargar las partes.",
+    "contactTitle": "Necesitas una parte o accesorio que no aparece?",
+    "contactSubtitle": "Cuéntanos lo que necesitas y te respondemos pronto.",
+    "form": {
+      "name": "Nombre",
+      "contactValue": "Correo o numero de WhatsApp",
+      "contactPlaceholder": "tu@ejemplo.com o +57 300 123 4567",
+      "model": "Modelo de copiadora",
+      "modelPlaceholder": "Ingresa el modelo",
+      "message": "Detalles de la parte o accesorio",
+      "send": "Enviar solicitud"
+    }
+  },
+  "maintenancePage": {
+    "title": "Mantenimiento",
+    "subtitle": "Selecciona tu copiadora y solicita una cotizacion de mantenimiento.",
+    "selectLabel": "Selecciona tu copiadora",
+    "selectTitle": "Elige una copiadora",
+    "selectedLabel": "Copiadora seleccionada",
+    "close": "Cerrar",
+    "otherOption": "Otras opciones",
+    "otherSubtitle": "No encuentras tu copiadora? Solicita una cotizacion.",
+    "selectPlaceholder": "Elige una copiadora",
+    "selectPrompt": "Selecciona una copiadora para solicitar mantenimiento.",
+    "noCopiers": "No hay copiadoras disponibles.",
+    "loading": "Cargando copiadoras...",
+    "loadFailed": "No se pudieron cargar las copiadoras.",
+    "formTitle": "Solicitar cotizacion de mantenimiento",
+    "formSubtitle": "Describe el problema y lo que necesitas, y te respondemos pronto.",
+    "form": {
+      "name": "Nombre",
+      "contactValue": "Correo o numero de WhatsApp",
+      "contactPlaceholder": "tu@ejemplo.com o +57 300 123 4567",
+      "model": "Modelo de copiadora",
+      "modelPlaceholder": "Ingresa el modelo",
+      "issue": "Descripcion del problema",
+      "issuePlaceholder": "Cuentanos que esta pasando con la copiadora.",
+      "needs": "Que necesitas",
+      "needsPlaceholder": "Partes, visita de servicio, diagnostico u otros detalles.",
+      "send": "Solicitar cotizacion"
+    }
   },
   "product": {
     "loading": "Cargando detalles del producto...",
@@ -59,11 +189,13 @@
     "next": "Siguiente",
     "price": "Precio",
     "rent": "Renta",
+    "perMonth": "por mes",
     "buyNow": "Comprar ahora"
   },
   "productCard": {
     "purchase": "Compra",
     "rent": "Renta",
+    "perMonth": "por mes",
     "inStock": "En stock",
     "outOfStock": "Agotado"
   },
@@ -80,16 +212,17 @@
   },
   "contact": {
     "title": "Ponte en contacto con nosotros",
-    "subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    "subtitle": "Tienes una pregunta o necesitas una cotizacion? Estamos para ayudarte y respondemos rapido.",
     "addressLabel": "Direccion",
     "addressValue": "Calle Principal 123, Bogota",
-    "phoneLabel": "Telefono",
+    "phoneLabel": "WhatsApp",
     "phoneValue": "+57 123 4567880",
     "emailLabel": "Correo",
     "emailValue": "info@copynexus.co",
     "formTitle": "Formulario de contacto",
     "name": "Nombre",
-    "email": "Correo",
+    "contactValue": "Correo o numero de WhatsApp",
+    "contactPlaceholder": "tu@ejemplo.com o +57 300 123 4567",
     "message": "Mensaje",
     "send": "Enviar mensaje"
   },

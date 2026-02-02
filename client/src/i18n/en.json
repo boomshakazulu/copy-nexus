@@ -6,17 +6,96 @@
   },
   "common": {
     "logoAlt": "Copy Nexus Logo",
-    "copierImageAlt": "Copier"
+    "copierImageAlt": "Copier",
+    "contactMethodLabel": "Preferred contact method",
+    "contactMethodPlaceholder": "Select contact method",
+    "contactMethods": {
+      "email": "Email",
+      "whatsappText": "Text (WhatsApp)",
+      "whatsappCall": "Phone call (WhatsApp)"
+    }
   },
   "nav": {
     "home": "Home",
     "copiers": "Copiers",
     "contact": "Contact",
     "about": "About",
+    "cart": "Cart",
+    "parts": "Parts & Accessories",
+    "maintenance": "Maintenance",
     "admin": "Admin",
     "login": "Login",
     "signup": "Signup",
-    "logout": "Logout"
+    "logout": "Logout",
+    "menu": "Menu"
+  },
+  "cart": {
+    "title": "Cart",
+    "subtitle": "Review items you've added and request a quote when you're ready.",
+    "empty": "Your cart is empty.",
+    "remove": "Remove",
+    "addToCart": "Add to cart",
+    "addedToCart": "Added to cart",
+    "keepShopping": "Keep shopping",
+    "item": "Cart item",
+    "summary": "Summary",
+    "items": "Items",
+    "total": "Estimated total",
+    "checkout": "Request quote",
+    "checkoutHint": "We will confirm availability and pricing before finalizing.",
+    "quantity": "Qty",
+    "purchase": "Purchase",
+    "rental": "Rental",
+    "modalTitle": "Added to cart",
+    "modalBodyBuy": "Would you like to proceed to checkout or continue shopping?",
+    "modalBodyRent": "Your rental selection was added. Proceed to checkout or continue shopping?",
+    "modalCheckout": "Proceed to checkout",
+    "modalContinue": "Continue shopping",
+    "form": {
+      "title": "Request a quote",
+      "subtitle": "Provide your details and delivery address so we can finalize the quote.",
+      "name": "Full name",
+    "email": "Email",
+    "phone": "Phone",
+    "idType": "ID type",
+    "idNumber": "ID number",
+    "street": "Street address",
+    "neighborhood": "Neighborhood (optional)",
+    "city": "City",
+    "department": "Department",
+    "postalCode": "Postal code (optional)",
+    "notes": "Additional notes or requests (optional)",
+    "departmentPlaceholder": "Select department",
+    "cityPlaceholder": "Select city",
+    "idTypePlaceholder": "Select ID type",
+    "idTypes": {
+      "cc": "Cedula de ciudadania (CC)",
+      "ce": "Cedula de extranjeria (CE)",
+      "nit": "NIT",
+      "ti": "Tarjeta de identidad (TI)",
+      "pas": "Pasaporte"
+    },
+      "submit": "Send request",
+      "submitting": "Sending...",
+      "cancel": "Cancel",
+      "noItems": "Add at least one item before requesting a quote.",
+      "submitFailed": "Unable to submit your request.",
+      "submitSuccess": "Request received. We will contact you shortly."
+    }
+  },
+  "orderConfirmation": {
+    "title": "Thanks for your order",
+    "subtitle": "We received your request and are getting it ready.",
+    "contactIntro": "We will reach out shortly using your preferred contact method:",
+    "contactMethods": {
+      "default": "the method you provided"
+    },
+    "emailIntro": "A confirmation email will be sent to",
+    "emailFrom": "from support@copynexus.co.",
+    "emailFallback": "your email address",
+    "spamHint": "If you don't see it soon, please check your spam or junk folder.",
+    "safelistHint": "We recommend adding support@copynexus.co to your safe sender list.",
+    "cta": "Return to homepage"
   },
   "home": {
     "titleLine1": "COPIER",
@@ -24,11 +103,11 @@
     "subtitle": "Copier Rentals & Sales",
     "features": {
       "copiersTitle": "COPIERS",
-      "copiersDesc": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Augdet quam ult amet.",
+      "copiersDesc": "Reliable copiers built for busy teams, with clear pricing and fast local support.",
       "partsTitle": "PARTS & ACCESSORIES",
-      "partsDesc": "Lorem ipsum dolor amet, consectetuer adipiscing. Augide quam ult ame.",
+      "partsDesc": "Genuine parts and accessories matched to your model, ready when you need them.",
       "maintenanceTitle": "MAINTENANCE",
-      "maintenanceDesc": "Lorem ipsum dolor amet, consectetuer adipiscing. Augdet quam ult amet."
+      "maintenanceDesc": "Preventive care, quick repairs, and clear quotes to keep you running."
     }
   },
   "copiers": {
@@ -40,13 +119,64 @@
     "filterHighVolume": "High Volume",
     "searchPlaceholder": "Search by model number"
   },
-  "productsPage": {
-    "title": "Products",
-    "category": "Category",
-    "copiers": "Copiers",
-    "parts": "Parts",
-    "toner": "Toner",
-    "searchPlaceholder": "Search by model number"
+  "partsPage": {
+    "title": "Parts & Accessories",
+    "subtitle": "Select your copier model to see compatible parts.",
+    "selectLabel": "Select your copier",
+    "selectTitle": "Choose a copier",
+    "selectedLabel": "Selected copier",
+    "close": "Close",
+    "otherOption": "Other options",
+    "otherSubtitle": "Can’t find your copier? Contact us.",
+    "selectPlaceholder": "Choose a copier",
+    "selectPrompt": "Select a copier to view available parts.",
+    "noCopiers": "No copiers available.",
+    "tonerTitle": "Toner",
+    "partsTitle": "Parts",
+    "noToner": "No toner available for this copier.",
+    "noParts": "No parts available for this copier.",
+    "loading": "Loading parts...",
+    "loadFailed": "Unable to load parts.",
+    "contactTitle": "Need a part or accessory that isn’t listed?",
+    "contactSubtitle": "Tell us what you need and we’ll get back to you quickly.",
+    "form": {
+      "name": "Name",
+      "contactValue": "Email or WhatsApp number",
+      "contactPlaceholder": "you@example.com or +57 300 123 4567",
+      "model": "Copier model",
+      "modelPlaceholder": "Enter copier model",
+      "message": "Part or accessory details",
+      "send": "Send request"
+    }
+  },
+  "maintenancePage": {
+    "title": "Maintenance",
+    "subtitle": "Select your copier model and request a maintenance quote.",
+    "selectLabel": "Select your copier",
+    "selectTitle": "Choose a copier",
+    "selectedLabel": "Selected copier",
+    "close": "Close",
+    "otherOption": "Other options",
+    "otherSubtitle": "Can’t find your copier? Request a quote.",
+    "selectPlaceholder": "Choose a copier",
+    "selectPrompt": "Select a copier to request maintenance.",
+    "noCopiers": "No copiers available.",
+    "loading": "Loading copiers...",
+    "loadFailed": "Unable to load copiers.",
+    "formTitle": "Request a maintenance quote",
+    "formSubtitle": "Describe the issue and what you need, and we’ll respond quickly.",
+    "form": {
+      "name": "Name",
+      "contactValue": "Email or WhatsApp number",
+      "contactPlaceholder": "you@example.com or +57 300 123 4567",
+      "model": "Copier model",
+      "modelPlaceholder": "Enter copier model",
+      "issue": "Issue description",
+      "issuePlaceholder": "Tell us what’s happening with the copier.",
+      "needs": "What’s needed",
+      "needsPlaceholder": "Parts, service visit, diagnostics, or other details.",
+      "send": "Request quote"
+    }
   },
   "product": {
     "loading": "Loading product details...",
@@ -59,11 +189,13 @@
     "next": "Next",
     "price": "Price",
     "rent": "Rent",
+    "perMonth": "per month",
     "buyNow": "Buy Now"
   },
   "productCard": {
     "purchase": "Purchase",
     "rent": "Rent",
+    "perMonth": "per month",
     "inStock": "in Stock",
     "outOfStock": "Out of Stock"
   },
@@ -80,16 +212,17 @@
   },
   "contact": {
     "title": "Get in touch with us",
-    "subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    "subtitle": "Have a question or need a quote? We’re happy to help and respond quickly.",
     "addressLabel": "Address",
     "addressValue": "123 Main St, Bogota",
-    "phoneLabel": "Phone",
+    "phoneLabel": "WhatsApp",
     "phoneValue": "+57 123 4567880",
     "emailLabel": "Email",
     "emailValue": "info@copynexus.co",
     "formTitle": "Contact Form",
     "name": "Name",
-    "email": "Email",
+    "contactValue": "Email or WhatsApp number",
+    "contactPlaceholder": "you@example.com or +57 300 123 4567",
     "message": "Message",
     "send": "Send Message"
   },

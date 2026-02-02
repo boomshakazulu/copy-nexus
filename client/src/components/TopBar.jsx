@@ -5,6 +5,7 @@ import LoginModal from "./LoginModal";
 import SignupModal from "./SignupModal";
 import Auth from "../utils/auth";
 import { useI18n } from "../i18n";
+import { useCart } from "../context/CartContext";
 
 export default function TopBar() {
   const { lang, setLang, t } = useI18n();
@@ -15,6 +16,7 @@ export default function TopBar() {
   const [showSignup, setShowSignup] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const { count } = useCart();
 
   useEffect(() => {
     if (Auth.loggedIn()) {
@@ -62,11 +64,13 @@ export default function TopBar() {
     <header className="bg-white w-full">
       <div className="flex items-center justify-between px-2 sm:px-6 py-2 sm:py-4 max-w-6xl mx-auto">
         {/* Logo */}
-        <img
-          src="/logo-cropped.png"
-          alt={t("common.logoAlt")}
-          className="h-16 md:h-20 w-auto object-contain"
-        />
+        <Link to="/" className="shrink-0">
+          <img
+            src="/logo-sas.png"
+            alt={t("common.logoAlt")}
+            className="h-16 md:h-20 w-auto object-contain"
+          />
+        </Link>
         <div className="flex gap-2 sm:gap-4 md:gap-6 pl-6 sm:pl-0 text-black font-medium text-sm">
           {/* Top Navigation - always visible */}
           <nav className="flex gap-2 sm:gap-4 md:gap-6 text-black font-medium text-sm">
@@ -113,8 +117,17 @@ export default function TopBar() {
           </div>
 
           {/* Hamburger menu - always visible */}
-          <button onClick={() => setMenuOpen(!menuOpen)} className="text-black">
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="relative text-black"
+            aria-label={t("nav.menu")}
+          >
             <Menu className="w-6 h-6" />
+            {count > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-red-500 text-white text-[10px] leading-4 text-center font-bold">
+                {count}
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -146,6 +159,24 @@ export default function TopBar() {
             onClick={(e) => e.stopPropagation()}
           >
             <nav className="flex flex-col gap-4 text-black font-medium text-base">
+              <Link
+                to="/cart"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center justify-between"
+              >
+                <span>{t("nav.cart")}</span>
+                {count > 0 && (
+                  <span className="min-w-5 h-5 px-1 rounded-full bg-red-500 text-white text-[11px] leading-5 text-center font-bold">
+                    {count}
+                  </span>
+                )}
+              </Link>
+              <Link to="/parts" onClick={() => setMenuOpen(false)}>
+                {t("nav.parts")}
+              </Link>
+              <Link to="/maintenance" onClick={() => setMenuOpen(false)}>
+                {t("nav.maintenance")}
+              </Link>
               <Link to="/about">{t("nav.about")}</Link>
               {!loggedIn ? (
                 <div className="flex flex-col gap-4 text-black font-medium text-base">

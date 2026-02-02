@@ -61,8 +61,14 @@ module.exports = {
 
     if (model) {
       const prefix = normModel(model);
-      // anchored regex so Mongo can use the index on copierModel_norm
-      filter.copierModel_norm = new RegExp("^" + escapeRegex(prefix));
+      const regex = new RegExp("^" + escapeRegex(prefix));
+      if (category === "copier") {
+        // anchored regex so Mongo can use the index on model_norm
+        filter.model_norm = regex;
+      } else {
+        // parts/toner: match compatible copier models
+        filter.compatibleCopiers_norm = regex;
+      }
     }
 
     if (minPrice || maxPrice) {

@@ -10,7 +10,7 @@ const addressSchema = new Schema(
     department: { type: String, required: true, trim: true },
     postalCode: { type: String, trim: true }, // keep just postalCode
   },
-  { _id: false }
+  { _id: false },
 );
 
 const lineItemSchema = new Schema(
@@ -20,8 +20,9 @@ const lineItemSchema = new Schema(
     model: { type: String, trim: true },
     qty: { type: Number, min: 1, required: true },
     unitAmount: { type: Number, min: 0, required: true }, // integer COP
+    IsRented: { type: Boolean, default: false },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const orderSchema = new Schema(
@@ -32,9 +33,14 @@ const orderSchema = new Schema(
       name: { type: String, required: true, trim: true },
       email: { type: String, required: true, lowercase: true, trim: true },
       phone: { type: String, required: true, trim: true },
+      idType: { type: String, required: true, trim: true },
+      idNumber: { type: String, required: true, trim: true },
+      preferredContactMethod: { type: String, trim: true, default: "" },
     },
 
     shippingAddress: { type: addressSchema, required: true },
+
+    notes: { type: String, trim: true, default: "" },
 
     items: {
       type: [lineItemSchema],
@@ -60,7 +66,7 @@ const orderSchema = new Schema(
       default: "pending",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Keep totals in sync
@@ -68,7 +74,7 @@ orderSchema.pre("save", function (next) {
   const items = Array.isArray(this.items) ? this.items : [];
   const subtotal = items.reduce(
     (s, i) => s + (i.unitAmount || 0) * (i.qty || 0),
-    0
+    0,
   );
 
   this.amounts = this.amounts || {};
@@ -79,7 +85,7 @@ orderSchema.pre("save", function (next) {
   this.amounts.subtotal = Math.round(subtotal);
   this.amounts.total = Math.max(
     0,
-    Math.round(subtotal + tax + shipping - discount)
+    Math.round(subtotal + tax + shipping - discount),
   );
 
   next();

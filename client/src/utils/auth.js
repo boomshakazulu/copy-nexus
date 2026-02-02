@@ -18,7 +18,7 @@ class AuthService {
         return true;
       } else return false;
     } catch (err) {
-      return false;
+      return true;
     }
   }
 
@@ -43,13 +43,13 @@ class AuthService {
 
   isAdmin() {
     const token = this.getToken();
-    if (token) {
+    if (!token || this.isTokenExpired(token)) return false;
+    try {
       const decodedToken = jwtDecode(token);
-      if (decodedToken.data.role === "admin") {
-        return true;
-      }
+      return decodedToken?.data?.role === "admin";
+    } catch (err) {
+      return false;
     }
-    return false; // Return false if token is not present or role is not "admin"
   }
 }
 
