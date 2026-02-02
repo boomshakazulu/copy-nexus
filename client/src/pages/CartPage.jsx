@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { formatCOP } from "../utils/helpers";
@@ -9,6 +9,7 @@ import coDepsCities from "../utils/coDepsCities.json";
 export default function CartPage() {
   const { items, removeItem, updateQuantity, clearCart } = useCart();
   const { t } = useI18n();
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -19,11 +20,13 @@ export default function CartPage() {
     phone: "",
     idType: "",
     idNumber: "",
+    preferredContactMethod: "",
     streetAddress: "",
     neighborhood: "",
     city: "",
     department: "",
     postalCode: "",
+    notes: "",
   });
   const departments = coDepsCities?.departments ?? [];
   const selectedDepartment = departments.find(
@@ -70,6 +73,7 @@ export default function CartPage() {
         phone: form.phone.trim(),
         idType: form.idType.trim(),
         idNumber: form.idNumber.trim(),
+        preferredContactMethod: form.preferredContactMethod.trim(),
       },
       shippingAddress: {
         streetAddress: form.streetAddress.trim(),
@@ -86,11 +90,19 @@ export default function CartPage() {
         unitAmount: Number(item.purchasePrice) || 0,
         IsRented: item.cartMode === "rent",
       })),
+      notes: form.notes.trim(),
     };
 
     setIsSubmitting(true);
     try {
       await http.post("/orders", payload);
+      sessionStorage.setItem(
+        "orderConfirmation",
+        JSON.stringify({
+          email: payload.customer.email,
+          preferredContactMethod: payload.customer.preferredContactMethod,
+        }),
+      );
       setSubmitSuccess(true);
       setShowForm(false);
       clearCart();
@@ -100,12 +112,15 @@ export default function CartPage() {
         phone: "",
         idType: "",
         idNumber: "",
+        preferredContactMethod: "",
         streetAddress: "",
         neighborhood: "",
         city: "",
         department: "",
         postalCode: "",
+        notes: "",
       });
+      navigate("/order-confirmation");
     } catch (err) {
       setSubmitError(err?.message || t("cart.form.submitFailed"));
     } finally {
@@ -344,6 +359,30 @@ export default function CartPage() {
             </div>
             <div>
               <label className="block text-sm font-semibold text-[#00294D] mb-1">
+                {t("common.contactMethodLabel")}
+              </label>
+              <select
+                value={form.preferredContactMethod}
+                onChange={handleChange("preferredContactMethod")}
+                required
+                className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              >
+                <option value="">
+                  {t("common.contactMethodPlaceholder")}
+                </option>
+                <option value="email">
+                  {t("common.contactMethods.email")}
+                </option>
+                <option value="whatsappCall">
+                  {t("common.contactMethods.whatsappCall")}
+                </option>
+                <option value="whatsappText">
+                  {t("common.contactMethods.whatsappText")}
+                </option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-[#00294D] mb-1">
                 {t("cart.form.street")}
               </label>
               <input
@@ -410,6 +449,17 @@ export default function CartPage() {
                 type="text"
                 value={form.postalCode}
                 onChange={handleChange("postalCode")}
+                className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-[#00294D] mb-1">
+                {t("cart.form.notes")}
+              </label>
+              <textarea
+                value={form.notes}
+                onChange={handleChange("notes")}
+                rows={4}
                 className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
               />
             </div>

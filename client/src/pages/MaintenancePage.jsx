@@ -132,20 +132,20 @@ export default function MaintenancePage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  {t("maintenancePage.form.contactMethod")}
+                  {t("common.contactMethodLabel")}
                 </label>
                 <select
                   className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                   defaultValue="email"
                 >
                   <option value="email">
-                    {t("maintenancePage.form.contactEmail")}
+                    {t("common.contactMethods.email")}
                   </option>
                   <option value="whatsappText">
-                    {t("maintenancePage.form.contactWhatsappText")}
+                    {t("common.contactMethods.whatsappText")}
                   </option>
                   <option value="whatsappCall">
-                    {t("maintenancePage.form.contactWhatsappCall")}
+                    {t("common.contactMethods.whatsappCall")}
                   </option>
                 </select>
               </div>

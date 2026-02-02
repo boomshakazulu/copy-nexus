@@ -35,9 +35,12 @@ const orderSchema = new Schema(
       phone: { type: String, required: true, trim: true },
       idType: { type: String, required: true, trim: true },
       idNumber: { type: String, required: true, trim: true },
+      preferredContactMethod: { type: String, trim: true, default: "" },
     },
 
     shippingAddress: { type: addressSchema, required: true },
+
+    notes: { type: String, trim: true, default: "" },
 
     items: {
       type: [lineItemSchema],

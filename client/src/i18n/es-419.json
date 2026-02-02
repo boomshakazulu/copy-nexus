@@ -6,7 +6,14 @@
   },
   "common": {
     "logoAlt": "Logo de Copy Nexus",
-    "copierImageAlt": "Copiadora"
+    "copierImageAlt": "Copiadora",
+    "contactMethodLabel": "Metodo de contacto preferido",
+    "contactMethodPlaceholder": "Selecciona metodo de contacto",
+    "contactMethods": {
+      "email": "Correo",
+      "whatsappText": "Mensaje por WhatsApp",
+      "whatsappCall": "Llamada por WhatsApp"
+    }
   },
   "nav": {
     "home": "Inicio",
@@ -57,6 +64,7 @@
     "city": "Ciudad",
     "department": "Departamento",
     "postalCode": "Codigo postal (opcional)",
+    "notes": "Notas o solicitudes adicionales (opcional)",
     "departmentPlaceholder": "Selecciona departamento",
     "cityPlaceholder": "Selecciona ciudad",
     "idTypePlaceholder": "Selecciona tipo de documento",
@@ -74,6 +82,20 @@
       "submitFailed": "No se pudo enviar la solicitud.",
       "submitSuccess": "Solicitud recibida. Te contactaremos pronto."
     }
+  },
+  "orderConfirmation": {
+    "title": "Gracias por tu pedido",
+    "subtitle": "Recibimos tu solicitud y la estamos preparando.",
+    "contactIntro": "Te contactaremos pronto usando tu metodo de contacto preferido:",
+    "contactMethods": {
+      "default": "el metodo que proporcionaste"
+    },
+    "emailIntro": "Te enviaremos un correo de confirmacion a",
+    "emailFrom": "desde support@copynexus.co.",
+    "emailFallback": "tu correo electronico",
+    "spamHint": "Si no lo ves pronto, revisa la carpeta de spam o correo no deseado.",
+    "safelistHint": "Recomendamos agregar support@copynexus.co a tu lista de remitentes seguros.",
+    "cta": "Volver al inicio"
   },
   "home": {
     "titleLine1": "COPIADORA",
@@ -119,10 +141,6 @@
     "contactSubtitle": "Cuéntanos lo que necesitas y te respondemos pronto.",
     "form": {
       "name": "Nombre",
-      "contactMethod": "Metodo de contacto preferido",
-      "contactEmail": "Correo",
-      "contactWhatsappText": "WhatsApp por texto",
-      "contactWhatsappCall": "Llamada por WhatsApp",
       "contactValue": "Correo o numero de WhatsApp",
       "contactPlaceholder": "tu@ejemplo.com o +57 300 123 4567",
       "model": "Modelo de copiadora",
@@ -149,10 +167,6 @@
     "formSubtitle": "Describe el problema y lo que necesitas, y te respondemos pronto.",
     "form": {
       "name": "Nombre",
-      "contactMethod": "Metodo de contacto preferido",
-      "contactEmail": "Correo",
-      "contactWhatsappText": "WhatsApp por texto",
-      "contactWhatsappCall": "Llamada por WhatsApp",
       "contactValue": "Correo o numero de WhatsApp",
       "contactPlaceholder": "tu@ejemplo.com o +57 300 123 4567",
       "model": "Modelo de copiadora",
@@ -207,10 +221,6 @@
     "emailValue": "info@copynexus.co",
     "formTitle": "Formulario de contacto",
     "name": "Nombre",
-    "contactMethod": "Metodo de contacto preferido",
-    "contactEmail": "Correo",
-    "contactWhatsappText": "WhatsApp por texto",
-    "contactWhatsappCall": "Llamada por WhatsApp",
     "contactValue": "Correo o numero de WhatsApp",
     "contactPlaceholder": "tu@ejemplo.com o +57 300 123 4567",
     "message": "Mensaje",
