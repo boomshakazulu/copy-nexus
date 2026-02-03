@@ -5,6 +5,7 @@ const routes = require("./routes");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const { notFound } = require("./utils/httpError");
 const app = express();
 const PORT = 3001;
 
@@ -19,7 +20,7 @@ app.use("/api/v1", routes);
 app.get("/health", (_req, res) => res.send("ok"));
 
 // 404 + error handlers (after routes)
-app.use((req, res) => res.status(404).json({ error: "Not found" }));
+app.use((req, _res, next) => next(notFound("Not found")));
 
 app.use((err, _req, res, _next) => {
   console.error(err);
@@ -31,7 +32,12 @@ app.use((err, _req, res, _next) => {
       (err.keyPattern && Object.keys(err.keyPattern)[0]) ||
       (err.keyValue && Object.keys(err.keyValue)[0]) ||
       "field";
-    return res.status(409).json({ error: `${field} already registered` });
+    return res.status(409).json({
+      error: {
+        message: `${field} already registered`,
+        code: "conflict",
+      },
+    });
   }
 
   // Mongoose validation errors
@@ -39,10 +45,24 @@ app.use((err, _req, res, _next) => {
     const details = Object.fromEntries(
       Object.entries(err.errors || {}).map(([k, v]) => [k, v.message])
     );
-    return res.status(400).json({ error: "Invalid data", details });
+    return res.status(422).json({
+      error: { message: "Invalid data", code: "validation_error", details },
+    });
   }
 
-  res.status(err.status || 500).json({ error: err.message || "Server error" });
+  if (err?.name === "CastError") {
+    return res.status(400).json({
+      error: { message: "Invalid identifier", code: "invalid_id" },
+    });
+  }
+
+  const status = err.status || 500;
+  const code =
+    err.code || (status >= 500 ? "server_error" : "error");
+  const message = err.message || "Server error";
+  const payload = { message, code };
+  if (err.details) payload.details = err.details;
+  res.status(status).json({ error: payload });
 });
 
 db.once("open", () => {

@@ -23,15 +23,15 @@ export default function PartsAccessoriesPage() {
       try {
         setIsLoading(true);
         const copiersRes = await http.get("/products", {
-          params: { category: "copier" },
+          params: { category: "copier", visibility: "active" },
         });
 
         setCopiers(copiersRes?.data?.data ?? []);
         setParts([]);
         setToners([]);
         setError("");
-      } catch (err) {
-        setError(err?.message || t("partsPage.loadFailed"));
+      } catch (_err) {
+        setError(t("partsPage.loadFailed"));
       } finally {
         setIsLoading(false);
       }
@@ -81,16 +81,16 @@ export default function PartsAccessoriesPage() {
         setIsItemsLoading(true);
         const [partsRes, tonerRes] = await Promise.all([
           http.get("/products", {
-            params: { category: "part", model: copierMatchValue },
+            params: { category: "part", model: copierMatchValue, visibility: "active" },
           }),
           http.get("/products", {
-            params: { category: "toner", model: copierMatchValue },
+            params: { category: "toner", model: copierMatchValue, visibility: "active" },
           }),
         ]);
         setParts(partsRes?.data?.data ?? []);
         setToners(tonerRes?.data?.data ?? []);
-      } catch (err) {
-        setError(err?.message || t("partsPage.loadFailed"));
+      } catch (_err) {
+        setError(t("partsPage.loadFailed"));
         setParts([]);
         setToners([]);
       } finally {

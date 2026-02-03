@@ -1,26 +1,27 @@
 const jwt = require("jsonwebtoken");
 const secret = process.env.SECRET_JWT;
 const expiration = "24h";
+const { unauthorized, forbidden } = require("./httpError");
 
 function requireAuth(req, res, next) {
   let token = req.body.token || req.query.token || req.headers.authorization;
   if (req.headers.authorization) token = token.split(" ").pop().trim();
-  if (!token) return res.status(401).json({ error: "No token provided" });
+  if (!token) return next(unauthorized("No token provided"));
 
   try {
     const { data } = jwt.verify(token, secret, { maxAge: expiration });
     req.user = data;
     next();
   } catch (e) {
-    return res.status(401).json({ error: "Invalid or expired token" });
+    return next(unauthorized("Invalid or expired token"));
   }
 }
 
 function requireRole(role) {
   return (req, res, next) => {
-    if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+    if (!req.user) return next(unauthorized("Unauthorized"));
     if (req.user.role !== role)
-      return res.status(403).json({ error: "Forbidden" });
+      return next(forbidden("Forbidden"));
     next();
   };
 }

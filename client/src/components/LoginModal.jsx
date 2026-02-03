@@ -32,8 +32,9 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
         }
       } catch (err) {
         const msg = err.message || "";
+        const code = err.code || "";
 
-        if (msg.includes("Invalid credentials")) {
+        if (code === "unauthorized" || msg.includes("Invalid credentials")) {
           passwordField.setCustomValidity(t("auth.errors.invalidCredentials"));
           passwordField.reportValidity();
           return;

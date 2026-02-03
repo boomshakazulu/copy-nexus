@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Order } = require("../models");
+const { unprocessable } = require("../utils/httpError");
 
 // helpers
 const escapeRegex = (s = "") => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -16,6 +17,10 @@ module.exports = {
       page = 1,
       limit = 20,
     } = req.query;
+
+    if (order && order !== "asc" && order !== "desc") {
+      throw unprocessable("Invalid sort order", { order });
+    }
 
     const pageNum = Math.max(parseInt(page, 10) || 1, 1);
     const perPage = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 100);
@@ -50,6 +55,9 @@ module.exports = {
         .filter(Boolean)
         .filter((id) => mongoose.Types.ObjectId.isValid(id))
         .map((id) => new mongoose.Types.ObjectId(id));
+      if (!objIds.length) {
+        throw unprocessable("No valid ids provided");
+      }
       if (objIds.length) filter._id = { $in: objIds };
     }
 

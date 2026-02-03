@@ -22,8 +22,8 @@ export default function MaintenancePage() {
         const res = await http.get("/products", { params: { category: "copier" } });
         setCopiers(res?.data?.data ?? []);
         setError("");
-      } catch (err) {
-        setError(err?.message || t("maintenancePage.loadFailed"));
+      } catch (_err) {
+        setError(t("maintenancePage.loadFailed"));
       } finally {
         setIsLoading(false);
       }
