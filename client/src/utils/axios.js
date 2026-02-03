@@ -13,11 +13,22 @@ export const http = axios.create({
 http.interceptors.response.use(
   (res) => res,
   (err) => {
-    const msg =
-      err?.response?.data?.error ||
-      err?.response?.data?.message ||
+    const status = err?.response?.status;
+    const data = err?.response?.data;
+    const errorObj = data?.error;
+    const message =
+      errorObj?.message ||
+      data?.message ||
+      (typeof errorObj === "string" ? errorObj : null) ||
       err?.message ||
       "Request failed";
-    return Promise.reject(new Error(msg));
+    const code = errorObj?.code || data?.code;
+    const details = errorObj?.details || data?.details;
+    const nextErr = new Error(message);
+    nextErr.status = status;
+    nextErr.code = code;
+    nextErr.details = details;
+    nextErr.raw = err;
+    return Promise.reject(nextErr);
   }
 );

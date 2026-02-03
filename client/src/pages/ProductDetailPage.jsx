@@ -45,7 +45,11 @@ export default function ProductDetailPage() {
           setError(t("product.notFound"));
         }
       } catch (err) {
-        setError(err.message || t("product.loadFailed"));
+        if (err?.status === 404) {
+          setError(t("product.notFound"));
+        } else {
+          setError(t("product.loadFailed"));
+        }
       } finally {
         setIsLoading(false);
       }

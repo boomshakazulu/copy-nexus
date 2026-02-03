@@ -122,7 +122,7 @@ export default function CartPage() {
       });
       navigate("/order-confirmation");
     } catch (err) {
-      setSubmitError(err?.message || t("cart.form.submitFailed"));
+      setSubmitError(t("cart.form.submitFailed"));
     } finally {
       setIsSubmitting(false);
     }

@@ -117,7 +117,8 @@
     "filterColor": "Color",
     "filterMono": "Mono",
     "filterHighVolume": "Alto volumen",
-    "searchPlaceholder": "Buscar por modelo"
+    "searchPlaceholder": "Buscar por modelo",
+    "loadFailed": "No se pudieron cargar las copiadoras."
   },
   "partsPage": {
     "title": "Partes y accesorios",
@@ -290,7 +291,11 @@
     },
     "products": {
       "title": "Productos",
-      "addProduct": "+ Agregar producto"
+      "addProduct": "+ Agregar producto",
+      "loadFailed": "No se pudieron cargar los productos.",
+      "saveFailed": "No se pudo guardar el producto.",
+      "validationFailed": "Corrige los campos resaltados.",
+      "unknownFields": "Campos desconocidos: {fields}"
     },
     "reports": {
       "title": "Reportes",
@@ -363,6 +368,18 @@
       "dragHint": "Arrastra miniaturas para cambiar el orden. La primera imagen sera la principal.",
       "cancel": "Cancelar",
       "saveProduct": "Guardar producto"
+    },
+    "errors": {
+      "required": "Este campo es obligatorio.",
+      "nonEmpty": "Ingresa un valor.",
+      "oneOf": "Selecciona una opción válida.",
+      "number": "Ingresa un número.",
+      "nonNegative": "El valor debe ser 0 o mayor.",
+      "requiredWhenRentable": "Se requiere cuando la renta está habilitada.",
+      "imagesUrl": "Ingresa URLs de imágenes válidas.",
+      "array": "Proporciona una lista de valores.",
+      "arrayOfStrings": "Proporciona una lista de textos.",
+      "invalid": "Valor inválido."
     },
     "compatibility": {
       "modelLabel": "Modelo:",

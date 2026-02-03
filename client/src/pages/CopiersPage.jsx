@@ -8,20 +8,23 @@ import { useI18n } from "../i18n";
 export default function CopiersPage() {
   const { t } = useI18n();
   const [copiers, setCopiers] = useState([]);
+  const [error, setError] = useState("");
 
   const fetchCopiers = async () => {
     try {
       const copiers = await http.get("/products", {
         params: {
           category: "copier",
+          visibility: "active",
         },
       });
       console.log(copiers.data);
       if (copiers.data) {
         setCopiers(copiers.data.data);
+        setError("");
       }
     } catch (err) {
-      console.log(err);
+      setError(t("copiers.loadFailed"));
     }
   };
 
@@ -65,17 +68,21 @@ export default function CopiersPage() {
       </div>
 
       {/* Copier Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-5 bg-white rounded-xl shadow-md overflow-hidden">
-        {copiers.map((copier) => (
-          <Link
-            key={copier._id}
-            to={`/products/${copier._id}`}
-            className="h-full"
-          >
-            <ProductCard {...copier} />
-          </Link>
-        ))}
-      </div>
+      {error ? (
+        <p className="text-sm text-red-600 font-semibold">{error}</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-5 bg-white rounded-xl shadow-md overflow-hidden">
+          {copiers.map((copier) => (
+            <Link
+              key={copier._id}
+              to={`/products/${copier._id}`}
+              className="h-full"
+            >
+              <ProductCard {...copier} />
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

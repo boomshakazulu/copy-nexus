@@ -11,6 +11,7 @@ const productSchema = new Schema(
     },
     model: {
       type: String,
+      required: true,
     },
     model_norm: {
       type: String,
@@ -74,6 +75,7 @@ const productSchema = new Schema(
     },
     description: {
       type: String,
+      required: true,
     },
   },
   { timestamps: true }

@@ -117,7 +117,8 @@
     "filterColor": "Color",
     "filterMono": "Mono",
     "filterHighVolume": "High Volume",
-    "searchPlaceholder": "Search by model number"
+    "searchPlaceholder": "Search by model number",
+    "loadFailed": "Unable to load copiers."
   },
   "partsPage": {
     "title": "Parts & Accessories",
@@ -290,7 +291,11 @@
     },
     "products": {
       "title": "Products",
-      "addProduct": "+ Add Product"
+      "addProduct": "+ Add Product",
+      "loadFailed": "Unable to load products.",
+      "saveFailed": "Unable to save the product.",
+      "validationFailed": "Please fix the highlighted fields.",
+      "unknownFields": "Unknown fields: {fields}"
     },
     "reports": {
       "title": "Reports",
@@ -363,6 +368,18 @@
       "dragHint": "Drag thumbnails to change order. First image becomes the product's primary image.",
       "cancel": "Cancel",
       "saveProduct": "Save Product"
+    },
+    "errors": {
+      "required": "This field is required.",
+      "nonEmpty": "Please enter a value.",
+      "oneOf": "Please select a valid option.",
+      "number": "Please enter a number.",
+      "nonNegative": "Value must be 0 or greater.",
+      "requiredWhenRentable": "Required when rent is enabled.",
+      "imagesUrl": "Please enter valid image URLs.",
+      "array": "Please provide a list of values.",
+      "arrayOfStrings": "Please provide a list of text values.",
+      "invalid": "Invalid value."
     },
     "compatibility": {
       "modelLabel": "Model:",

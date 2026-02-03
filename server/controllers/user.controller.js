@@ -1,17 +1,74 @@
 const mongoose = require("mongoose");
-const { User } = require("../models");
+const { User, Order } = require("../models");
 const { signToken } = require("../utils/auth");
 const bcrypt = require("bcrypt");
+const {
+  badRequest,
+  notFound,
+  unprocessable,
+  unauthorized,
+} = require("../utils/httpError");
+
+const isEmail = (q = "") => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(q);
 
 module.exports = {
+  async getUser(req, res) {
+    const { id, email } = req.query || {};
+
+    if (!id && !email) {
+      throw badRequest("id or email is required");
+    }
+
+    let user = null;
+
+    if (id) {
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw badRequest("Invalid user id");
+      }
+      user = await User.findById(id).lean();
+    } else if (email) {
+      const normalized = String(email).trim().toLowerCase();
+      if (!isEmail(normalized)) {
+        throw badRequest("Invalid email");
+      }
+      user = await User.findOne({ email: normalized }).lean();
+    }
+
+    if (!user) {
+      throw notFound("User not found");
+    }
+
+    const orders = await Order.find({
+      "customer.email": user.email,
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    delete user.password;
+    delete user.passwordHash;
+    delete user.__v;
+
+    return res.json({ user, orders });
+  },
+
   async createUser(req, res) {
     const { email, password } = req.body;
-    if (!email || !password)
-      return res.status(400).json({ error: "Email and password are required" });
+    if (!email || !password) {
+      throw badRequest("Email and password are required");
+    }
+
+    const normalizedEmail = String(email).trim().toLowerCase();
+    if (!isEmail(normalizedEmail)) {
+      throw unprocessable("Invalid email");
+    }
+
+    if (typeof password !== "string" || password.length < 8) {
+      throw unprocessable("Password must be at least 8 characters");
+    }
 
     try {
       // Triggers pre('validate') to set passwordHash
-      const user = await User.create({ email, password });
+      const user = await User.create({ email: normalizedEmail, password });
 
       const publicUser = user.toObject();
       delete publicUser.password;
@@ -26,29 +83,37 @@ module.exports = {
 
       return res.status(201).json({ user: publicUser, token });
     } catch (err) {
-      if (err?.code === 11000) {
-        return res.status(409).json({ error: "email already registered" });
-      }
-      if (err?.errors?.password?.message) {
-        return res.status(400).json({ error: err.errors.password.message });
-      }
-      return res.status(500).json({ error: "Could not create user" });
+      throw err;
     }
   },
 
   async login(req, res) {
     const { email, password } = req.body || {};
-    if (!email || !password)
-      return res.status(400).json({ error: "Email and password are required" });
+    if (!email || !password) {
+      throw badRequest("Email and password are required");
+    }
+
+    const normalizedEmail = String(email).trim().toLowerCase();
+    if (!isEmail(normalizedEmail)) {
+      throw unprocessable("Invalid email");
+    }
+
+    if (typeof password !== "string") {
+      throw unprocessable("Invalid password");
+    }
 
     const user = await User.findOne({
-      email: String(email).trim().toLowerCase(),
+      email: normalizedEmail,
     }).select("+passwordHash");
 
-    if (!user) return res.status(401).json({ error: "Invalid credentials" });
+    if (!user) {
+      throw unauthorized("Invalid credentials");
+    }
 
     const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok) return res.status(401).json({ error: "Invalid credentials" });
+    if (!ok) {
+      throw unauthorized("Invalid credentials");
+    }
 
     const token = signToken({
       email: user.email,

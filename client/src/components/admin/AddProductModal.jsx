@@ -11,6 +11,8 @@ export default function AddProductModal({
   onClose,
   onSubmit,
   copierOptions = [],
+  formError = "",
+  fieldErrors = {},
 }) {
   const { t } = useI18n();
   const [name, setName] = useState("");
@@ -57,7 +59,11 @@ export default function AddProductModal({
   if (!isOpen) return null;
 
   const canSave =
-    name.trim() && purchasePrice !== "" && (!rentable || rentPrice !== "");
+    name.trim() &&
+    model.trim() &&
+    description.trim() &&
+    purchasePrice !== "" &&
+    (!rentable || rentPrice !== "");
 
   const onlyDigits = (s) => (s || "").replace(/\D/g, "");
 
@@ -78,12 +84,11 @@ export default function AddProductModal({
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!canSave || !Auth.isAdmin()) return;
 
     const product = {
-      isNew: true,
       name: name.trim(),
       subtitle: subtitle.trim(),
       model,
@@ -98,8 +103,8 @@ export default function AddProductModal({
       compatibleCopiers: category === "copier" ? [] : compatibleCopiers,
     };
 
-    onSubmit?.(product);
-    onClose?.();
+    const ok = await onSubmit?.(product);
+    if (ok) onClose?.();
   };
 
   // ---- Images: add/remove/reorder ----
@@ -182,6 +187,11 @@ export default function AddProductModal({
             onSubmit={handleSubmit}
             className="px-6 py-5 overflow-y-auto flex-1"
           >
+            {formError && (
+              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {formError}
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Name */}
               <div className="md:col-span-2">
@@ -194,6 +204,9 @@ export default function AddProductModal({
                   className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
                   placeholder={t("admin.forms.namePlaceholder")}
                 />
+                {fieldErrors.name && (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.name}</p>
+                )}
               </div>
 
               {/* Subtitle / Model */}
@@ -207,6 +220,11 @@ export default function AddProductModal({
                   className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
                   placeholder={t("admin.forms.subtitlePlaceholder")}
                 />
+                {fieldErrors.subtitle && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {fieldErrors.subtitle}
+                  </p>
+                )}
               </div>
               {/* Model */}
               <div className="md:col-span-2">
@@ -219,6 +237,11 @@ export default function AddProductModal({
                   className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
                   placeholder={t("admin.forms.modelPlaceholder")}
                 />
+                {fieldErrors.model && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {fieldErrors.model}
+                  </p>
+                )}
               </div>
 
               {/* Description (rich text) */}
@@ -230,6 +253,11 @@ export default function AddProductModal({
                 <p className="mt-1 text-xs text-gray-500">
                   {t("admin.forms.descriptionHint")}
                 </p>
+                {fieldErrors.description && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {fieldErrors.description}
+                  </p>
+                )}
               </div>
 
               {/* Category */}
@@ -254,6 +282,11 @@ export default function AddProductModal({
                     </label>
                   ))}
                 </div>
+                {fieldErrors.category && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {fieldErrors.category}
+                  </p>
+                )}
               </div>
 
               {/* Stock */}
@@ -269,6 +302,11 @@ export default function AddProductModal({
                   <option value="true">{t("admin.forms.inStock")}</option>
                   <option value="false">{t("admin.forms.outOfStock")}</option>
                 </select>
+                {fieldErrors.inStock && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {fieldErrors.inStock}
+                  </p>
+                )}
                 <span className="block text-sm font-semibold text-[#00294D] mb-1 mt-4">
                   {t("admin.forms.visibility")}
                 </span>
@@ -280,6 +318,11 @@ export default function AddProductModal({
                   <option value="active">{t("admin.forms.active")}</option>
                   <option value="archived">{t("admin.forms.archived")}</option>
                 </select>
+                {fieldErrors.visibility && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {fieldErrors.visibility}
+                  </p>
+                )}
               </div>
 
               {/* Purchase Price (COP) */}
@@ -303,6 +346,11 @@ export default function AddProductModal({
                   className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
                   placeholder="$0"
                 />
+                {fieldErrors.purchasePrice && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {fieldErrors.purchasePrice}
+                  </p>
+                )}
               </div>
 
               {/* Rentable toggle + Rent price (only for copiers) */}
@@ -326,11 +374,11 @@ export default function AddProductModal({
                   </div>
 
                   {/* Rent Price (COP / month) */}
-                  <div
-                    className={`${
-                      rentable ? "" : "opacity-50"
-                    } transition-opacity`}
-                  >
+                <div
+                  className={`${
+                    rentable ? "" : "opacity-50"
+                  } transition-opacity`}
+                >
                     <label className="block text-sm font-semibold text-[#00294D] mb-1">
                       {t("admin.forms.rentPrice")}
                     </label>
@@ -351,6 +399,11 @@ export default function AddProductModal({
                       className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20 disabled:bg-gray-100"
                       placeholder="$0"
                     />
+                    {fieldErrors.rentPrice && (
+                      <p className="mt-1 text-xs text-red-600">
+                        {fieldErrors.rentPrice}
+                      </p>
+                    )}
                   </div>
                 </>
               )}
@@ -388,6 +441,11 @@ export default function AddProductModal({
                   <p className="mt-1 text-xs text-gray-500">
                     {t("admin.forms.compatibleHint")}
                   </p>
+                  {fieldErrors.compatibleCopiers && (
+                    <p className="mt-1 text-xs text-red-600">
+                      {fieldErrors.compatibleCopiers}
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -456,6 +514,11 @@ export default function AddProductModal({
                 <p className="mt-1 text-xs text-gray-500">
                   {t("admin.forms.dragHint")}
                 </p>
+                {fieldErrors.images && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {fieldErrors.images}
+                  </p>
+                )}
               </div>
             </div>
 

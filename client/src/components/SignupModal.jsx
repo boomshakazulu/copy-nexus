@@ -57,8 +57,9 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
       console.error(err);
 
       const msg = err.message || "";
+      const code = err.code || "";
 
-      if (msg.includes("email already registered")) {
+      if (code === "conflict" || msg.includes("email already registered")) {
         emailField.setCustomValidity(t("auth.errors.emailTaken"));
         emailField.reportValidity();
         return;
