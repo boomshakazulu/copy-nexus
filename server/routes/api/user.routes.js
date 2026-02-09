@@ -3,6 +3,7 @@ const {
   getUser,
   createUser,
   login,
+  changePassword,
 } = require("../../controllers/user.controller");
 
 const { requireAuth, requireRole } = require("../../utils/auth");
@@ -13,5 +14,6 @@ const wrap = (fn) => (req, res, next) =>
 router.get("/user", requireAuth, wrap(getUser));
 router.post("/create", wrap(createUser));
 router.post("/login", wrap(login));
+router.post("/change-password", requireAuth, wrap(changePassword));
 
 module.exports = router;

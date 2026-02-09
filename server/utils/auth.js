@@ -4,7 +4,10 @@ const expiration = "24h";
 const { unauthorized, forbidden } = require("./httpError");
 
 function requireAuth(req, res, next) {
-  let token = req.body.token || req.query.token || req.headers.authorization;
+  const body = req.body || {};
+  const query = req.query || {};
+  const headers = req.headers || {};
+  let token = body.token || query.token || headers.authorization;
   if (req.headers.authorization) token = token.split(" ").pop().trim();
   if (!token) return next(unauthorized("No token provided"));
 

@@ -194,9 +194,14 @@ export default function TopBar() {
                   </button>
                 </div>
               ) : (
-                <button className="text-left" onClick={() => Auth.logout()}>
-                  {t("nav.logout")}
-                </button>
+                <>
+                  <Link to="/profile" onClick={() => setMenuOpen(false)}>
+                    {t("nav.profile")}
+                  </Link>
+                  <button className="text-left" onClick={() => Auth.logout()}>
+                    {t("nav.logout")}
+                  </button>
+                </>
               )}
               {isAdmin && (
                 <Link
