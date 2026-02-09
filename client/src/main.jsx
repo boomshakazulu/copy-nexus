@@ -25,6 +25,7 @@ import Reports from "./pages/admin/Reports";
 import AdminGuard from "./components/admin/AdminGuard";
 import CartPage from "./pages/CartPage";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
+import ProfilePage from "./pages/ProfilePage";
 import { CartProvider } from "./context/CartContext";
 
 const router = createBrowserRouter([
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
       {
         path: "/order-confirmation",
         element: <OrderConfirmationPage />,
+      },
+      {
+        path: "/profile",
+        element: <ProfilePage />,
       },
     ],
   },

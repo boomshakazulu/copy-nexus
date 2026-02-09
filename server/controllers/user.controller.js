@@ -14,6 +14,8 @@ const isEmail = (q = "") => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(q);
 module.exports = {
   async getUser(req, res) {
     const { id, email } = req.query || {};
+    const requester = req.user || {};
+    const isAdmin = requester.role === "admin";
 
     if (!id && !email) {
       throw badRequest("id or email is required");
@@ -25,13 +27,23 @@ module.exports = {
       if (!mongoose.Types.ObjectId.isValid(id)) {
         throw badRequest("Invalid user id");
       }
+      if (!isAdmin && requester.id !== id) {
+        throw unauthorized("Unauthorized");
+      }
       user = await User.findById(id).lean();
     } else if (email) {
       const normalized = String(email).trim().toLowerCase();
       if (!isEmail(normalized)) {
         throw badRequest("Invalid email");
       }
+      if (!isAdmin && normalized !== String(requester.email || "").toLowerCase()) {
+        throw unauthorized("Unauthorized");
+      }
       user = await User.findOne({ email: normalized }).lean();
+    } else if (requester.email) {
+      user = await User.findOne({
+        email: String(requester.email).trim().toLowerCase(),
+      }).lean();
     }
 
     if (!user) {
@@ -127,5 +139,36 @@ module.exports = {
     delete publicUser.__v;
 
     return res.json({ user: publicUser, token });
+  },
+
+  async changePassword(req, res) {
+    const { currentPassword, newPassword } = req.body || {};
+    if (!currentPassword || !newPassword) {
+      throw badRequest("Current and new password are required");
+    }
+
+    if (typeof newPassword !== "string" || newPassword.length < 8) {
+      throw unprocessable("Password must be at least 8 characters");
+    }
+
+    const userId = req.user?.id;
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      throw unauthorized("Invalid user");
+    }
+
+    const user = await User.findById(userId).select("+passwordHash");
+    if (!user) {
+      throw notFound("User not found");
+    }
+
+    const ok = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!ok) {
+      throw unauthorized("Invalid credentials");
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    return res.json({ ok: true });
   },
 };
