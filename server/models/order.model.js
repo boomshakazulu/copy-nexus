@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose");
+const crypto = require("crypto");
 
 const money = { type: Number, min: 0, default: 0 }; // integer COP
 
@@ -15,15 +16,52 @@ const addressSchema = new Schema(
 
 const lineItemSchema = new Schema(
   {
-    product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    product: { type: Schema.Types.ObjectId, ref: "Product" },
     name: { type: String, required: true, trim: true }, // snapshot
     model: { type: String, trim: true },
     qty: { type: Number, min: 1, required: true },
     unitAmount: { type: Number, min: 0, required: true }, // integer COP
     IsRented: { type: Boolean, default: false },
+    isCustom: { type: Boolean, default: false },
   },
   { _id: false },
 );
+
+const deriveKey = () => {
+  const raw =
+    process.env.DATA_ENCRYPTION_KEY ||
+    process.env.SECRET_JWT ||
+    "development-fallback-key";
+  return crypto.createHash("sha256").update(String(raw)).digest();
+};
+
+const encryptValue = (value) => {
+  const key = deriveKey();
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+  const encrypted = Buffer.concat([
+    cipher.update(String(value), "utf8"),
+    cipher.final(),
+  ]);
+  const tag = cipher.getAuthTag();
+  return Buffer.concat([iv, tag, encrypted]).toString("base64");
+};
+
+const decryptValue = (value) => {
+  if (!value) return "";
+  const data = Buffer.from(String(value), "base64");
+  const iv = data.subarray(0, 12);
+  const tag = data.subarray(12, 28);
+  const encrypted = data.subarray(28);
+  const key = deriveKey();
+  const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
+  decipher.setAuthTag(tag);
+  const decrypted = Buffer.concat([
+    decipher.update(encrypted),
+    decipher.final(),
+  ]);
+  return decrypted.toString("utf8");
+};
 
 const orderSchema = new Schema(
   {
@@ -35,6 +73,8 @@ const orderSchema = new Schema(
       phone: { type: String, required: true, trim: true },
       idType: { type: String, required: true, trim: true },
       idNumber: { type: String, required: true, trim: true },
+      idNumberEncrypted: { type: String, select: false },
+      idNumberLast4: { type: String, default: "" },
       preferredContactMethod: { type: String, trim: true, default: "" },
     },
 
@@ -62,8 +102,25 @@ const orderSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["pending", "paid", "failed", "canceled", "refunded", "shipped"],
+      enum: [
+        "pending",
+        "paid",
+        "failed",
+        "canceled",
+        "refunded",
+        "shipped",
+        "completed",
+      ],
       default: "pending",
+    },
+    trackingNumber: { type: String, trim: true, default: "" },
+    completedAt: { type: Date, default: null },
+    consent: { type: Boolean, default: false },
+    consentMeta: {
+      acceptedAt: { type: Date, default: null },
+      policyVersion: { type: String, default: "" },
+      ip: { type: String, default: "" },
+      userAgent: { type: String, default: "" },
     },
   },
   { timestamps: true },
@@ -88,10 +145,26 @@ orderSchema.pre("save", function (next) {
     Math.round(subtotal + tax + shipping - discount),
   );
 
+  const idNumber = this.customer?.idNumber;
+  if (idNumber && !this.customer.idNumberEncrypted) {
+    const last4 = String(idNumber).replace(/\D/g, "").slice(-4);
+    this.customer.idNumberEncrypted = encryptValue(idNumber);
+    this.customer.idNumberLast4 = last4;
+    this.customer.idNumber = last4 ? `***${last4}` : "***";
+  }
+
   next();
 });
 
 orderSchema.index({ "customer.email": 1, createdAt: -1 });
 orderSchema.index({ status: 1, createdAt: -1 });
+
+orderSchema.statics.decryptIdNumber = function (value) {
+  try {
+    return decryptValue(value);
+  } catch (_err) {
+    return "";
+  }
+};
 
 module.exports = model("Order", orderSchema);

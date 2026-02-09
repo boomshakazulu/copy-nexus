@@ -1,65 +1,96 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useI18n } from "../../i18n";
+import { http } from "../../utils/axios";
+import auth from "../../utils/auth";
+import OrderDetailsModal from "../../components/admin/OrderDetailsModal";
 
-const ordersData = [
-  { id: "#10489", name: "Maria Gomez", dateKey: "admin.dashboard.dateToday", status: "shipped" },
-  { id: "#10488", name: "John Diaz", dateKey: "admin.dashboard.dateYesterday", status: "pending" },
-  {
-    id: "#10487",
-    name: "Laura Perez",
-    dateKey: "admin.dashboard.dateApr21",
-    status: "pending",
-  },
-  {
-    id: "#10486",
-    name: "Carlos Jimenez",
-    dateKey: "admin.dashboard.dateApr20",
-    status: "pending",
-  },
-  {
-    id: "#10485",
-    name: "Sofia Reyes",
-    dateKey: "admin.dashboard.dateApr20",
-    status: "pending",
-  },
-  { id: "#10484", name: "Ana Lopez", dateKey: "admin.dashboard.dateApr19", status: "shipped" },
-  {
-    id: "#10483",
-    name: "Luis Torres",
-    dateKey: "admin.dashboard.dateApr18",
-    status: "pending",
-  },
-  {
-    id: "#10482",
-    name: "Camila Vega",
-    dateKey: "admin.dashboard.dateApr17",
-    status: "pending",
-  },
-];
-
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 20;
 
 export default function Orders() {
   const { t } = useI18n();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [items, setItems] = useState({
+    data: [],
+    pagination: { total: 0, page: 1, limit: ITEMS_PER_PAGE, totalPages: 1 },
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [saveError, setSaveError] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  const filteredOrders = ordersData.filter(
-    (order) =>
-      order.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const token = auth.getToken();
+      const res = await http.get("/admin/orders", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          q: searchTerm || undefined,
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+        },
+      });
+      setItems(res.data);
+    } catch (_err) {
+      setError(t("admin.orders.loadFailed"));
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
-  const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentOrders = filteredOrders.slice(
-    startIdx,
-    startIdx + ITEMS_PER_PAGE
-  );
+  useEffect(() => {
+    fetchOrders();
+  }, [currentPage, searchTerm]);
+
+  const currentOrders = items?.data || [];
+  const totalPages = items?.pagination?.totalPages || 1;
 
   const handlePrev = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
   const handleNext = () =>
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+
+  const handleSaveOrder = async (payload) => {
+    try {
+      setSaving(true);
+      setSaveError("");
+      const token = auth.getToken();
+      const res = await http.put("/admin/orders", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const updated = res.data;
+      setItems((prev) => ({
+        ...prev,
+        data: (prev?.data || []).map((order) =>
+          order._id === updated._id ? updated : order
+        ),
+      }));
+      setSelectedOrder(null);
+    } catch (_err) {
+      setSaveError(t("admin.orders.saveFailed"));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const formatDate = (value) => {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const statusLabel = (status) => {
+    if (status === "shipped") return t("admin.orders.statusShipped");
+    if (status === "completed") return t("admin.orders.statusCompleted");
+    return t("admin.orders.statusPending");
+  };
 
   return (
     <div className="bg-white p-6 rounded w-full h-full">
@@ -90,31 +121,45 @@ export default function Orders() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {currentOrders.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan="4" className="px-6 py-6 text-center text-gray-400">
+                  {t("admin.orders.loading")}
+                </td>
+              </tr>
+            ) : currentOrders.length === 0 ? (
               <tr>
                 <td colSpan="4" className="px-6 py-6 text-center text-gray-400">
                   {t("admin.orders.noOrders")}
                 </td>
               </tr>
             ) : (
-              currentOrders.map((order, idx) => (
-                <tr key={idx} className="bg-white">
-                  <td className="px-6 py-4">{order.id}</td>
-                  <td className="px-6 py-4">{order.name}</td>
-                  <td className="px-6 py-4">{t(order.dateKey)}</td>
+              currentOrders.map((order) => (
+                <tr
+                  key={order._id}
+                  className="bg-white hover:bg-gray-50 cursor-pointer"
+                  onClick={() => setSelectedOrder(order)}
+                >
+                  <td className="px-6 py-4">
+                    {order?._id?.slice(-6).toUpperCase()}
+                  </td>
+                  <td className="px-6 py-4">{order?.customer?.name}</td>
+                  <td className="px-6 py-4">
+                    {formatDate(order?.createdAt)}
+                  </td>
                   <td className="px-6 py-4">
                     <span
                       className={`text-white text-xs font-semibold px-3 py-1 rounded-full inline-block
                         ${
                           order.status === "shipped"
                             ? "bg-[#003B66]"
+                            : order.status === "completed"
+                            ? "bg-[#1B5E20]"
                             : "bg-[#E53935]"
                         }
                       `}
                     >
-                      {order.status === "shipped"
-                        ? t("admin.dashboard.statusShipped")
-                        : t("admin.dashboard.statusPending")}
+                      {statusLabel(order.status)}
                     </span>
                   </td>
                 </tr>
@@ -123,6 +168,10 @@ export default function Orders() {
           </tbody>
         </table>
       </div>
+
+      {error && (
+        <p className="mt-4 text-sm font-semibold text-red-600">{error}</p>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (
@@ -148,6 +197,19 @@ export default function Orders() {
             {t("admin.orders.next")}
           </button>
         </div>
+      )}
+
+      {selectedOrder && (
+        <OrderDetailsModal
+          order={selectedOrder}
+          onClose={() => {
+            setSelectedOrder(null);
+            setSaveError("");
+          }}
+          onSave={handleSaveOrder}
+          saving={saving}
+          error={saveError}
+        />
       )}
     </div>
   );

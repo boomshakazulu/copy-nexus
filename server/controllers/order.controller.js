@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
-const { Order } = require("../models");
-const { unprocessable } = require("../utils/httpError");
+const { Order, AccessLog } = require("../models");
+const { policyVersion } = require("../config/privacy");
+const { unprocessable, badRequest, notFound } = require("../utils/httpError");
 
 // helpers
 const escapeRegex = (s = "") => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -40,12 +41,58 @@ module.exports = {
     const filter = {};
 
     if (q) {
-      const rx = { $regex: escapeRegex(q), $options: "i" };
-      if (isEmail(q)) {
-        filter["customer.email"] = rx;
-      } else {
-        filter["customer.name"] = rx;
+      const trimmed = String(q).trim();
+      const rx = { $regex: escapeRegex(trimmed), $options: "i" };
+      const hexOnly = trimmed.replace(/[^0-9a-fA-F]/g, "");
+      const isObjectId = mongoose.Types.ObjectId.isValid(trimmed) ||
+        mongoose.Types.ObjectId.isValid(hexOnly);
+      const isShortId =
+        /^[0-9a-fA-F]{6}$/.test(trimmed) ||
+        /^[0-9a-fA-F]{6}$/.test(hexOnly);
+      const isPartialHex =
+        hexOnly.length >= 2 && hexOnly.length < 6;
+
+      const orFilters = [
+        { "customer.name": rx },
+        { "customer.email": rx },
+        { "customer.phone": rx },
+      ];
+
+      if (isObjectId) {
+        const idValue = mongoose.Types.ObjectId.isValid(trimmed)
+          ? trimmed
+          : hexOnly;
+        orFilters.push({ _id: new mongoose.Types.ObjectId(idValue) });
       }
+
+      if (isShortId) {
+        const shortId = /^[0-9a-fA-F]{6}$/.test(trimmed)
+          ? trimmed
+          : hexOnly;
+        orFilters.push({
+          $expr: {
+            $regexMatch: {
+              input: { $toString: "$_id" },
+              regex: `${shortId}$`,
+              options: "i",
+            },
+          },
+        });
+      }
+
+      if (isPartialHex) {
+        orFilters.push({
+          $expr: {
+            $regexMatch: {
+              input: { $toString: "$_id" },
+              regex: `${hexOnly}`,
+              options: "i",
+            },
+          },
+        });
+      }
+
+      filter.$or = orFilters;
     }
 
     if (ids) {
@@ -63,6 +110,7 @@ module.exports = {
 
     const [data, total] = await Promise.all([
       Order.find(filter)
+        .select("+customer.idNumberEncrypted")
         .sort({ [sortField]: sortDir })
         .skip((pageNum - 1) * perPage)
         .limit(perPage)
@@ -70,8 +118,37 @@ module.exports = {
       Order.countDocuments(filter),
     ]);
 
+    const nextData = data.map((order) => {
+      const encrypted = order?.customer?.idNumberEncrypted;
+      const full = Order.decryptIdNumber(encrypted);
+      if (order?.customer) {
+        order.customer.idNumberFull = full || "";
+        delete order.customer.idNumberEncrypted;
+      }
+      return order;
+    });
+
+    // log admin access to full IDs
+    if (nextData.length) {
+      const actorId = req.user?.id || null;
+      const actorEmail = req.user?.email || "";
+      const ip = req.ip || req.headers["x-forwarded-for"] || "";
+      const userAgent = req.headers["user-agent"] || "";
+      const logs = nextData.map((order) => ({
+        actorId,
+        actorEmail,
+        action: "view_id",
+        entityType: "order",
+        entityId: order._id,
+        ip: Array.isArray(ip) ? ip[0] : ip,
+        userAgent,
+        meta: { scope: "admin_orders_list" },
+      }));
+      AccessLog.insertMany(logs, { ordered: false }).catch(() => {});
+    }
+
     return res.json({
-      data,
+      data: nextData,
       pagination: {
         total,
         page: pageNum,
@@ -85,7 +162,171 @@ module.exports = {
   },
 
   async createOrder(req, res) {
-    const order = await Order.create(req.body);
+    const { consentMeta, ...payload } = req.body || {};
+    const ip = req.ip || req.headers["x-forwarded-for"] || "";
+    const userAgent = req.headers["user-agent"] || "";
+    const nextConsentMeta = {
+      acceptedAt: new Date(),
+      policyVersion: consentMeta?.policyVersion || policyVersion,
+      ip: Array.isArray(ip) ? ip[0] : ip,
+      userAgent,
+    };
+    const order = await Order.create({
+      ...payload,
+      consentMeta: nextConsentMeta,
+    });
     return res.status(201).json(order);
+  },
+
+  async updateOrder(req, res) {
+    const {
+      id,
+      status,
+      trackingNumber,
+      shipping,
+      discount,
+      items,
+      customer,
+      shippingAddress,
+    } = req.body || {};
+
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      throw badRequest("Valid order id is required");
+    }
+
+    const order = await Order.findById(id);
+    if (!order) {
+      throw notFound("Order not found");
+    }
+
+    if (status) {
+      const allowed = Order.schema.path("status").enumValues || [];
+      if (!allowed.includes(status)) {
+        throw unprocessable("Invalid status", { status });
+      }
+      order.status = status;
+      if (status === "shipped" || status === "completed") {
+        if (!order.completedAt) {
+          order.completedAt = new Date();
+        }
+      } else {
+        order.completedAt = null;
+      }
+    }
+
+    if (typeof trackingNumber === "string") {
+      order.trackingNumber = trackingNumber.trim();
+    }
+
+    if (typeof shipping === "number" && Number.isFinite(shipping)) {
+      if (shipping < 0) throw unprocessable("Shipping must be >= 0");
+      order.amounts = order.amounts || {};
+      order.amounts.shipping = shipping;
+    }
+
+    if (typeof discount === "number" && Number.isFinite(discount)) {
+      if (discount < 0) throw unprocessable("Discount must be >= 0");
+      order.amounts = order.amounts || {};
+      order.amounts.discount = discount;
+    }
+
+    if (customer && typeof customer === "object") {
+      const nextCustomer = {
+        ...order.customer?.toObject?.(),
+        ...customer,
+      };
+      if (typeof nextCustomer.email === "string") {
+        nextCustomer.email = nextCustomer.email.trim().toLowerCase();
+      }
+      if (typeof nextCustomer.idNumber === "string") {
+        nextCustomer.idNumberEncrypted = undefined;
+        nextCustomer.idNumberLast4 = "";
+      }
+      order.customer = nextCustomer;
+    }
+
+    if (shippingAddress && typeof shippingAddress === "object") {
+      const nextAddress = {
+        ...order.shippingAddress?.toObject?.(),
+        ...shippingAddress,
+      };
+      order.shippingAddress = nextAddress;
+    }
+
+    if (Array.isArray(items) && items.length) {
+      const looksLikeFullReplace = items.every(
+        (item) => item && item.name && (item.product || item.isCustom)
+      );
+
+      if (looksLikeFullReplace) {
+        const nextItems = items.map((item) => {
+          const qty = Number(item.qty) || 0;
+          const unitAmount = Number(item.unitAmount) || 0;
+          if (qty < 1) {
+            throw unprocessable("Item qty must be >= 1");
+          }
+          if (unitAmount < 0) {
+            throw unprocessable("Item price must be >= 0");
+          }
+          if (item.product) {
+            if (!mongoose.Types.ObjectId.isValid(item.product)) {
+              throw unprocessable("Invalid product id");
+            }
+          } else if (!item.isCustom) {
+            throw unprocessable("Custom items must set isCustom");
+          }
+          return {
+            product: item.product || null,
+            name: String(item.name || "").trim(),
+            model: String(item.model || "").trim(),
+            qty,
+            unitAmount,
+            IsRented: !!item.IsRented,
+            isCustom: !!item.isCustom,
+          };
+        });
+        if (!nextItems.length) {
+          throw unprocessable("Order must have at least one line item");
+        }
+        order.items = nextItems;
+      } else {
+        items.forEach((update) => {
+          const index = update?.index;
+          const unitAmount = update?.unitAmount;
+          if (typeof index !== "number") return;
+          if (!order.items?.[index]) return;
+          if (!order.items[index].IsRented) return;
+          if (typeof unitAmount !== "number" || unitAmount < 0) return;
+          order.items[index].unitAmount = unitAmount;
+        });
+      }
+    }
+
+    await order.save();
+    const saved = order.toObject();
+    const encrypted = saved?.customer?.idNumberEncrypted;
+    const full = Order.decryptIdNumber(encrypted);
+    if (saved?.customer) {
+      saved.customer.idNumberFull = full || "";
+      delete saved.customer.idNumberEncrypted;
+    }
+    // log admin access to full ID on update response
+    if (saved?._id && saved?.customer?.idNumberFull) {
+      const actorId = req.user?.id || null;
+      const actorEmail = req.user?.email || "";
+      const ip = req.ip || req.headers["x-forwarded-for"] || "";
+      const userAgent = req.headers["user-agent"] || "";
+      AccessLog.create({
+        actorId,
+        actorEmail,
+        action: "view_id",
+        entityType: "order",
+        entityId: saved._id,
+        ip: Array.isArray(ip) ? ip[0] : ip,
+        userAgent,
+        meta: { scope: "admin_order_update" },
+      }).catch(() => {});
+    }
+    return res.json(saved);
   },
 };

@@ -8,17 +8,17 @@ import {
   CartesianGrid,
 } from "recharts";
 import { useI18n } from "../../i18n";
+import { formatCOP } from "../../utils/helpers";
 
-const data = [
-  { month: "jan", value: 120 },
-  { month: "feb", value: 135 },
-  { month: "mar", value: 110 },
-  { month: "apr", value: 150 },
-  { month: "may", value: 170 },
-];
-
-export default function SalesOverTimeChart() {
+export default function SalesOverTimeChart({ data = [] }) {
   const { t } = useI18n();
+  if (!data.length) {
+    return (
+      <div className="h-48 flex items-center justify-center text-sm text-slate-400">
+        {t("admin.reports.empty")}
+      </div>
+    );
+  }
   return (
     <div className="h-48">
       <ResponsiveContainer width="100%" height="100%">
@@ -30,9 +30,14 @@ export default function SalesOverTimeChart() {
             axisLine={false}
             tickFormatter={(value) => t(`admin.reports.months.${value}`)}
           />
-          <YAxis tickLine={false} axisLine={false} />
+          <YAxis
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={(value) => formatCOP(value, true)}
+          />
           <Tooltip
             labelFormatter={(value) => t(`admin.reports.months.${value}`)}
+            formatter={(value) => formatCOP(value, true)}
           />
           <Line
             type="monotone"

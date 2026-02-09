@@ -1,5 +1,7 @@
 const router = require("express").Router();
-const { getOrders } = require("../../controllers/order.controller");
+const { getOrders, updateOrder } = require("../../controllers/order.controller");
+const { getAccessLogs } = require("../../controllers/accessLog.controller");
+const { getReports, getDashboard } = require("../../controllers/report.controller");
 const {
   createProduct,
   updateProduct,
@@ -12,6 +14,11 @@ const wrap = (fn) => (req, res, next) =>
 router.use(requireAuth, requireRole("admin"));
 
 router.get("/orders", wrap(getOrders));
+router.put("/order", wrap(updateOrder));
+router.put("/orders", wrap(updateOrder));
+router.get("/access-logs", wrap(getAccessLogs));
+router.get("/reports", wrap(getReports));
+router.get("/dashboard", wrap(getDashboard));
 router.post("/product", wrap(createProduct));
 router.put("/product", wrap(updateProduct));
 
