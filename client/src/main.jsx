@@ -22,10 +22,12 @@ import Dashboard from "./pages/admin/Dashboard";
 import Orders from "./pages/admin/Orders";
 import Products from "./pages/admin/Products";
 import Reports from "./pages/admin/Reports";
+import AccessLogs from "./pages/admin/AccessLogs";
 import AdminGuard from "./components/admin/AdminGuard";
 import CartPage from "./pages/CartPage";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import ProfilePage from "./pages/ProfilePage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import { CartProvider } from "./context/CartContext";
 
 const router = createBrowserRouter([
@@ -74,6 +76,7 @@ const router = createBrowserRouter([
           { path: "/admin/orders", element: <Orders /> },
           { path: "/admin/products", element: <Products /> },
           { path: "/admin/reports", element: <Reports /> },
+          { path: "/admin/access-logs", element: <AccessLogs /> },
         ],
       },
       {
@@ -87,6 +90,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <ProfilePage />,
+      },
+      {
+        path: "/privacy",
+        element: <PrivacyPolicyPage />,
       },
     ],
   },

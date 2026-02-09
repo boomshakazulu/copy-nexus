@@ -6,6 +6,8 @@ import { useI18n } from "../i18n";
 import { http } from "../utils/axios";
 import coDepsCities from "../utils/coDepsCities.json";
 
+const POLICY_VERSION = import.meta.env.VITE_PRIVACY_POLICY_VERSION || "1.0";
+
 export default function CartPage() {
   const { items, removeItem, updateQuantity, clearCart } = useCart();
   const { t } = useI18n();
@@ -17,6 +19,7 @@ export default function CartPage() {
   const [form, setForm] = useState({
     name: "",
     email: "",
+    phoneCountryCode: "+57",
     phone: "",
     idType: "",
     idNumber: "",
@@ -27,7 +30,14 @@ export default function CartPage() {
     department: "",
     postalCode: "",
     notes: "",
+    consent: false,
   });
+  const phoneCountryOptions = [
+    { code: "+57", label: "CO (+57)" },
+    { code: "+1", label: "US/CA (+1)" },
+    { code: "+52", label: "MX (+52)" },
+    { code: "+34", label: "ES (+34)" },
+  ];
   const departments = coDepsCities?.departments ?? [];
   const selectedDepartment = departments.find(
     (dep) => dep.name === form.department
@@ -66,20 +76,50 @@ export default function CartPage() {
       return;
     }
 
+    const trimmedName = form.name.trim();
+    const trimmedEmail = form.email.trim().toLowerCase();
+    const trimmedPhone = form.phone.trim();
+    const trimmedIdType = form.idType.trim();
+    const trimmedIdNumber = form.idNumber.trim();
+    const trimmedContact = form.preferredContactMethod.trim();
+    const trimmedStreet = form.streetAddress.trim();
+    const trimmedCity = form.city.trim();
+    const trimmedDepartment = form.department.trim();
+
+    const phoneDigits = trimmedPhone.replace(/\D/g, "");
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail);
+    const isValidPhone = phoneDigits.length >= 7 && phoneDigits.length <= 15;
+
+    if (
+      !trimmedName ||
+      !isValidEmail ||
+      !isValidPhone ||
+      !trimmedIdType ||
+      !trimmedIdNumber ||
+      !trimmedContact ||
+      !trimmedStreet ||
+      !trimmedCity ||
+      !trimmedDepartment ||
+      !form.consent
+    ) {
+      setSubmitError(t("cart.form.validationError"));
+      return;
+    }
+
     const payload = {
       customer: {
-        name: form.name.trim(),
-        email: form.email.trim().toLowerCase(),
-        phone: form.phone.trim(),
-        idType: form.idType.trim(),
-        idNumber: form.idNumber.trim(),
-        preferredContactMethod: form.preferredContactMethod.trim(),
+        name: trimmedName,
+        email: trimmedEmail,
+        phone: `${form.phoneCountryCode} ${phoneDigits}`.trim(),
+        idType: trimmedIdType,
+        idNumber: trimmedIdNumber,
+        preferredContactMethod: trimmedContact,
       },
       shippingAddress: {
-        streetAddress: form.streetAddress.trim(),
+        streetAddress: trimmedStreet,
         neighborhood: form.neighborhood.trim(),
-        city: form.city.trim(),
-        department: form.department.trim(),
+        city: trimmedCity,
+        department: trimmedDepartment,
         postalCode: form.postalCode.trim(),
       },
       items: items.map((item) => ({
@@ -91,6 +131,10 @@ export default function CartPage() {
         IsRented: item.cartMode === "rent",
       })),
       notes: form.notes.trim(),
+      consent: !!form.consent,
+      consentMeta: {
+        policyVersion: POLICY_VERSION,
+      },
     };
 
     setIsSubmitting(true);
@@ -109,6 +153,7 @@ export default function CartPage() {
       setForm({
         name: "",
         email: "",
+        phoneCountryCode: "+57",
         phone: "",
         idType: "",
         idNumber: "",
@@ -119,6 +164,7 @@ export default function CartPage() {
         department: "",
         postalCode: "",
         notes: "",
+        consent: false,
       });
       navigate("/order-confirmation");
     } catch (err) {
@@ -319,13 +365,30 @@ export default function CartPage() {
               <label className="block text-sm font-semibold text-[#00294D] mb-1">
                 {t("cart.form.phone")}
               </label>
-              <input
-                type="text"
-                value={form.phone}
-                onChange={handleChange("phone")}
-                required
-                className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              />
+              <div className="flex gap-2">
+                <select
+                  value={form.phoneCountryCode}
+                  onChange={handleChange("phoneCountryCode")}
+                  className="w-32 border border-gray-300 rounded-md px-2 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  aria-label={t("cart.form.phoneCountryCode")}
+                >
+                  {phoneCountryOptions.map((option) => (
+                    <option key={option.code} value={option.code}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  pattern="[0-9]{7,15}"
+                  title={t("cart.form.phoneHint")}
+                  value={form.phone}
+                  onChange={handleChange("phone")}
+                  required
+                  className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                />
+              </div>
             </div>
             <div>
               <label className="block text-sm font-semibold text-[#00294D] mb-1">
@@ -462,6 +525,33 @@ export default function CartPage() {
                 rows={4}
                 className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
               />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="flex items-start gap-3 text-sm text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={form.consent}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      consent: e.target.checked,
+                    }))
+                  }
+                  className="mt-1 h-4 w-4 rounded border-gray-300"
+                  required
+                />
+                <span>
+                  {t("cart.form.consent")}{" "}
+                  <Link
+                    to="/privacy"
+                    className="font-semibold text-[#00294D] underline"
+                  >
+                    {t("cart.form.privacyLink")}
+                  </Link>
+                  .
+                </span>
+              </label>
             </div>
 
             {submitError && (

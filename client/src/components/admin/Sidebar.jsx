@@ -5,6 +5,7 @@ import {
   ShoppingCart,
   FileText,
   BarChart,
+  ShieldCheck,
 } from "lucide-react";
 import { useI18n } from "../../i18n";
 
@@ -32,6 +33,11 @@ export default function AdminSidebar({ isOpen, onClose }) {
       to: "/admin/reports",
       label: t("admin.sidebar.reports"),
       icon: <BarChart className="h-5 w-5" />,
+    },
+    {
+      to: "/admin/access-logs",
+      label: t("admin.sidebar.accessLogs"),
+      icon: <ShieldCheck className="h-5 w-5" />,
     },
   ];
 

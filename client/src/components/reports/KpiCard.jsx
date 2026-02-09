@@ -47,18 +47,20 @@ export default function KpiCard({
     : (value ?? "").toLocaleString?.("es-CO") ?? value;
 
   return (
-    <div className="bg-white border rounded-lg p-5 flex items-center gap-4">
-      <div className={`rounded-lg ${toneMap[tone]} p-2.5 text-[#00294D]`}>
+    <div className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center gap-4 shadow-sm">
+      <div className={`rounded-xl ${toneMap[tone]} p-2.5 text-[#00294D]`}>
         <Icon className="w-5 h-5" />
       </div>
 
       <div className="min-w-0">
-        <div className="text-sm text-[#00294D]">{label}</div>
+        <div className="text-xs uppercase tracking-wide text-slate-500">
+          {label}
+        </div>
 
         {/* Responsive size + prevent wrap */}
         <div
-          className="font-extrabold text-[#00294D] leading-tight whitespace-nowrap
-                     text-[clamp(1rem,2.8vw,1.5rem)]"
+          className="font-extrabold text-[#0B2A4A] leading-tight whitespace-nowrap
+                     text-[clamp(1.1rem,2.8vw,1.6rem)]"
           title={isMoney ? formatCOP(value, false) : display}
         >
           {display}

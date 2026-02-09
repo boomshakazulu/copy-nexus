@@ -8,19 +8,21 @@ import {
   CartesianGrid,
 } from "recharts";
 import { useI18n } from "../../i18n";
+import { formatCOP } from "../../utils/helpers";
 
-const data = [
-  { key: "copiers", navy: 280, yellow: 140 },
-  { key: "toner", navy: 240, yellow: 160 },
-  { key: "parts", navy: 320, yellow: 150 },
-];
-
-export default function SalesByCategoryChart() {
+export default function SalesByCategoryChart({ data = [] }) {
   const { t } = useI18n();
+  if (!data.length) {
+    return (
+      <div className="h-48 flex items-center justify-center text-sm text-slate-400">
+        {t("admin.reports.empty")}
+      </div>
+    );
+  }
   return (
     <div className="h-48">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} barSize={18}>
+        <BarChart data={data} barSize={24}>
           <CartesianGrid vertical={false} stroke="#eef2f7" />
           <XAxis
             dataKey="key"
@@ -28,16 +30,19 @@ export default function SalesByCategoryChart() {
             axisLine={false}
             tickFormatter={(value) => t(`admin.reports.categories.${value}`)}
           />
-          <YAxis tickLine={false} axisLine={false} />
+          <YAxis
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={(value) => formatCOP(value, true)}
+          />
           <Tooltip
             cursor={{ fill: "#f8fafc" }}
             formatter={(value, name, props) => [
-              value,
+              formatCOP(value, true),
               t(`admin.reports.categories.${props.payload.key}`),
             ]}
           />
-          <Bar dataKey="navy" fill="#0D3B66" radius={[6, 6, 0, 0]} />
-          <Bar dataKey="yellow" fill="#F4C430" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="sales" fill="#0D3B66" radius={[8, 8, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
