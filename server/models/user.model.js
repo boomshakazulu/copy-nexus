@@ -18,6 +18,7 @@ const userSchema = new Schema(
     },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     resetToken: { type: String, default: null },
+    resetTokenExpiresAt: { type: Date, default: null },
     orders: [{ type: Schema.Types.ObjectId, ref: "Order" }],
   },
   { timestamps: true }

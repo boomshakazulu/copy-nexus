@@ -1,7 +1,6 @@
 import { X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { http } from "../utils/axios";
-import Auth from "../utils/auth";
 import { useI18n } from "../i18n";
 
 export default function SignupModal({ isOpen, onClose, showLogin }) {
@@ -9,12 +8,13 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [status, setStatus] = useState("idle");
 
   useEffect(() => {
-    if (Auth.loggedIn()) {
-      onClose();
+    if (isOpen) {
+      setStatus("idle");
     }
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -50,9 +50,8 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
     }
 
     try {
-      const { data } = await http.post("/users/create", { email, password });
-      Auth.login(data.token);
-      onClose();
+      await http.post("/users/signup-request", { email, password });
+      setStatus("sent");
     } catch (err) {
       console.error(err);
 
@@ -104,6 +103,11 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
 
         {/* Form */}
         <form onSubmit={handleSubmit}>
+          {status === "sent" && (
+            <div className="mb-4 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
+              {t("auth.signupVerifySent", { email })}
+            </div>
+          )}
           {/* Email */}
           <div className="mb-4">
             <label className="block text-sm font-semibold text-[#00294D] mb-1">
@@ -116,6 +120,7 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
               className="w-full px-4 py-2 border rounded text-sm focus:outline-none focus:ring focus:ring-red-100"
               onChange={(event) => setEmail(event.target.value)}
               onInput={(e) => e.target.setCustomValidity("")}
+              disabled={status === "sent"}
             />
           </div>
 
@@ -131,6 +136,7 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
               className="w-full px-4 py-2 border rounded text-sm focus:outline-none focus:ring focus:ring-red-100"
               onChange={(event) => setPassword(event.target.value)}
               onInput={(e) => e.target.setCustomValidity("")}
+              disabled={status === "sent"}
             />
           </div>
 
@@ -146,13 +152,15 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
               className="w-full px-4 py-2 border rounded text-sm focus:outline-none focus:ring focus:ring-red-100"
               onChange={(event) => setConfirmPassword(event.target.value)}
               onInput={(e) => e.target.setCustomValidity("")}
+              disabled={status === "sent"}
             />
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded transition"
+            className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded transition disabled:opacity-70"
+            disabled={status === "sent"}
           >
             {t("auth.signupButton")}
           </button>

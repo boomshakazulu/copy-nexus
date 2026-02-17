@@ -143,12 +143,14 @@ export default function CartPage() {
 
     setIsSubmitting(true);
     try {
-      await http.post("/orders", payload);
+      const res = await http.post("/orders", payload);
+      const accountExists = res?.data?.accountExists;
       sessionStorage.setItem(
         "orderConfirmation",
         JSON.stringify({
           email: payload.customer.email,
           preferredContactMethod: payload.customer.preferredContactMethod,
+          accountExists,
         }),
       );
       setSubmitSuccess(true);

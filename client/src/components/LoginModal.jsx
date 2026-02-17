@@ -8,6 +8,8 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
   const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [mode, setMode] = useState("login");
+  const [resetStatus, setResetStatus] = useState("idle");
 
   useEffect(() => {
     if (Auth.loggedIn()) {
@@ -19,6 +21,16 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (mode === "forgot") {
+      try {
+        await http.post("/users/forgot-password", { email });
+        setResetStatus("sent");
+      } catch (_err) {
+        setResetStatus("error");
+      }
+      return;
+    }
 
     const passwordField = e.target.querySelector('input[name="password"]');
 
@@ -74,7 +86,7 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
 
         {/* Title */}
         <h1 className="text-3xl font-bold text-[#00294D] text-center mb-6">
-          {t("auth.loginTitle")}
+          {mode === "forgot" ? t("auth.forgotTitle") : t("auth.loginTitle")}
         </h1>
 
         {/* Form */}
@@ -95,31 +107,77 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
             />
           </div>
 
-          <label className="block text-[#00294D] font-semibold mb-1">
-            {t("auth.password")}
-          </label>
-          <input
-            type="password"
-            name="password"
-            className="w-full mb-6 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
-            placeholder={t("auth.passwordMask")}
-            onChange={(event) => setPassword(event.target.value)}
-            onInput={(e) => e.target.setCustomValidity("")}
-          />
+          {mode === "login" && (
+            <>
+              <label className="block text-[#00294D] font-semibold mb-1">
+                {t("auth.password")}
+              </label>
+              <input
+                type="password"
+                name="password"
+                className="w-full mb-2 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
+                placeholder={t("auth.passwordMask")}
+                onChange={(event) => setPassword(event.target.value)}
+                onInput={(e) => e.target.setCustomValidity("")}
+              />
+              <div className="mb-6 text-right">
+                <button
+                  type="button"
+                  className="text-sm font-semibold text-[#00294D] hover:underline"
+                  onClick={() => {
+                    setMode("forgot");
+                    setResetStatus("idle");
+                  }}
+                >
+                  {t("auth.forgotLink")}
+                </button>
+              </div>
+            </>
+          )}
 
           <button
             type="submit"
             className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-md"
           >
-            {t("auth.loginButton")}
+            {mode === "forgot"
+              ? t("auth.forgotButton")
+              : t("auth.loginButton")}
           </button>
 
-          <p className="mt-4 text-center text-sm text-gray-700">
-            {t("auth.noAccount")}{" "}
-            <button className="text-[#00294D] font-bold" onClick={showSignup}>
-              {t("auth.signUpLink")}
-            </button>
-          </p>
+          {mode === "forgot" ? (
+            <>
+              {resetStatus === "sent" && (
+                <p className="mt-3 text-center text-sm text-green-700">
+                  {t("auth.forgotSent")}
+                </p>
+              )}
+              {resetStatus === "error" && (
+                <p className="mt-3 text-center text-sm text-red-600">
+                  {t("auth.forgotFailed")}
+                </p>
+              )}
+              <p className="mt-4 text-center text-sm text-gray-700">
+                <button
+                  type="button"
+                  className="text-[#00294D] font-bold"
+                  onClick={() => setMode("login")}
+                >
+                  {t("auth.backToLogin")}
+                </button>
+              </p>
+            </>
+          ) : (
+            <p className="mt-4 text-center text-sm text-gray-700">
+              {t("auth.noAccount")}{" "}
+              <button
+                type="button"
+                className="text-[#00294D] font-bold"
+                onClick={showSignup}
+              >
+                {t("auth.signUpLink")}
+              </button>
+            </p>
+          )}
         </form>
         </div>
       </div>
