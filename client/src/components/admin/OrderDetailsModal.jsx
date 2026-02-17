@@ -26,6 +26,8 @@ export default function OrderDetailsModal({
   order,
   onClose,
   onSave,
+  onCreate,
+  mode = "edit",
   saving,
   error,
 }) {
@@ -54,6 +56,7 @@ export default function OrderDetailsModal({
   const [productError, setProductError] = useState("");
   const [editingContact, setEditingContact] = useState(false);
   const [contactDirty, setContactDirty] = useState(false);
+  const [notes, setNotes] = useState("");
   const [customerForm, setCustomerForm] = useState({
     name: "",
     email: "",
@@ -86,6 +89,7 @@ export default function OrderDetailsModal({
     setCustomQty(1);
     setEditingContact(false);
     setContactDirty(false);
+    setNotes(order?.notes || "");
     setCustomerForm({
       name: order?.customer?.name || "",
       email: order?.customer?.email || "",
@@ -102,6 +106,11 @@ export default function OrderDetailsModal({
       department: order?.shippingAddress?.department || "",
       postalCode: order?.shippingAddress?.postalCode || "",
     });
+
+    if (mode === "create") {
+      setEditingContact(true);
+      setContactDirty(true);
+    }
   }, [order, initialItems]);
 
   useEffect(() => {
@@ -112,7 +121,8 @@ export default function OrderDetailsModal({
         const res = await http.get("/products", {
           params: {
             category,
-            fields: "_id,name,model,purchasePrice,rentable,rentPrice",
+            fields:
+              "_id,name,model,purchasePrice,rentable,rentPrice,rentCostPerScan,rentCostPerPrint",
             limit: 100,
             order: "asc",
             sort: "name",
@@ -199,6 +209,12 @@ export default function OrderDetailsModal({
       qty: 1,
       unitAmount,
       IsRented: isRental,
+      rentCostPerScan: isRental
+        ? Number(selectedProduct.rentCostPerScan) || 0
+        : 0,
+      rentCostPerPrint: isRental
+        ? Number(selectedProduct.rentCostPerPrint) || 0
+        : 0,
     };
     setEditItems((prev) => [...prev, nextItem]);
     setProductId("");
@@ -217,6 +233,8 @@ export default function OrderDetailsModal({
       qty,
       unitAmount,
       IsRented: customIsRental,
+      rentCostPerScan: 0,
+      rentCostPerPrint: 0,
       isCustom: true,
     };
     setEditItems((prev) => [...prev, nextItem]);
@@ -226,9 +244,9 @@ export default function OrderDetailsModal({
     setCustomQty(1);
   };
 
-  const handleSave = () => {
+  const buildPayload = () => {
     const shouldSendContact = contactDirty;
-    onSave?.({
+    return {
       id: order?._id,
       shipping: shippingValue,
       discount: discountValue,
@@ -261,8 +279,28 @@ export default function OrderDetailsModal({
         qty: Number(item.qty) || 1,
         unitAmount: Number(item.unitAmount) || 0,
         IsRented: !!item.IsRented,
+        rentCostPerScan: Number(item.rentCostPerScan) || 0,
+        rentCostPerPrint: Number(item.rentCostPerPrint) || 0,
         isCustom: !!item.isCustom,
       })),
+      notes: notes.trim(),
+    };
+  };
+
+  const handleSave = () => {
+    onSave?.(buildPayload());
+  };
+
+  const handleCreate = () => {
+    const payload = buildPayload();
+    const { id, shipping, discount, ...rest } = payload;
+    onCreate?.({
+      ...rest,
+      amounts: {
+        shipping: Number(shipping) || 0,
+        discount: Number(discount) || 0,
+      },
+      consent: false,
     });
   };
 
@@ -277,14 +315,18 @@ export default function OrderDetailsModal({
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <h2 className="text-2xl font-bold text-[#00294D]">
-                {t("admin.orders.detailsTitle")}
+                {mode === "create"
+                  ? t("admin.orders.createTitle")
+                  : t("admin.orders.detailsTitle")}
               </h2>
-              <p className="text-sm text-gray-600">
-                {t("admin.orders.orderId")}:{" "}
-                <span className="font-semibold text-[#00294D]">
-                  {order?._id || "—"}
-                </span>
-              </p>
+              {mode !== "create" && (
+                <p className="text-sm text-gray-600">
+                  {t("admin.orders.orderId")}:{" "}
+                  <span className="font-semibold text-[#00294D]">
+                    {order?._id || "-"}
+                  </span>
+                </p>
+              )}
             </div>
             <button
               type="button"
@@ -295,18 +337,21 @@ export default function OrderDetailsModal({
             </button>
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-wide text-gray-600">
-            {order?.status && (
-              <span className="rounded-full bg-gray-100 px-3 py-1">
-                {order.status}
-              </span>
-            )}
-            {order?.createdAt && (
-              <span className="rounded-full bg-gray-100 px-3 py-1">
-                {formatDate(order.createdAt)}
-              </span>
-            )}
-          </div>
+          {mode !== "create" && (
+            <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-wide text-gray-600">
+              {order?.status && (
+                <span className="rounded-full bg-gray-100 px-3 py-1">
+                  {order.status}
+                </span>
+              )}
+              {order?.createdAt && (
+                <span className="rounded-full bg-gray-100 px-3 py-1">
+                  {formatDate(order.createdAt)}
+                </span>
+              )}
+            </div>
+          )}
+
 
           <div className="mt-6 grid gap-6 md:grid-cols-2">
             <section className="rounded-lg border border-gray-200 p-4">
@@ -558,11 +603,11 @@ export default function OrderDetailsModal({
                           <p className="text-xs text-gray-600">{item.model}</p>
                         )}
                       </div>
-                      <div className="grid gap-2 text-sm text-gray-700 sm:grid-cols-3 sm:items-end">
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-600">
-                            {t("admin.orders.qtyLabel")}
-                          </label>
+                    <div className="grid gap-2 text-sm text-gray-700 sm:grid-cols-3 sm:items-end">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600">
+                          {t("admin.orders.qtyLabel")}
+                        </label>
                           <input
                             type="number"
                             min="1"
@@ -599,6 +644,46 @@ export default function OrderDetailsModal({
                         </div>
                       </div>
                     </div>
+                    {isRental && (
+                      <div className="mt-3 grid gap-3 text-sm text-gray-700 sm:grid-cols-2">
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-600">
+                            {t("admin.orders.rentCostPerPrint")}
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            className="w-full rounded-md border border-gray-300 px-2 py-1 text-sm"
+                            value={Number(item?.rentCostPerPrint) || 0}
+                            onChange={(e) =>
+                              handleItemChange(
+                                index,
+                                "rentCostPerPrint",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-600">
+                            {t("admin.orders.rentCostPerScan")}
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            className="w-full rounded-md border border-gray-300 px-2 py-1 text-sm"
+                            value={Number(item?.rentCostPerScan) || 0}
+                            onChange={(e) =>
+                              handleItemChange(
+                                index,
+                                "rentCostPerScan",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
+                    )}
                     <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
                       {isRental && (
                         <span className="inline-flex rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold uppercase text-gray-600">
@@ -778,14 +863,18 @@ export default function OrderDetailsModal({
             </div>
           </section>
 
-          {order?.notes && (
-            <section className="mt-6 rounded-lg border border-gray-200 p-4">
-              <h3 className="text-sm font-semibold text-[#00294D]">
-                {t("admin.orders.notesTitle")}
-              </h3>
-              <p className="mt-2 text-sm text-gray-700">{order.notes}</p>
-            </section>
-          )}
+          <section className="mt-6 rounded-lg border border-gray-200 p-4">
+            <h3 className="text-sm font-semibold text-[#00294D]">
+              {t("admin.orders.notesTitle")}
+            </h3>
+            <textarea
+              className="mt-2 w-full rounded-md border border-gray-300 px-2 py-2 text-sm"
+              rows={3}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder={t("admin.orders.notesPlaceholder")}
+            />
+          </section>
 
           <section className="mt-6 grid gap-6 md:grid-cols-2">
             <div className="rounded-lg border border-gray-200 p-4">
@@ -904,14 +993,25 @@ export default function OrderDetailsModal({
             >
               {t("admin.orders.cancel")}
             </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={saving}
-              className="rounded-md bg-[#00294D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#003B66] disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {saving ? t("admin.orders.saving") : t("admin.orders.save")}
-            </button>
+            {mode === "create" ? (
+              <button
+                type="button"
+                onClick={handleCreate}
+                disabled={saving}
+                className="rounded-md bg-[#00294D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#003B66] disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {saving ? t("admin.orders.saving") : t("admin.orders.create")}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={saving}
+                className="rounded-md bg-[#00294D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#003B66] disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {saving ? t("admin.orders.saving") : t("admin.orders.save")}
+              </button>
+            )}
           </div>
         </div>
       </div>

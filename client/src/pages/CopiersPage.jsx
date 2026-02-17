@@ -1,14 +1,20 @@
 import ProductCard from "../components/ProductCard";
-import { Search, ChevronDown } from "lucide-react";
+import { Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { http } from "../utils/axios";
 import { useI18n } from "../i18n";
+import useDebounce from "../utils/useDebounce";
 
 export default function CopiersPage() {
   const { t } = useI18n();
   const [copiers, setCopiers] = useState([]);
   const [error, setError] = useState("");
+  const [copierColorMode, setCopierColorMode] = useState("");
+  const [filterMultifunction, setFilterMultifunction] = useState(false);
+  const [filterHighVolume, setFilterHighVolume] = useState(false);
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query, 300);
 
   const fetchCopiers = async () => {
     try {
@@ -16,9 +22,12 @@ export default function CopiersPage() {
         params: {
           category: "copier",
           visibility: "active",
+          copierColorMode: copierColorMode || undefined,
+          copierMultifunction: filterMultifunction ? "true" : undefined,
+          copierHighVolume: filterHighVolume ? "true" : undefined,
+          model: debouncedQuery.trim() || undefined,
         },
       });
-      console.log(copiers.data);
       if (copiers.data) {
         setCopiers(copiers.data.data);
         setError("");
@@ -30,7 +39,7 @@ export default function CopiersPage() {
 
   useEffect(() => {
     fetchCopiers();
-  }, []);
+  }, [copierColorMode, filterMultifunction, filterHighVolume, debouncedQuery]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-4">
@@ -46,20 +55,42 @@ export default function CopiersPage() {
         </div>
 
         <div className="flex flex-wrap justify-between items-center gap-4 w-full">
-          <div className="relative">
-            <select className="appearance-none bg-[#FFCB05] text-[#00294D] font-semibold px-4 py-2 pr-10 rounded-md focus:outline-none">
-              <option>{t("copiers.filterAll")}</option>
-              <option>{t("copiers.filterColor")}</option>
-              <option>{t("copiers.filterMono")}</option>
-              <option>{t("copiers.filterHighVolume")}</option>
+          <div className="flex flex-wrap items-center gap-3">
+            <select
+              value={copierColorMode}
+              onChange={(e) => setCopierColorMode(e.target.value)}
+              className="appearance-none bg-[#FFCB05] text-[#00294D] font-semibold px-4 py-2 pr-10 rounded-md focus:outline-none"
+            >
+              <option value="">{t("copiers.filterAll")}</option>
+              <option value="blackWhite">{t("copiers.filterMono")}</option>
+              <option value="color">{t("copiers.filterColor")}</option>
             </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#00294D] pointer-events-none" />
+            <div className="flex items-center gap-2">
+              <label className="inline-flex items-center gap-2 text-sm font-semibold text-[#00294D]">
+                <input
+                  type="checkbox"
+                  checked={filterMultifunction}
+                  onChange={(e) => setFilterMultifunction(e.target.checked)}
+                />
+                {t("copiers.filterMultifunction")}
+              </label>
+              <label className="inline-flex items-center gap-2 text-sm font-semibold text-[#00294D]">
+                <input
+                  type="checkbox"
+                  checked={filterHighVolume}
+                  onChange={(e) => setFilterHighVolume(e.target.checked)}
+                />
+                {t("copiers.filterHighVolume")}
+              </label>
+            </div>
           </div>
 
           <div className="relative w-full sm:w-72">
             <input
               type="text"
               placeholder={t("copiers.searchPlaceholder")}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
               className="w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20"
             />
             <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />

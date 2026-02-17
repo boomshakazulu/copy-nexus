@@ -3,9 +3,11 @@ import { X } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import { http } from "../utils/axios";
 import { useI18n } from "../i18n";
+import { useNavigate } from "react-router-dom";
 
 export default function MaintenancePage() {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const [copiers, setCopiers] = useState([]);
   const [selectedCopierId, setSelectedCopierId] = useState("");
   const [selectorOpen, setSelectorOpen] = useState(false);
@@ -19,7 +21,9 @@ export default function MaintenancePage() {
     const fetchCopiers = async () => {
       try {
         setIsLoading(true);
-        const res = await http.get("/products", { params: { category: "copier" } });
+        const res = await http.get("/products", {
+          params: { category: "copier", visibility: "active" },
+        });
         setCopiers(res?.data?.data ?? []);
         setError("");
       } catch (_err) {
@@ -120,7 +124,13 @@ export default function MaintenancePage() {
               {t("maintenancePage.formSubtitle")}
             </p>
 
-            <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                navigate("/request-confirmation?type=maintenance");
+              }}
+            >
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   {t("maintenancePage.form.name")}

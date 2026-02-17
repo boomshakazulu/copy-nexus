@@ -13,6 +13,7 @@ module.exports = {
     const {
       q, // search: name or email
       ids, // CSV of order ids to fetch
+      status, // CSV of statuses
       sort = "createdAt",
       order = "desc",
       page = 1,
@@ -108,6 +109,19 @@ module.exports = {
       if (objIds.length) filter._id = { $in: objIds };
     }
 
+    if (status) {
+      const allowed = Order.schema.path("status").enumValues || [];
+      const statusList = String(status)
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const invalid = statusList.filter((s) => !allowed.includes(s));
+      if (invalid.length) {
+        throw unprocessable("Invalid status", { status: invalid });
+      }
+      filter.status = statusList.length === 1 ? statusList[0] : { $in: statusList };
+    }
+
     const [data, total] = await Promise.all([
       Order.find(filter)
         .select("+customer.idNumberEncrypted")
@@ -188,6 +202,7 @@ module.exports = {
       items,
       customer,
       shippingAddress,
+      notes,
     } = req.body || {};
 
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
@@ -253,6 +268,10 @@ module.exports = {
       order.shippingAddress = nextAddress;
     }
 
+    if (typeof notes === "string") {
+      order.notes = notes.trim();
+    }
+
     if (Array.isArray(items) && items.length) {
       const looksLikeFullReplace = items.every(
         (item) => item && item.name && (item.product || item.isCustom)
@@ -262,11 +281,19 @@ module.exports = {
         const nextItems = items.map((item) => {
           const qty = Number(item.qty) || 0;
           const unitAmount = Number(item.unitAmount) || 0;
+          const rentCostPerScan = Number(item.rentCostPerScan) || 0;
+          const rentCostPerPrint = Number(item.rentCostPerPrint) || 0;
           if (qty < 1) {
             throw unprocessable("Item qty must be >= 1");
           }
           if (unitAmount < 0) {
             throw unprocessable("Item price must be >= 0");
+          }
+          if (rentCostPerScan < 0) {
+            throw unprocessable("Item rentCostPerScan must be >= 0");
+          }
+          if (rentCostPerPrint < 0) {
+            throw unprocessable("Item rentCostPerPrint must be >= 0");
           }
           if (item.product) {
             if (!mongoose.Types.ObjectId.isValid(item.product)) {
@@ -282,6 +309,8 @@ module.exports = {
             qty,
             unitAmount,
             IsRented: !!item.IsRented,
+            rentCostPerScan,
+            rentCostPerPrint,
             isCustom: !!item.isCustom,
           };
         });

@@ -10,6 +10,7 @@ const isNumber = (v) => typeof v === "number" && Number.isFinite(v);
 const isNonEmptyString = (v) => typeof v === "string" && v.trim().length > 0;
 
 const CATEGORY_VALUES = ["copier", "part", "toner"];
+const COPIER_COLOR_VALUES = ["blackWhite", "color"];
 const VISIBILITY_VALUES = ["active", "archived"];
 const SORT_FIELDS = [
   "createdAt",
@@ -27,6 +28,9 @@ const FIELD_WHITELIST = [
   "compatibleCopiers",
   "compatibleCopiers_norm",
   "category",
+  "copierColorMode",
+  "copierMultifunction",
+  "copierHighVolume",
   "stockQty",
   "inStock",
   "visibility",
@@ -46,6 +50,9 @@ const UPDATE_FIELDS = new Set([
   "model",
   "compatibleCopiers",
   "category",
+  "copierColorMode",
+  "copierMultifunction",
+  "copierHighVolume",
   "stockQty",
   "inStock",
   "visibility",
@@ -94,9 +101,37 @@ function validateProductPayload(payload, { partial, allowedKeys } = {}) {
     add("description", "Must be a non-empty string");
   }
 
-  if (payload.category != null && !CATEGORY_VALUES.includes(payload.category)) {
-    add("category", `Must be one of: ${CATEGORY_VALUES.join(", ")}`);
-  }
+    if (payload.category != null && !CATEGORY_VALUES.includes(payload.category)) {
+      add("category", `Must be one of: ${CATEGORY_VALUES.join(", ")}`);
+    }
+
+    if (
+      payload.copierColorMode != null &&
+      !COPIER_COLOR_VALUES.includes(payload.copierColorMode)
+    ) {
+      add(
+        "copierColorMode",
+        `Must be one of: ${COPIER_COLOR_VALUES.join(", ")}`
+      );
+    }
+
+    if (
+      payload.copierMultifunction != null &&
+      typeof payload.copierMultifunction !== "boolean"
+    ) {
+      add("copierMultifunction", "Must be a boolean");
+    }
+
+    if (
+      payload.copierHighVolume != null &&
+      typeof payload.copierHighVolume !== "boolean"
+    ) {
+      add("copierHighVolume", "Must be a boolean");
+    }
+
+    if (!partial && payload.category === "copier" && payload.copierColorMode == null) {
+      add("copierColorMode", "Required for copier products");
+    }
 
   if (
     payload.visibility != null &&
@@ -187,6 +222,9 @@ module.exports = {
       q, // name contains
       model, // copier model prefix search
       category, // "copier" | "part" | "toner"
+      copierColorMode, // "blackWhite" | "color"
+      copierMultifunction, // "true"/"false"
+      copierHighVolume, // "true"/"false"
       visibility,
       inStock, // "true"/"false"
       rentable, // "true"/"false"
@@ -202,6 +240,23 @@ module.exports = {
 
     if (category && !CATEGORY_VALUES.includes(category)) {
       throw unprocessable("Invalid category", { category });
+    }
+    if (copierColorMode && !COPIER_COLOR_VALUES.includes(copierColorMode)) {
+      throw unprocessable("Invalid copierColorMode", { copierColorMode });
+    }
+    if (
+      copierMultifunction &&
+      copierMultifunction !== "true" &&
+      copierMultifunction !== "false"
+    ) {
+      throw unprocessable("Invalid copierMultifunction", { copierMultifunction });
+    }
+    if (
+      copierHighVolume &&
+      copierHighVolume !== "true" &&
+      copierHighVolume !== "false"
+    ) {
+      throw unprocessable("Invalid copierHighVolume", { copierHighVolume });
     }
     if (visibility && !VISIBILITY_VALUES.includes(visibility)) {
       throw unprocessable("Invalid visibility", { visibility });
@@ -254,6 +309,13 @@ module.exports = {
     }
 
     if (category) filter.category = category;
+    if (copierColorMode) filter.copierColorMode = copierColorMode;
+    if (copierMultifunction === "true") {
+      filter.copierMultifunction = true;
+    }
+    if (copierHighVolume === "true") {
+      filter.copierHighVolume = true;
+    }
 
     if (inStock === "true" || inStock === "false") {
       filter.inStock = inStock === "true";

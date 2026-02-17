@@ -3,9 +3,11 @@ import { X } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import { http } from "../utils/axios";
 import { useI18n } from "../i18n";
+import { useNavigate } from "react-router-dom";
 
 export default function PartsAccessoriesPage() {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const [copiers, setCopiers] = useState([]);
   const [parts, setParts] = useState([]);
   const [toners, setToners] = useState([]);
@@ -149,7 +151,13 @@ export default function PartsAccessoriesPage() {
             {t("partsPage.contactSubtitle")}
           </p>
 
-          <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              navigate("/request-confirmation?type=parts");
+            }}
+          >
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 {t("partsPage.form.name")}
@@ -307,7 +315,13 @@ export default function PartsAccessoriesPage() {
               {t("partsPage.contactSubtitle")}
             </p>
 
-            <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                navigate("/request-confirmation?type=parts");
+              }}
+            >
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   {t("partsPage.form.name")}

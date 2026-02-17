@@ -19,6 +19,9 @@ export default function AddProductModal({
   const [subtitle, setSubtitle] = useState("");
   const [model, setModel] = useState("");
   const [category, setCategory] = useState("copier");
+  const [copierColorMode, setCopierColorMode] = useState("blackWhite");
+  const [copierMultifunction, setCopierMultifunction] = useState(false);
+  const [copierHighVolume, setCopierHighVolume] = useState(false);
   const [inStock, setInStock] = useState(true);
   const [description, setDescription] = useState("");
   const [visibility, setVisibility] = useState("active");
@@ -48,6 +51,9 @@ export default function AddProductModal({
       setSubtitle("");
       setModel("");
       setCategory("copier");
+      setCopierColorMode("blackWhite");
+      setCopierMultifunction(false);
+      setCopierHighVolume(false);
       setInStock(true);
       setPurchasePrice("");
       setRentable(true);
@@ -69,6 +75,7 @@ export default function AddProductModal({
     model.trim() &&
     description.trim() &&
     purchasePrice !== "" &&
+    (category !== "copier" || copierColorMode) &&
     (!rentable ||
       (rentPrice !== "" && rentCostPerScan !== "" && rentCostPerPrint !== ""));
 
@@ -80,12 +87,16 @@ export default function AddProductModal({
     if (nextCategory === "copier") {
       // copiers CAN be rentable
       setRentable(true);
+      if (!copierColorMode) setCopierColorMode("blackWhite");
     } else {
       // parts/toner are NOT rentable
       setRentable(false);
       setRentPrice("");
       setRentCostPerScan("");
       setRentCostPerPrint("");
+      setCopierColorMode("");
+      setCopierMultifunction(false);
+      setCopierHighVolume(false);
     }
 
     if (nextCategory === "copier") {
@@ -110,6 +121,9 @@ export default function AddProductModal({
       inStock,
       visibility,
       category,
+      copierColorMode: category === "copier" ? copierColorMode : null,
+      copierMultifunction: category === "copier" ? copierMultifunction : false,
+      copierHighVolume: category === "copier" ? copierHighVolume : false,
       images,
       compatibleCopiers: category === "copier" ? [] : compatibleCopiers,
     };
@@ -131,6 +145,9 @@ export default function AddProductModal({
       rentCostPerPrint: rentable ? Number(rentCostPerPrint) || 0 : 0,
       inStock,
       category,
+      copierColorMode: category === "copier" ? copierColorMode : null,
+      copierMultifunction: category === "copier" ? copierMultifunction : false,
+      copierHighVolume: category === "copier" ? copierHighVolume : false,
       images,
     };
     localStorage.setItem("productPreview", JSON.stringify(previewPayload));
@@ -319,6 +336,80 @@ export default function AddProductModal({
                 )}
               </div>
 
+              {/* Copier Attributes */}
+              {category === "copier" && (
+                <div className="md:col-span-2">
+                  <span className="block text-sm font-semibold text-[#00294D] mb-1">
+                    {t("admin.forms.copierAttributes")}
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <span className="block text-xs font-semibold text-gray-500 mb-2">
+                        {t("admin.forms.copierColorMode")}
+                      </span>
+                      <div className="flex flex-col gap-2">
+                        <label className="inline-flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name="copierColorMode"
+                            value="blackWhite"
+                            checked={copierColorMode === "blackWhite"}
+                            onChange={(e) => setCopierColorMode(e.target.value)}
+                          />
+                          <span>{t("admin.forms.copierTypes.blackWhite")}</span>
+                        </label>
+                        <label className="inline-flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name="copierColorMode"
+                            value="color"
+                            checked={copierColorMode === "color"}
+                            onChange={(e) => setCopierColorMode(e.target.value)}
+                          />
+                          <span>{t("admin.forms.copierTypes.color")}</span>
+                        </label>
+                      </div>
+                      {fieldErrors.copierColorMode && (
+                        <p className="mt-1 text-xs text-red-600">
+                          {fieldErrors.copierColorMode}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <span className="block text-xs font-semibold text-gray-500 mb-2">
+                        {t("admin.forms.copierFeatures")}
+                      </span>
+                      <label className="inline-flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={copierMultifunction}
+                          onChange={(e) =>
+                            setCopierMultifunction(e.target.checked)
+                          }
+                        />
+                        <span>
+                          {t("admin.forms.copierTypes.multifunction")}
+                        </span>
+                      </label>
+                    </div>
+
+                    <div className="flex items-start">
+                      <label className="inline-flex items-center gap-2 mt-6">
+                        <input
+                          type="checkbox"
+                          checked={copierHighVolume}
+                          onChange={(e) =>
+                            setCopierHighVolume(e.target.checked)
+                          }
+                        />
+                        <span>{t("admin.forms.copierTypes.highVolume")}</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Stock */}
               <div>
                 <span className="block text-sm font-semibold text-[#00294D] mb-1">
@@ -452,8 +543,8 @@ export default function AddProductModal({
                       value={
                         editingRentCostPerScan
                           ? rentCostPerScan
-                          : rentCostPerScan
-                            ? formatCOP(rentCostPerScan)
+                          : rentCostPerScan !== ""
+                            ? formatCOP(Number(rentCostPerScan) || 0)
                             : ""
                       }
                       onFocus={() => setEditingRentCostPerScan(true)}
@@ -486,8 +577,8 @@ export default function AddProductModal({
                       value={
                         editingRentCostPerPrint
                           ? rentCostPerPrint
-                          : rentCostPerPrint
-                            ? formatCOP(rentCostPerPrint)
+                          : rentCostPerPrint !== ""
+                            ? formatCOP(Number(rentCostPerPrint) || 0)
                             : ""
                       }
                       onFocus={() => setEditingRentCostPerPrint(true)}
@@ -556,11 +647,11 @@ export default function AddProductModal({
 
                 {/* Thumbs */}
                 {images.length > 0 && (
-                  <ul className="mb-3 flex flex-wrap gap-3">
+                  <ul className="mb-3 flex flex-wrap gap-4">
                     {images.map((url, idx) => (
                       <li
                         key={url + idx}
-                        className="relative h-20 w-20 overflow-hidden rounded border border-gray-200 bg-white"
+                        className="relative h-28 w-28 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
                         draggable
                         onDragStart={onDragStart(idx)}
                         onDragOver={onDragOver}
@@ -576,16 +667,71 @@ export default function AddProductModal({
                             e.currentTarget.src = "/placeholder.png";
                           }}
                         />
+
+                        {/* primary badge */}
+                        {idx === 0 && (
+                          <span className="absolute left-1 top-1 rounded bg-[#00294D] px-2 py-0.5 text-[10px] font-semibold text-white">
+                            {t("admin.forms.primaryImage")}
+                          </span>
+                        )}
+
+                        {/* drag handle */}
+                        <span className="absolute bottom-1 left-1 rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-semibold text-[#00294D] shadow">
+                          {t("admin.forms.dragHandle")}
+                        </span>
+
                         {/* remove */}
                         <button
                           type="button"
                           onClick={() => removeImage(idx)}
-                          className="absolute -top-2 -right-2 rounded-full bg-white shadow p-1 hover:bg-gray-50"
+                          className="absolute -top-2 -right-2 h-7 w-7 rounded-full bg-white shadow-md ring-1 ring-gray-200 hover:bg-red-50"
                           aria-label={t("admin.forms.removeImage")}
                           title={t("admin.forms.removeImage")}
                         >
-                          <X className="h-4 w-4 text-gray-700" />
+                          <X className="mx-auto h-4 w-4 text-red-600" />
                         </button>
+
+                        {/* move left/right */}
+                        <div className="absolute bottom-1 right-1 flex gap-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (idx === 0) return;
+                              setImages((prev) => {
+                                const next = [...prev];
+                                const temp = next[idx - 1];
+                                next[idx - 1] = next[idx];
+                                next[idx] = temp;
+                                return next;
+                              });
+                            }}
+                            className="h-6 w-6 rounded bg-white/90 text-xs font-semibold text-[#00294D] shadow hover:bg-gray-50 disabled:opacity-50"
+                            disabled={idx === 0}
+                            aria-label={t("admin.forms.moveLeft")}
+                            title={t("admin.forms.moveLeft")}
+                          >
+                            ←
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (idx === images.length - 1) return;
+                              setImages((prev) => {
+                                const next = [...prev];
+                                const temp = next[idx + 1];
+                                next[idx + 1] = next[idx];
+                                next[idx] = temp;
+                                return next;
+                              });
+                            }}
+                            className="h-6 w-6 rounded bg-white/90 text-xs font-semibold text-[#00294D] shadow hover:bg-gray-50 disabled:opacity-50"
+                            disabled={idx === images.length - 1}
+                            aria-label={t("admin.forms.moveRight")}
+                            title={t("admin.forms.moveRight")}
+                          >
+                            →
+                          </button>
+                        </div>
                       </li>
                     ))}
                   </ul>

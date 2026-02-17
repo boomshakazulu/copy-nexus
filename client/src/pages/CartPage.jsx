@@ -129,6 +129,10 @@ export default function CartPage() {
         qty: Number(item.quantity) || 1,
         unitAmount: Number(item.purchasePrice) || 0,
         IsRented: item.cartMode === "rent",
+        rentCostPerScan:
+          item.cartMode === "rent" ? Number(item.rentCostPerScan) || 0 : 0,
+        rentCostPerPrint:
+          item.cartMode === "rent" ? Number(item.rentCostPerPrint) || 0 : 0,
       })),
       notes: form.notes.trim(),
       consent: !!form.consent,

@@ -12,6 +12,7 @@ export default function Products() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [copiers, setCopiers] = useState([]);
   const [thisProduct, setThisProduct] = useState(null);
+  const [activeVisibility, setActiveVisibility] = useState("active");
   const [activeCategory, setActiveCategory] = useState("copier");
   const [error, setError] = useState("");
   const [formError, setFormError] = useState("");
@@ -24,11 +25,12 @@ export default function Products() {
     filter: {},
   });
 
-  const fetchProducts = async (category) => {
+  const fetchProducts = async (category, visibility) => {
     try {
       const res = await http.get("/products", {
         params: {
           category,
+          visibility,
         },
       });
       if (res.data) {
@@ -55,8 +57,8 @@ export default function Products() {
   };
 
   useEffect(() => {
-    fetchProducts(activeCategory);
-  }, [activeCategory]);
+    fetchProducts(activeCategory, activeVisibility);
+  }, [activeCategory, activeVisibility]);
 
   useEffect(() => {
     fetchCopierOptions();
@@ -249,6 +251,26 @@ export default function Products() {
         >
           {t("admin.products.addProduct")}
         </button>
+      </div>
+
+      <div className="mb-4 flex flex-wrap gap-2">
+        {[
+          { key: "active", label: t("admin.products.activeTab") },
+          { key: "archived", label: t("admin.products.archivedTab") },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setActiveVisibility(tab.key)}
+            className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+              activeVisibility === tab.key
+                ? "bg-[#00294D] text-white"
+                : "bg-gray-100 text-[#00294D] hover:bg-gray-200"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       <div className="mb-6 flex flex-wrap gap-2">
