@@ -1,1 +1,71 @@
 @import "tailwindcss";
+@import "react-quill/dist/quill.core.css";
+
+.ql-display {
+  padding: 0;
+}
+
+.ql-display .ql-ui {
+  display: none;
+}
+
+.ql-display h1,
+.ql-display h2,
+.ql-display h3,
+.ql-display h4 {
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0.8rem 0 0.4rem;
+}
+
+.ql-display h1 {
+  font-size: 1.875rem;
+}
+
+.ql-display h2 {
+  font-size: 1.5rem;
+}
+
+.ql-display h3 {
+  font-size: 1.25rem;
+}
+
+.ql-display p {
+  margin: 0.35rem 0;
+}
+
+.ql-display ul,
+.ql-display ol {
+  padding-left: 1.5rem;
+  margin: 0.35rem 0 0.6rem;
+}
+
+.ql-display ul {
+  list-style: disc;
+}
+
+.ql-display ol {
+  list-style: decimal;
+}
+
+.ql-display blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 0.75rem;
+  color: #4b5563;
+  margin: 0.6rem 0;
+}
+
+.ql-display pre {
+  background: #111827;
+  color: #f9fafb;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 0.6rem 0;
+}
+
+.ql-display code {
+  background: #f3f4f6;
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.25rem;
+}

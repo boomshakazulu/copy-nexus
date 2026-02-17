@@ -16,6 +16,7 @@ import CopiersPage from "./pages/CopiersPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import PartsAccessoriesPage from "./pages/PartsAccessoriesPage";
 import MaintenancePage from "./pages/MaintenancePage";
+import ProductPreviewPage from "./pages/ProductPreviewPage";
 
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
       {
         path: "/products/:id",
         element: <ProductDetailPage />,
+      },
+      {
+        path: "/preview/product",
+        element: <ProductPreviewPage />,
       },
       {
         path: "/admin",
