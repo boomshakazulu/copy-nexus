@@ -139,9 +139,33 @@ export default function OrderDetailsModal({ order, onClose }) {
                     </div>
                   </div>
                   {item?.IsRented && (
-                    <span className="mt-2 inline-flex rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold uppercase text-gray-600">
-                      {t("profile.rentalLabel")}
-                    </span>
+                    <div className="mt-2 space-y-1">
+                      <span className="inline-flex rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold uppercase text-gray-600">
+                        {t("profile.rentalLabel")}
+                      </span>
+                      {(Number(item?.rentCostPerPrint) || 0) > 0 && (
+                        <p className="text-xs text-gray-600">
+                          {t("profile.rentCostPerPrint")}:{" "}
+                          <span className="font-semibold text-[#00294D]">
+                            {formatMoney(
+                              Number(item.rentCostPerPrint) || 0,
+                              currency
+                            )}
+                          </span>
+                        </p>
+                      )}
+                      {(Number(item?.rentCostPerScan) || 0) > 0 && (
+                        <p className="text-xs text-gray-600">
+                          {t("profile.rentCostPerScan")}:{" "}
+                          <span className="font-semibold text-[#00294D]">
+                            {formatMoney(
+                              Number(item.rentCostPerScan) || 0,
+                              currency
+                            )}
+                          </span>
+                        </p>
+                      )}
+                    </div>
                   )}
                 </div>
               ))}

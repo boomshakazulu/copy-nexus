@@ -22,6 +22,8 @@ const lineItemSchema = new Schema(
     qty: { type: Number, min: 1, required: true },
     unitAmount: { type: Number, min: 0, required: true }, // integer COP
     IsRented: { type: Boolean, default: false },
+    rentCostPerScan: { type: Number, min: 0, default: 0 },
+    rentCostPerPrint: { type: Number, min: 0, default: 0 },
     isCustom: { type: Boolean, default: false },
   },
   { _id: false },

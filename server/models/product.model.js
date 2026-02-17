@@ -32,6 +32,18 @@ const productSchema = new Schema(
       required: true,
       enum: ["copier", "part", "toner"],
     },
+    copierColorMode: {
+      type: String,
+      enum: ["blackWhite", "color"],
+    },
+    copierMultifunction: {
+      type: Boolean,
+      default: false,
+    },
+    copierHighVolume: {
+      type: Boolean,
+      default: false,
+    },
     stockQty: {
       type: Number,
       min: 0,

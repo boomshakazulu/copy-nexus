@@ -16,6 +16,7 @@ import CopiersPage from "./pages/CopiersPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import PartsAccessoriesPage from "./pages/PartsAccessoriesPage";
 import MaintenancePage from "./pages/MaintenancePage";
+import RequestConfirmationPage from "./pages/RequestConfirmationPage";
 import ProductPreviewPage from "./pages/ProductPreviewPage";
 
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -60,6 +61,10 @@ const router = createBrowserRouter([
       {
         path: "/maintenance",
         element: <MaintenancePage />,
+      },
+      {
+        path: "/request-confirmation",
+        element: <RequestConfirmationPage />,
       },
       {
         path: "/products/:id",

@@ -3,6 +3,7 @@ import { useI18n } from "../../i18n";
 import { http } from "../../utils/axios";
 import auth from "../../utils/auth";
 import OrderDetailsModal from "../../components/admin/OrderDetailsModal";
+import useDebounce from "../../utils/useDebounce";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -10,27 +11,38 @@ export default function Orders() {
   const { t } = useI18n();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 300);
   const [items, setItems] = useState({
     data: [],
     pagination: { total: 0, page: 1, limit: ITEMS_PER_PAGE, totalPages: 1 },
   });
+  const [statusTab, setStatusTab] = useState("open");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [saveError, setSaveError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [createError, setCreateError] = useState("");
+  const [creating, setCreating] = useState(false);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
       setError("");
       const token = auth.getToken();
+      const statusMap = {
+        open: "pending",
+        completed: "completed,shipped",
+        canceled: "canceled",
+      };
       const res = await http.get("/admin/orders", {
         headers: { Authorization: `Bearer ${token}` },
         params: {
-          q: searchTerm || undefined,
+          q: debouncedSearch || undefined,
           page: currentPage,
           limit: ITEMS_PER_PAGE,
+          status: statusMap[statusTab],
         },
       });
       setItems(res.data);
@@ -43,7 +55,7 @@ export default function Orders() {
 
   useEffect(() => {
     fetchOrders();
-  }, [currentPage, searchTerm]);
+  }, [currentPage, debouncedSearch, statusTab]);
 
   const currentOrders = items?.data || [];
   const totalPages = items?.pagination?.totalPages || 1;
@@ -75,6 +87,27 @@ export default function Orders() {
     }
   };
 
+  const handleCreateOrder = async (payload) => {
+    try {
+      setCreating(true);
+      setCreateError("");
+      const token = auth.getToken();
+      const res = await http.post("/admin/order", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const created = res.data;
+      setItems((prev) => ({
+        ...prev,
+        data: [created, ...(prev?.data || [])],
+      }));
+      setIsCreateOpen(false);
+    } catch (_err) {
+      setCreateError(t("admin.orders.createFailed"));
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const formatDate = (value) => {
     if (!value) return "";
     const date = new Date(value);
@@ -98,16 +131,53 @@ export default function Orders() {
         <h1 className="text-2xl font-bold text-[#00294D]">
           {t("admin.orders.title")}
         </h1>
-        <input
-          type="text"
-          placeholder={t("admin.orders.searchPlaceholder")}
-          className="border px-4 py-2 rounded text-sm w-full max-w-xs"
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setCurrentPage(1);
-          }}
-        />
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setCreateError("");
+              setIsCreateOpen(true);
+            }}
+            className="inline-flex items-center gap-2 rounded-full bg-[#00294D] px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#003B66]"
+          >
+            <span className="text-lg leading-none">+</span>
+            {t("admin.orders.createOrder")}
+          </button>
+          <input
+            type="text"
+            placeholder={t("admin.orders.searchPlaceholder")}
+            className="border px-4 py-2 rounded text-sm w-full max-w-xs"
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+      </div>
+
+      <div className="mb-4 flex flex-wrap gap-2">
+        {[
+          { key: "open", label: t("admin.orders.tabOpen") },
+          { key: "completed", label: t("admin.orders.tabCompleted") },
+          { key: "canceled", label: t("admin.orders.tabCanceled") },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => {
+              setStatusTab(tab.key);
+              setCurrentPage(1);
+            }}
+            className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+              statusTab === tab.key
+                ? "bg-[#00294D] text-white"
+                : "bg-gray-100 text-[#00294D] hover:bg-gray-200"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       <div className="overflow-hidden rounded-xl border border-gray-200">
@@ -209,6 +279,26 @@ export default function Orders() {
           onSave={handleSaveOrder}
           saving={saving}
           error={saveError}
+        />
+      )}
+
+      {isCreateOpen && (
+        <OrderDetailsModal
+          mode="create"
+          order={{
+            status: "pending",
+            items: [],
+            customer: {},
+            shippingAddress: {},
+            notes: "",
+          }}
+          onClose={() => {
+            setIsCreateOpen(false);
+            setCreateError("");
+          }}
+          onCreate={handleCreateOrder}
+          saving={creating}
+          error={createError}
         />
       )}
     </div>
