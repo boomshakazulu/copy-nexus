@@ -95,6 +95,8 @@ export default function ProductDetailPage() {
       model: copier.model,
       purchasePrice: mode === "rent" ? copier.rentPrice : copier.purchasePrice,
       rentPrice: copier.rentPrice,
+      rentCostPerScan: copier.rentCostPerScan,
+      rentCostPerPrint: copier.rentCostPerPrint,
       inStock: copier.inStock,
       images: copier.images,
       rentable: copier.rentable,
@@ -105,6 +107,11 @@ export default function ProductDetailPage() {
     setCartMode(mode);
     setCartModalOpen(true);
   };
+
+  const rentCostPerScan = Number(copier?.rentCostPerScan) || 0;
+  const rentCostPerPrint = Number(copier?.rentCostPerPrint) || 0;
+  const showRentCosts =
+    copier?.rentable && (rentCostPerScan > 0 || rentCostPerPrint > 0);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
@@ -211,11 +218,34 @@ export default function ProductDetailPage() {
                 </span>
               </div>
             )}
+            {showRentCosts && (
+              <div className="mt-2 space-y-1 text-sm text-[#555]">
+                {rentCostPerPrint > 0 && (
+                  <div>
+                    {t("product.pricePerCopy")}: {" "}
+                    <span className="font-bold text-[#00294D]">
+                      {formatCOP(rentCostPerPrint)}
+                    </span>
+                  </div>
+                )}
+                {rentCostPerScan > 0 && (
+                  <div>
+                    {t("product.pricePerScan")}: {" "}
+                    <span className="font-bold text-[#00294D]">
+                      {formatCOP(rentCostPerScan)}
+                    </span>
+                  </div>
+                )}
+                <p className="text-xs text-gray-500">
+                  {t("product.rentalOnlyNote")}
+                </p>
+              </div>
+            )}
           </div>
 
           {copier.description && (
             <div
-              className="prose prose-sm max-w-none text-gray-600"
+              className="ql-editor ql-display text-gray-600"
               dangerouslySetInnerHTML={{ __html: copier.description }}
             />
           )}

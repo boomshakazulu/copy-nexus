@@ -212,6 +212,9 @@
     "price": "Price",
     "rent": "Rent",
     "perMonth": "per month",
+    "pricePerCopy": "Price per copy",
+    "pricePerScan": "Price per scan",
+    "rentalOnlyNote": "Only applies to rentals.",
     "buyNow": "Buy Now"
   },
   "productCard": {
@@ -515,7 +518,7 @@
       "modelNumber": "Model Number",
       "modelPlaceholder": "required (e.g., M4125idn)",
       "description": "Description",
-      "descriptionHint": "Use bold, italic, lists, and links. You can paste text - formatting will be preserved.",
+      "descriptionHint": "Use headings, bold, italic, lists, quotes, and links. Pasted content is cleaned.",
       "category": "Category",
       "categories": {
         "copier": "Copier",
@@ -531,6 +534,8 @@
       "purchasePrice": "Purchase Price (COP)",
       "rentable": "Available for Rent",
       "rentPrice": "Rent Price (COP / month)",
+      "rentCostPerScan": "Cost per Scan (COP)",
+      "rentCostPerPrint": "Cost per Print (COP)",
       "compatibleCopiers": "Compatible Copiers",
       "noCopiers": "No copiers found.",
       "compatibleHint": "Tap to add or remove compatible copiers.",
@@ -542,6 +547,11 @@
       "addImage": "Add",
       "dragHint": "Drag thumbnails to change order. First image becomes the product's primary image.",
       "cancel": "Cancel",
+      "preview": "Preview",
+      "previewLabel": "Preview",
+      "previewMissing": "Preview data not found. Please open preview from the product form.",
+      "previewUntitled": "Untitled product",
+      "backToAdmin": "Back to Admin",
       "saveProduct": "Save Product"
     },
     "errors": {
@@ -565,10 +575,37 @@
     "richText": {
       "placeholder": "Write a description...",
       "enterUrl": "Enter URL:",
+      "bold": "Bold",
+      "italic": "Italic",
+      "underline": "Underline",
+      "strike": "Strikethrough",
+      "blockStyle": "Block style",
+      "paragraph": "Paragraph",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
       "unorderedList": "List",
       "orderedList": "Numbered List",
+      "quote": "Quote",
+      "codeBlock": "Code block",
+      "codeInline": "Inline code",
+      "inline": "Inline",
+      "horizontalRule": "Horizontal rule",
+      "alignLeft": "Align left",
+      "alignCenter": "Align center",
+      "alignRight": "Align right",
+      "alignJustify": "Justify",
+      "indent": "Indent",
+      "outdent": "Outdent",
       "link": "Link",
-      "clear": "Clear"
+      "unlink": "Remove link",
+      "undo": "Undo",
+      "redo": "Redo",
+      "removeFormat": "Clear formatting",
+      "clear": "Clear",
+      "pasteHint": "Pasted content is cleaned for safety.",
+      "wordCount": "{count} words",
+      "charCount": "{count} characters",
+      "codePlaceholder": "code"
     }
   }
 }

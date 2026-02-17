@@ -33,6 +33,8 @@ const FIELD_WHITELIST = [
   "purchasePrice",
   "rentable",
   "rentPrice",
+  "rentCostPerScan",
+  "rentCostPerPrint",
   "images",
   "description",
   "createdAt",
@@ -50,6 +52,8 @@ const UPDATE_FIELDS = new Set([
   "purchasePrice",
   "rentable",
   "rentPrice",
+  "rentCostPerScan",
+  "rentCostPerPrint",
   "images",
   "description",
 ]);
@@ -126,6 +130,24 @@ function validateProductPayload(payload, { partial, allowedKeys } = {}) {
   }
   if (payload.rentable === true && payload.rentPrice == null) {
     add("rentPrice", "Required when rentable is true");
+  }
+  if (payload.rentCostPerScan != null && !isNumber(payload.rentCostPerScan)) {
+    add("rentCostPerScan", "Must be a number");
+  }
+  if (payload.rentCostPerScan != null && payload.rentCostPerScan < 0) {
+    add("rentCostPerScan", "Must be >= 0");
+  }
+  if (payload.rentable === true && payload.rentCostPerScan == null) {
+    add("rentCostPerScan", "Required when rentable is true");
+  }
+  if (payload.rentCostPerPrint != null && !isNumber(payload.rentCostPerPrint)) {
+    add("rentCostPerPrint", "Must be a number");
+  }
+  if (payload.rentCostPerPrint != null && payload.rentCostPerPrint < 0) {
+    add("rentCostPerPrint", "Must be >= 0");
+  }
+  if (payload.rentable === true && payload.rentCostPerPrint == null) {
+    add("rentCostPerPrint", "Required when rentable is true");
   }
 
   if (payload.images != null) {

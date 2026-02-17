@@ -62,7 +62,7 @@ export default function ProductCard({
 
       {showDescription && description && (
         <div
-          className="text-sm text-gray-600 mb-3 line-clamp-3"
+          className="ql-editor ql-display text-gray-600 mb-3 line-clamp-3"
           dangerouslySetInnerHTML={{ __html: description }}
         />
       )}

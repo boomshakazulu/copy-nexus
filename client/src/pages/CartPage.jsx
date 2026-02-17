@@ -202,6 +202,11 @@ export default function CartPage() {
                 item?.images && item.images.length > 0
                   ? item.images[0]
                   : "/part.png";
+              const rentCostPerPrint = Number(item?.rentCostPerPrint) || 0;
+              const rentCostPerScan = Number(item?.rentCostPerScan) || 0;
+              const showRentCosts =
+                item?.cartMode === "rent" &&
+                (rentCostPerPrint > 0 || rentCostPerScan > 0);
               return (
                 <div
                   key={itemId}
@@ -240,6 +245,29 @@ export default function CartPage() {
                       </span>
                     )}
                   </div>
+                  {showRentCosts && (
+                    <div className="mt-2 space-y-1 text-sm text-[#555]">
+                      {rentCostPerPrint > 0 && (
+                        <div>
+                          {t("product.pricePerCopy")}: {" "}
+                          <span className="font-semibold text-[#00294D]">
+                            {formatCOP(rentCostPerPrint)}
+                          </span>
+                        </div>
+                      )}
+                      {rentCostPerScan > 0 && (
+                        <div>
+                          {t("product.pricePerScan")}: {" "}
+                          <span className="font-semibold text-[#00294D]">
+                            {formatCOP(rentCostPerScan)}
+                          </span>
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-500">
+                        {t("product.rentalOnlyNote")}
+                      </p>
+                    </div>
+                  )}
                   <div className="mt-4 flex flex-wrap items-center gap-4">
                     <div className="flex items-center gap-2">
                       <label className="text-xs font-semibold text-gray-500">

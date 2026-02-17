@@ -212,6 +212,9 @@
     "price": "Precio",
     "rent": "Renta",
     "perMonth": "por mes",
+    "pricePerCopy": "Precio por copia",
+    "pricePerScan": "Precio por escaneo",
+    "rentalOnlyNote": "Solo aplica a rentas.",
     "buyNow": "Comprar ahora"
   },
   "productCard": {
@@ -515,7 +518,7 @@
       "modelNumber": "Numero de modelo",
       "modelPlaceholder": "requerido (ej., M4125idn)",
       "description": "Descripcion",
-      "descriptionHint": "Usa negritas, cursiva, listas y enlaces. Puedes pegar texto - el formato se mantiene.",
+      "descriptionHint": "Usa encabezados, negritas, cursiva, listas, citas y enlaces. El contenido pegado se limpia.",
       "category": "Categoria",
       "categories": {
         "copier": "Copiadora",
@@ -531,6 +534,8 @@
       "purchasePrice": "Precio de compra (COP)",
       "rentable": "Disponible para renta",
       "rentPrice": "Precio de renta (COP / mes)",
+      "rentCostPerScan": "Costo por escaneo (COP)",
+      "rentCostPerPrint": "Costo por impresion (COP)",
       "compatibleCopiers": "Copiadoras compatibles",
       "noCopiers": "No se encontraron copiadoras.",
       "compatibleHint": "Toca para agregar o quitar copiadoras compatibles.",
@@ -542,6 +547,11 @@
       "addImage": "Agregar",
       "dragHint": "Arrastra miniaturas para cambiar el orden. La primera imagen sera la principal.",
       "cancel": "Cancelar",
+      "preview": "Vista previa",
+      "previewLabel": "Vista previa",
+      "previewMissing": "No se encontraron datos de vista previa. Abre la vista previa desde el formulario.",
+      "previewUntitled": "Producto sin titulo",
+      "backToAdmin": "Volver al admin",
       "saveProduct": "Guardar producto"
     },
     "errors": {
@@ -565,10 +575,37 @@
     "richText": {
       "placeholder": "Escribe una descripcion...",
       "enterUrl": "Ingresa URL:",
+      "bold": "Negrita",
+      "italic": "Cursiva",
+      "underline": "Subrayado",
+      "strike": "Tachado",
+      "blockStyle": "Estilo de bloque",
+      "paragraph": "Parrafo",
+      "heading2": "Encabezado 2",
+      "heading3": "Encabezado 3",
       "unorderedList": "Lista",
       "orderedList": "Lista numerada",
+      "quote": "Cita",
+      "codeBlock": "Bloque de codigo",
+      "codeInline": "Codigo en linea",
+      "inline": "En linea",
+      "horizontalRule": "Regla horizontal",
+      "alignLeft": "Alinear izquierda",
+      "alignCenter": "Alinear centro",
+      "alignRight": "Alinear derecha",
+      "alignJustify": "Justificar",
+      "indent": "Indentar",
+      "outdent": "Desindentar",
       "link": "Enlace",
-      "clear": "Limpiar"
+      "unlink": "Quitar enlace",
+      "undo": "Deshacer",
+      "redo": "Rehacer",
+      "removeFormat": "Quitar formato",
+      "clear": "Limpiar",
+      "pasteHint": "El contenido pegado se limpia por seguridad.",
+      "wordCount": "{count} palabras",
+      "charCount": "{count} caracteres",
+      "codePlaceholder": "codigo"
     }
   }
 }

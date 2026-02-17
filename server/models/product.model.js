@@ -65,6 +65,26 @@ const productSchema = new Schema(
         message: "rentPrice is required when rentable is true",
       },
     },
+    rentCostPerScan: {
+      type: Number,
+      min: 0,
+      validate: {
+        validator: function (v) {
+          return !this.rentable || v != null;
+        },
+        message: "rentCostPerScan is required when rentable is true",
+      },
+    },
+    rentCostPerPrint: {
+      type: Number,
+      min: 0,
+      validate: {
+        validator: function (v) {
+          return !this.rentable || v != null;
+        },
+        message: "rentCostPerPrint is required when rentable is true",
+      },
+    },
     images: {
       type: [String],
       default: [],

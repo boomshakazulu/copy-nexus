@@ -27,8 +27,12 @@ export default function AddProductModal({
   const [purchasePrice, setPurchasePrice] = useState("");
   const [rentable, setRentable] = useState(true);
   const [rentPrice, setRentPrice] = useState("");
+  const [rentCostPerScan, setRentCostPerScan] = useState("");
+  const [rentCostPerPrint, setRentCostPerPrint] = useState("");
   const [editingPurchase, setEditingPurchase] = useState(false);
   const [editingRent, setEditingRent] = useState(false);
+  const [editingRentCostPerScan, setEditingRentCostPerScan] = useState(false);
+  const [editingRentCostPerPrint, setEditingRentCostPerPrint] = useState(false);
 
   // Compatible copiers (for parts/toner)
   const [compatibleCopiers, setCompatibleCopiers] = useState([]);
@@ -48,6 +52,8 @@ export default function AddProductModal({
       setPurchasePrice("");
       setRentable(true);
       setRentPrice("");
+      setRentCostPerScan("");
+      setRentCostPerPrint("");
       setImages([]);
       setNewImageUrl("");
       setDescription("");
@@ -63,7 +69,8 @@ export default function AddProductModal({
     model.trim() &&
     description.trim() &&
     purchasePrice !== "" &&
-    (!rentable || rentPrice !== "");
+    (!rentable ||
+      (rentPrice !== "" && rentCostPerScan !== "" && rentCostPerPrint !== ""));
 
   const onlyDigits = (s) => (s || "").replace(/\D/g, "");
 
@@ -77,6 +84,8 @@ export default function AddProductModal({
       // parts/toner are NOT rentable
       setRentable(false);
       setRentPrice("");
+      setRentCostPerScan("");
+      setRentCostPerPrint("");
     }
 
     if (nextCategory === "copier") {
@@ -96,6 +105,8 @@ export default function AddProductModal({
       purchasePrice: Number(purchasePrice),
       rentable,
       rentPrice: rentable ? Number(rentPrice) : null,
+      rentCostPerScan: rentable ? Number(rentCostPerScan) : null,
+      rentCostPerPrint: rentable ? Number(rentCostPerPrint) : null,
       inStock,
       visibility,
       category,
@@ -105,6 +116,25 @@ export default function AddProductModal({
 
     const ok = await onSubmit?.(product);
     if (ok) onClose?.();
+  };
+
+  const handlePreview = () => {
+    const previewPayload = {
+      name: name.trim(),
+      subtitle: subtitle.trim(),
+      model,
+      description,
+      purchasePrice: Number(purchasePrice) || 0,
+      rentable,
+      rentPrice: rentable ? Number(rentPrice) || 0 : 0,
+      rentCostPerScan: rentable ? Number(rentCostPerScan) || 0 : 0,
+      rentCostPerPrint: rentable ? Number(rentCostPerPrint) || 0 : 0,
+      inStock,
+      category,
+      images,
+    };
+    localStorage.setItem("productPreview", JSON.stringify(previewPayload));
+    window.open("/preview/product", "_blank", "noopener,noreferrer");
   };
 
   // ---- Images: add/remove/reorder ----
@@ -374,11 +404,11 @@ export default function AddProductModal({
                   </div>
 
                   {/* Rent Price (COP / month) */}
-                <div
-                  className={`${
-                    rentable ? "" : "opacity-50"
-                  } transition-opacity`}
-                >
+                  <div
+                    className={`${
+                      rentable ? "" : "opacity-50"
+                    } transition-opacity`}
+                  >
                     <label className="block text-sm font-semibold text-[#00294D] mb-1">
                       {t("admin.forms.rentPrice")}
                     </label>
@@ -402,6 +432,75 @@ export default function AddProductModal({
                     {fieldErrors.rentPrice && (
                       <p className="mt-1 text-xs text-red-600">
                         {fieldErrors.rentPrice}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Rent Cost Per Scan / Print */}
+                  <div
+                    className={`${
+                      rentable ? "" : "opacity-50"
+                    } transition-opacity`}
+                  >
+                    <label className="block text-sm font-semibold text-[#00294D] mb-1">
+                      {t("admin.forms.rentCostPerScan")}
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      disabled={!rentable}
+                      value={
+                        editingRentCostPerScan
+                          ? rentCostPerScan
+                          : rentCostPerScan
+                            ? formatCOP(rentCostPerScan)
+                            : ""
+                      }
+                      onFocus={() => setEditingRentCostPerScan(true)}
+                      onBlur={() => setEditingRentCostPerScan(false)}
+                      onChange={(e) =>
+                        setRentCostPerScan(onlyDigits(e.target.value))
+                      }
+                      className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20 disabled:bg-gray-100"
+                      placeholder="$0"
+                    />
+                    {fieldErrors.rentCostPerScan && (
+                      <p className="mt-1 text-xs text-red-600">
+                        {fieldErrors.rentCostPerScan}
+                      </p>
+                    )}
+                  </div>
+
+                  <div
+                    className={`${
+                      rentable ? "" : "opacity-50"
+                    } transition-opacity`}
+                  >
+                    <label className="block text-sm font-semibold text-[#00294D] mb-1">
+                      {t("admin.forms.rentCostPerPrint")}
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      disabled={!rentable}
+                      value={
+                        editingRentCostPerPrint
+                          ? rentCostPerPrint
+                          : rentCostPerPrint
+                            ? formatCOP(rentCostPerPrint)
+                            : ""
+                      }
+                      onFocus={() => setEditingRentCostPerPrint(true)}
+                      onBlur={() => setEditingRentCostPerPrint(false)}
+                      onChange={(e) =>
+                        setRentCostPerPrint(onlyDigits(e.target.value))
+                      }
+                      className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00294D]/20 disabled:bg-gray-100"
+                      placeholder="$0"
+                    />
+                    {fieldErrors.rentCostPerPrint && (
+                      <p className="mt-1 text-xs text-red-600">
+                        {fieldErrors.rentCostPerPrint}
                       </p>
                     )}
                   </div>
@@ -524,6 +623,13 @@ export default function AddProductModal({
 
             {/* Actions */}
             <div className="mt-6 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={handlePreview}
+                className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold hover:bg-gray-50"
+              >
+                {t("admin.forms.preview")}
+              </button>
               <button
                 type="button"
                 onClick={onClose}
