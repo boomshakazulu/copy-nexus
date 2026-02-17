@@ -6,6 +6,7 @@ import {
   FileText,
   BarChart,
   ShieldCheck,
+  ClipboardList,
 } from "lucide-react";
 import { useI18n } from "../../i18n";
 
@@ -28,6 +29,11 @@ export default function AdminSidebar({ isOpen, onClose }) {
       to: "/admin/orders",
       label: t("admin.sidebar.orders"),
       icon: <FileText className="h-5 w-5" />,
+    },
+    {
+      to: "/admin/rentals",
+      label: t("admin.sidebar.rentals"),
+      icon: <ClipboardList className="h-5 w-5" />,
     },
     {
       to: "/admin/reports",
