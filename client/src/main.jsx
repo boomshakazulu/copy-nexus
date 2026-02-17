@@ -30,6 +30,7 @@ import CartPage from "./pages/CartPage";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import ProfilePage from "./pages/ProfilePage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 import { CartProvider } from "./context/CartContext";
 
 const router = createBrowserRouter([
@@ -96,6 +97,10 @@ const router = createBrowserRouter([
       {
         path: "/order-confirmation",
         element: <OrderConfirmationPage />,
+      },
+      {
+        path: "/verify-email",
+        element: <VerifyEmailPage />,
       },
       {
         path: "/profile",

@@ -244,7 +244,7 @@ export default function OrderDetailsModal({
     setCustomQty(1);
   };
 
-  const buildPayload = () => {
+  const buildPayload = (sendEmail = false) => {
     const shouldSendContact = contactDirty;
     return {
       id: order?._id,
@@ -284,16 +284,21 @@ export default function OrderDetailsModal({
         isCustom: !!item.isCustom,
       })),
       notes: notes.trim(),
+      sendUpdateEmail: !!sendEmail,
     };
   };
 
   const handleSave = () => {
-    onSave?.(buildPayload());
+    onSave?.(buildPayload(false));
+  };
+
+  const handleSaveAndEmail = () => {
+    onSave?.(buildPayload(true));
   };
 
   const handleCreate = () => {
     const payload = buildPayload();
-    const { id, shipping, discount, ...rest } = payload;
+    const { id, shipping, discount, sendUpdateEmail, ...rest } = payload;
     onCreate?.({
       ...rest,
       amounts: {
@@ -301,6 +306,7 @@ export default function OrderDetailsModal({
         discount: Number(discount) || 0,
       },
       consent: false,
+      suppressEmail: true,
     });
   };
 
@@ -1003,14 +1009,26 @@ export default function OrderDetailsModal({
                 {saving ? t("admin.orders.saving") : t("admin.orders.create")}
               </button>
             ) : (
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={saving}
-                className="rounded-md bg-[#00294D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#003B66] disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {saving ? t("admin.orders.saving") : t("admin.orders.save")}
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={handleSaveAndEmail}
+                  disabled={saving}
+                  className="rounded-md border border-[#00294D] px-4 py-2 text-sm font-semibold text-[#00294D] hover:bg-[#E6EEF5] disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {saving
+                    ? t("admin.orders.saving")
+                    : t("admin.orders.saveAndEmail")}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="rounded-md bg-[#00294D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#003B66] disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {saving ? t("admin.orders.saving") : t("admin.orders.save")}
+                </button>
+              </>
             )}
           </div>
         </div>

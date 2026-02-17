@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
-const { Order, AccessLog } = require("../models");
+const { Order, AccessLog, User } = require("../models");
 const { policyVersion } = require("../config/privacy");
 const { unprocessable, badRequest, notFound } = require("../utils/httpError");
+const { sendMail } = require("../utils/mailer");
 
 // helpers
 const escapeRegex = (s = "") => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -177,6 +178,9 @@ module.exports = {
 
   async createOrder(req, res) {
     const { consentMeta, ...payload } = req.body || {};
+    const isAdmin = req.user?.role === "admin";
+    const suppressEmail = isAdmin || payload?.suppressEmail === true;
+    if (payload?.suppressEmail != null) delete payload.suppressEmail;
     const ip = req.ip || req.headers["x-forwarded-for"] || "";
     const userAgent = req.headers["user-agent"] || "";
     const nextConsentMeta = {
@@ -189,7 +193,123 @@ module.exports = {
       ...payload,
       consentMeta: nextConsentMeta,
     });
-    return res.status(201).json(order);
+
+    const customerEmail = order.customer?.email;
+    let accountExists = false;
+    if (customerEmail) {
+      const existingUser = await User.findOne({
+        email: String(customerEmail).trim().toLowerCase(),
+      })
+        .select("_id")
+        .lean();
+      accountExists = !!existingUser;
+    }
+
+    const adminEmail = process.env.ADMIN_NOTIFY_EMAIL;
+    if (suppressEmail) {
+      const response = order.toObject();
+      response.accountExists = accountExists;
+      return res.status(201).json(response);
+    }
+    const baseUrl =
+      process.env.FRONTEND_URL || "http://localhost:5173";
+    const accountNote =
+      customerEmail && !accountExists
+        ? `\nCreate an account with ${customerEmail} to see your order history: ${baseUrl}/signup\n`
+        : "";
+    const subject = `New order request ${order._id}`;
+    const itemLines = (order.items || [])
+      .map((item) => {
+        const unit = new Intl.NumberFormat(undefined, {
+          maximumFractionDigits: 0,
+        }).format(item.unitAmount || 0);
+        return `- ${item.name} (${item.model || "n/a"}) x${item.qty} @ ${unit} COP`;
+      })
+      .join("\n");
+    const rentalLines = (order.items || [])
+      .filter((item) => item.IsRented)
+      .map((item) => {
+        const perPrint = new Intl.NumberFormat(undefined, {
+          maximumFractionDigits: 0,
+        }).format(item.rentCostPerPrint || 0);
+        const perScan = new Intl.NumberFormat(undefined, {
+          maximumFractionDigits: 0,
+        }).format(item.rentCostPerScan || 0);
+        return `  - ${item.name}: per print ${perPrint} COP, per scan ${perScan} COP`;
+      })
+      .join("\n");
+    const text = `New order request\n\nCustomer: ${order.customer?.name}\nEmail: ${order.customer?.email}\nPhone: ${order.customer?.phone}\nID: ${order.customer?.idType || ""} ${order.customer?.idNumber || ""}\nPreferred contact: ${order.customer?.preferredContactMethod || ""}\n\nShipping:\n${order.shippingAddress?.streetAddress || ""}\n${order.shippingAddress?.neighborhood || ""}\n${order.shippingAddress?.city || ""} ${order.shippingAddress?.department || ""}\n${order.shippingAddress?.postalCode || ""}\n\nItems:\n${itemLines}\n${rentalLines ? `\nRental rates:\n${rentalLines}` : ""}\n\nNotes:\n${order.notes || ""}\n${accountNote}`;
+    const html = `
+      <h2>New order request</h2>
+      <p><strong>Customer:</strong> ${order.customer?.name || ""}</p>
+      <p><strong>Email:</strong> ${order.customer?.email || ""}</p>
+      <p><strong>Phone:</strong> ${order.customer?.phone || ""}</p>
+      <p><strong>ID:</strong> ${order.customer?.idType || ""} ${order.customer?.idNumber || ""}</p>
+      <p><strong>Preferred contact:</strong> ${order.customer?.preferredContactMethod || ""}</p>
+      <h3>Shipping</h3>
+      <p>${order.shippingAddress?.streetAddress || ""}<br/>
+      ${order.shippingAddress?.neighborhood || ""}<br/>
+      ${order.shippingAddress?.city || ""} ${order.shippingAddress?.department || ""}<br/>
+      ${order.shippingAddress?.postalCode || ""}</p>
+      <h3>Items</h3>
+      <ul>
+        ${(order.items || [])
+          .map((item) => {
+            const unit = new Intl.NumberFormat(undefined, {
+              maximumFractionDigits: 0,
+            }).format(item.unitAmount || 0);
+            return `<li>${item.name} (${item.model || "n/a"}) x${item.qty} @ ${unit} COP</li>`;
+          })
+          .join("")}
+      </ul>
+      ${
+        (order.items || []).some((i) => i.IsRented)
+          ? `<h4>Rental rates</h4>
+             <ul>
+               ${(order.items || [])
+                 .filter((i) => i.IsRented)
+                 .map((i) => {
+                   const perPrint = new Intl.NumberFormat(undefined, {
+                     maximumFractionDigits: 0,
+                   }).format(i.rentCostPerPrint || 0);
+                   const perScan = new Intl.NumberFormat(undefined, {
+                     maximumFractionDigits: 0,
+                   }).format(i.rentCostPerScan || 0);
+                   return `<li>${i.name}: per print ${perPrint} COP, per scan ${perScan} COP</li>`;
+                 })
+                 .join("")}
+             </ul>`
+          : ""
+      }
+      ${order.notes ? `<h3>Notes</h3><p>${order.notes}</p>` : ""}
+      ${
+        customerEmail && !accountExists
+          ? `<h3>See your order history</h3>
+             <p>Create an account with <strong>${customerEmail}</strong> to view your order history.</p>
+             <p><a href="${baseUrl}/signup">Create an account</a></p>`
+          : ""
+      }
+    `;
+
+    if (customerEmail) {
+      await sendMail({
+        to: customerEmail,
+        subject: "We received your order request",
+        text,
+        html,
+      });
+    }
+    if (adminEmail) {
+      await sendMail({
+        to: adminEmail,
+        subject,
+        text,
+        html,
+      });
+    }
+    const response = order.toObject();
+    response.accountExists = accountExists;
+    return res.status(201).json(response);
   },
 
   async updateOrder(req, res) {
@@ -203,6 +323,7 @@ module.exports = {
       customer,
       shippingAddress,
       notes,
+      sendUpdateEmail,
     } = req.body || {};
 
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
@@ -355,6 +476,90 @@ module.exports = {
         userAgent,
         meta: { scope: "admin_order_update" },
       }).catch(() => {});
+    }
+    if (sendUpdateEmail && saved?.customer?.email) {
+      const subject = `Your order was updated`;
+      const trackingLabel = saved.trackingNumber
+        ? `Tracking: ${saved.trackingNumber}\n`
+        : "";
+      const shippingText = saved.shippingAddress
+        ? `Shipping:\n${saved.shippingAddress?.streetAddress || ""}\n${saved.shippingAddress?.neighborhood || ""}\n${saved.shippingAddress?.city || ""} ${saved.shippingAddress?.department || ""}\n${saved.shippingAddress?.postalCode || ""}\n`
+        : "";
+      const itemLines = (saved.items || [])
+        .map((item) => {
+          const unit = new Intl.NumberFormat(undefined, {
+            maximumFractionDigits: 0,
+          }).format(item.unitAmount || 0);
+          return `- ${item.name} (${item.model || "n/a"}) x${item.qty} @ ${unit} COP`;
+        })
+        .join("\n");
+      const rentalLines = (saved.items || [])
+        .filter((item) => item.IsRented)
+        .map((item) => {
+          const perPrint = new Intl.NumberFormat(undefined, {
+            maximumFractionDigits: 0,
+          }).format(item.rentCostPerPrint || 0);
+          const perScan = new Intl.NumberFormat(undefined, {
+            maximumFractionDigits: 0,
+          }).format(item.rentCostPerScan || 0);
+          return `  - ${item.name}: per print ${perPrint} COP, per scan ${perScan} COP`;
+        })
+        .join("\n");
+      const text = `Your order was updated\n\nOrder: ${saved._id}\nStatus: ${saved.status}\n${trackingLabel}\n${shippingText}\nItems:\n${itemLines}\n${rentalLines ? `\nRental rates:\n${rentalLines}` : ""}\n\nNotes:\n${saved.notes || ""}\n`;
+      const shippingHtml = saved.shippingAddress
+        ? `<h3>Shipping</h3>
+           <p>${saved.shippingAddress?.streetAddress || ""}<br/>
+           ${saved.shippingAddress?.neighborhood || ""}<br/>
+           ${saved.shippingAddress?.city || ""} ${saved.shippingAddress?.department || ""}<br/>
+           ${saved.shippingAddress?.postalCode || ""}</p>`
+        : "";
+      const trackingHtml = saved.trackingNumber
+        ? `<p><strong>Tracking:</strong> ${saved.trackingNumber}</p>`
+        : "";
+      const html = `
+        <h2>Your order was updated</h2>
+        <p><strong>Order:</strong> ${saved._id}</p>
+        <p><strong>Status:</strong> ${saved.status}</p>
+        ${trackingHtml}
+        ${shippingHtml}
+        <h3>Items</h3>
+        <ul>
+          ${(saved.items || [])
+            .map((item) => {
+              const unit = new Intl.NumberFormat(undefined, {
+                maximumFractionDigits: 0,
+              }).format(item.unitAmount || 0);
+              return `<li>${item.name} (${item.model || "n/a"}) x${item.qty} @ ${unit} COP</li>`;
+            })
+            .join("")}
+        </ul>
+        ${
+          (saved.items || []).some((i) => i.IsRented)
+            ? `<h4>Rental rates</h4>
+               <ul>
+                 ${(saved.items || [])
+                   .filter((i) => i.IsRented)
+                   .map((i) => {
+                     const perPrint = new Intl.NumberFormat(undefined, {
+                       maximumFractionDigits: 0,
+                     }).format(i.rentCostPerPrint || 0);
+                     const perScan = new Intl.NumberFormat(undefined, {
+                       maximumFractionDigits: 0,
+                     }).format(i.rentCostPerScan || 0);
+                     return `<li>${i.name}: per print ${perPrint} COP, per scan ${perScan} COP</li>`;
+                   })
+                   .join("")}
+               </ul>`
+            : ""
+        }
+        ${saved.notes ? `<h3>Notes</h3><p>${saved.notes}</p>` : ""}
+      `;
+      await sendMail({
+        to: saved.customer.email,
+        subject,
+        text,
+        html,
+      });
     }
     return res.json(saved);
   },

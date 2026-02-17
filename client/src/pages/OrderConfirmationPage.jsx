@@ -14,6 +14,7 @@ export default function OrderConfirmationPage() {
 
   const email = details?.email || "";
   const preferredMethod = details?.preferredContactMethod || "";
+  const accountExists = details?.accountExists !== false;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
@@ -39,6 +40,16 @@ export default function OrderConfirmationPage() {
           </p>
           <p>{t("orderConfirmation.spamHint")}</p>
           <p>{t("orderConfirmation.safelistHint")}</p>
+          {!accountExists && email && (
+            <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+              <p className="font-semibold">
+                {t("orderConfirmation.createAccountTitle")}
+              </p>
+              <p>
+                {t("orderConfirmation.createAccountBody", { email })}
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="mt-8">
