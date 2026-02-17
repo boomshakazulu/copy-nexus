@@ -6,6 +6,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  Legend,
 } from "recharts";
 import { useI18n } from "../../i18n";
 import { formatCOP } from "../../utils/helpers";
@@ -37,12 +38,26 @@ export default function SalesOverTimeChart({ data = [] }) {
           />
           <Tooltip
             labelFormatter={(value) => t(`admin.reports.months.${value}`)}
-            formatter={(value) => formatCOP(value, true)}
+            formatter={(value, name) => [
+              formatCOP(value, true),
+              t(`admin.reports.series.${name}`),
+            ]}
+          />
+          <Legend
+            formatter={(value) => t(`admin.reports.series.${value}`)}
           />
           <Line
             type="monotone"
-            dataKey="value"
+            dataKey="sales"
             stroke="#0D3B66"
+            strokeWidth={3}
+            dot={{ r: 3 }}
+            activeDot={{ r: 5 }}
+          />
+          <Line
+            type="monotone"
+            dataKey="rentals"
+            stroke="#F4B740"
             strokeWidth={3}
             dot={{ r: 3 }}
             activeDot={{ r: 5 }}

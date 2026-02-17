@@ -1,4 +1,4 @@
-const { Order } = require("../models");
+const { Order, Rental, RentalPayment } = require("../models");
 const { unprocessable } = require("../utils/httpError");
 
 const monthKeys = [
@@ -54,6 +54,23 @@ module.exports = {
         },
       },
     ]);
+    const [rentalKpi] = await RentalPayment.aggregate([
+      {
+        $match: {
+          paidAt: { $gte: rangeStart, $lte: rangeEnd },
+        },
+      },
+      { $group: { _id: null, totalPayments: { $sum: "$amount" } } },
+    ]);
+    const [rentalEndKpi] = await Rental.aggregate([
+      {
+        $match: {
+          status: "ended",
+          endedAt: { $gte: rangeStart, $lte: rangeEnd },
+        },
+      },
+      { $group: { _id: null, totalFinal: { $sum: "$finalPayment" } } },
+    ]);
 
     const [recentOrders] = await Promise.all([
       Order.find(match)
@@ -68,7 +85,10 @@ module.exports = {
         to: rangeEnd.toISOString(),
       },
       kpis: {
-        totalSales: kpi?.totalSales || 0,
+        totalSales:
+          (kpi?.totalSales || 0) +
+          (rentalKpi?.totalPayments || 0) +
+          (rentalEndKpi?.totalFinal || 0),
         orders: kpi?.orders || 0,
       },
       recentOrders,
@@ -106,8 +126,28 @@ module.exports = {
         },
       },
     ]);
+    const [rentalKpi] = await RentalPayment.aggregate([
+      {
+        $match: {
+          paidAt: { $gte: rangeStart, $lte: rangeEnd },
+        },
+      },
+      { $group: { _id: null, totalPayments: { $sum: "$amount" } } },
+    ]);
+    const [rentalEndKpi] = await Rental.aggregate([
+      {
+        $match: {
+          status: "ended",
+          endedAt: { $gte: rangeStart, $lte: rangeEnd },
+        },
+      },
+      { $group: { _id: null, totalFinal: { $sum: "$finalPayment" } } },
+    ]);
 
-    const totalSales = kpi?.totalSales || 0;
+    const totalSales =
+      (kpi?.totalSales || 0) +
+      (rentalKpi?.totalPayments || 0) +
+      (rentalEndKpi?.totalFinal || 0);
     const orders = kpi?.orders || 0;
     const aov = orders ? Math.round(totalSales / orders) : 0;
 
@@ -147,18 +187,37 @@ module.exports = {
       { $sort: { sales: -1 } },
     ]);
 
-    const salesOverTime = await Order.aggregate([
-      { $match: match },
-      {
-        $group: {
-          _id: {
-            year: { $year: "$createdAt" },
-            month: { $month: "$createdAt" },
+    const [salesOverTimeOrders, salesOverTimeRentals] = await Promise.all([
+      Order.aggregate([
+        { $match: match },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" },
+            },
+            sales: { $sum: "$amounts.total" },
           },
-          sales: { $sum: "$amounts.total" },
         },
-      },
-      { $sort: { "_id.year": 1, "_id.month": 1 } },
+        { $sort: { "_id.year": 1, "_id.month": 1 } },
+      ]),
+      RentalPayment.aggregate([
+        {
+          $match: {
+            paidAt: { $gte: rangeStart, $lte: rangeEnd },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$paidAt" },
+              month: { $month: "$paidAt" },
+            },
+            rentals: { $sum: "$amount" },
+          },
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } },
+      ]),
     ]);
 
     const topProducts = await Order.aggregate([
@@ -208,10 +267,36 @@ module.exports = {
         key: row._id,
         sales: row.sales,
       })),
-      salesOverTime: salesOverTime.map((row) => ({
-        month: monthKeys[(row._id.month || 1) - 1],
-        value: row.sales,
-      })),
+      salesOverTime: (() => {
+        const map = new Map();
+        salesOverTimeOrders.forEach((row) => {
+          const key = `${row._id.year}-${row._id.month}`;
+          map.set(key, {
+            year: row._id.year,
+            monthNum: row._id.month,
+            month: monthKeys[(row._id.month || 1) - 1],
+            sales: row.sales || 0,
+            rentals: 0,
+          });
+        });
+        salesOverTimeRentals.forEach((row) => {
+          const key = `${row._id.year}-${row._id.month}`;
+          const existing = map.get(key) || {
+            year: row._id.year,
+            monthNum: row._id.month,
+            month: monthKeys[(row._id.month || 1) - 1],
+            sales: 0,
+            rentals: 0,
+          };
+          existing.rentals = row.rentals || 0;
+          map.set(key, existing);
+        });
+        return Array.from(map.values())
+          .sort((a, b) =>
+            a.year === b.year ? a.monthNum - b.monthNum : a.year - b.year
+          )
+          .map(({ month, sales, rentals }) => ({ month, sales, rentals }));
+      })(),
       topProducts: topProducts.map((row) => ({
         name: row._id.name,
         category: row._id.category,

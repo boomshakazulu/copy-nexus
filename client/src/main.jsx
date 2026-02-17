@@ -31,6 +31,8 @@ import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import ProfilePage from "./pages/ProfilePage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
+import RentalPaymentsPage from "./pages/admin/RentalPaymentsPage";
+import Rentals from "./pages/admin/Rentals";
 import { CartProvider } from "./context/CartContext";
 
 const router = createBrowserRouter([
@@ -85,6 +87,8 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <Dashboard /> },
           { path: "/admin/orders", element: <Orders /> },
+          { path: "/admin/rentals", element: <Rentals /> },
+          { path: "/admin/rentals/:id/payments", element: <RentalPaymentsPage /> },
           { path: "/admin/products", element: <Products /> },
           { path: "/admin/reports", element: <Reports /> },
           { path: "/admin/access-logs", element: <AccessLogs /> },
