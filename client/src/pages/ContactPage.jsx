@@ -1,14 +1,21 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useI18n } from "../i18n";
 import { http } from "../utils/axios";
 
 export default function ContactPage() {
   const { t } = useI18n();
+  const captcha = useMemo(() => {
+    const a = Math.floor(Math.random() * 9) + 1;
+    const b = Math.floor(Math.random() * 9) + 1;
+    return { a, b };
+  }, []);
   const [form, setForm] = useState({
     name: "",
     contactMethod: "email",
     contactValue: "",
     message: "",
+    captchaAnswer: "",
+    company: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -28,6 +35,12 @@ export default function ContactPage() {
       contactMethod: form.contactMethod,
       contactValue: form.contactValue.trim(),
       message: form.message.trim(),
+      captcha: {
+        a: captcha.a,
+        b: captcha.b,
+        answer: form.captchaAnswer.trim(),
+      },
+      company: form.company.trim(),
     };
 
     if (!payload.name || !payload.contactValue || !payload.message) {
@@ -44,6 +57,8 @@ export default function ContactPage() {
         contactMethod: "email",
         contactValue: "",
         message: "",
+        captchaAnswer: "",
+        company: "",
       });
     } catch (_err) {
       setSubmitError(t("contact.submitFailed"));
@@ -169,6 +184,19 @@ export default function ContactPage() {
               required
             />
           </div>
+          <div className="hidden" aria-hidden="true">
+            <label className="block text-sm font-medium text-gray-700">
+              {t("contact.company")}
+            </label>
+            <input
+              type="text"
+              className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              value={form.company}
+              onChange={handleChange("company")}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
               {t("common.contactMethodLabel")}
@@ -207,6 +235,22 @@ export default function ContactPage() {
               onChange={handleChange("message")}
               required
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              {t("contact.captchaLabel", { a: captcha.a, b: captcha.b })}
+            </label>
+            <input
+              type="text"
+              inputMode="numeric"
+              className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              value={form.captchaAnswer}
+              onChange={handleChange("captchaAnswer")}
+              required
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              {t("contact.captchaHint")}
+            </p>
           </div>
           {submitError && (
             <p className="text-sm font-semibold text-red-600">{submitError}</p>

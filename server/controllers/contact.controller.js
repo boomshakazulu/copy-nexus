@@ -21,6 +21,18 @@ const isValidContact = (method, value) => {
   return true;
 };
 
+const isValidCaptcha = (captcha) => {
+  if (!captcha || typeof captcha !== "object") return false;
+  const a = Number(captcha.a);
+  const b = Number(captcha.b);
+  const answer = Number(captcha.answer);
+  if (!Number.isFinite(a) || !Number.isFinite(b) || !Number.isFinite(answer)) {
+    return false;
+  }
+  if (a < 1 || a > 9 || b < 1 || b > 9) return false;
+  return a + b === answer;
+};
+
 async function submitContact(req, res, next) {
   try {
     const {
@@ -28,18 +40,23 @@ async function submitContact(req, res, next) {
       contactMethod,
       contactValue,
       message,
+      captcha,
+      company,
     } = req.body || {};
 
     const trimmedName = String(name || "").trim();
     const trimmedContactMethod = normalizeContactMethod(contactMethod);
     const trimmedContactValue = String(contactValue || "").trim();
     const trimmedMessage = String(message || "").trim();
+    const honeypot = String(company || "").trim();
 
     if (
+      honeypot ||
       !isNonEmpty(trimmedName) ||
       !isNonEmpty(trimmedMessage) ||
       !isNonEmpty(trimmedContactMethod) ||
-      !isValidContact(trimmedContactMethod, trimmedContactValue)
+      !isValidContact(trimmedContactMethod, trimmedContactValue) ||
+      !isValidCaptcha(captcha)
     ) {
       return res.status(422).json({
         error: {
@@ -76,15 +93,28 @@ async function submitContact(req, res, next) {
       <p>${trimmedMessage.replace(/\n/g, "<br />")}</p>
     `;
 
-    await sendMail({
+    const result = await sendMail({
       to: ADMIN_NOTIFY_EMAIL,
       subject,
       text,
       html,
     });
 
+    if (result?.skipped) {
+      console.warn("Contact email skipped", {
+        reason: "smtp_not_configured",
+        ip: req.ip,
+        userAgent: req.headers["user-agent"],
+      });
+    }
+
     return res.json({ ok: true });
   } catch (err) {
+    console.error("Contact email failed", {
+      error: err?.message,
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+    });
     return next(err);
   }
 }

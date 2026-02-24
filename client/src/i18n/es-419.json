@@ -260,6 +260,7 @@
     "hoursValue": "Lunes a sábado de 8:00 a.m. a 6:00 p.m.",
     "formTitle": "Formulario de contacto",
     "name": "Nombre",
+    "company": "Empresa",
     "contactValue": "Correo o numero de WhatsApp",
     "contactPlaceholder": "tu@ejemplo.com o +57 300 123 4567",
     "message": "Mensaje",
@@ -267,7 +268,9 @@
     "sending": "Enviando...",
     "validationError": "Completa todos los campos requeridos.",
     "submitFailed": "No se pudo enviar tu mensaje.",
-    "submitSuccess": "Mensaje enviado. Te contactaremos pronto."
+    "submitSuccess": "Mensaje enviado. Te contactaremos pronto.",
+    "captchaLabel": "Cuanto es {a} + {b}?",
+    "captchaHint": "Verificacion rapida para evitar spam."
   },
   "errors": {
     "brand": "Copy Nexus",

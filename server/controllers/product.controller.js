@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { Product } = require("../models");
 const { badRequest, unprocessable, notFound } = require("../utils/httpError");
+const { invalidateByPrefix } = require("../utils/responseCache");
 
 // helpers
 const escapeRegex = (s = "") => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -403,6 +404,7 @@ module.exports = {
       allowedKeys: CREATE_FIELDS,
     });
     const product = await Product.create(req.body);
+    invalidateByPrefix("/api/v1/products");
     return res.status(201).json(product);
   },
   async updateProduct(req, res) {
@@ -427,6 +429,7 @@ module.exports = {
       throw notFound("Product not found");
     }
 
+    invalidateByPrefix("/api/v1/products");
     return res.status(200).json(product);
   },
 };

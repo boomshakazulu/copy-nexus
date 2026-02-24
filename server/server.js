@@ -6,6 +6,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const { notFound } = require("./utils/httpError");
+const { isConfigured: isMailConfigured } = require("./utils/mailer");
 const app = express();
 const PORT = 3001;
 
@@ -17,7 +18,9 @@ app.use(morgan("dev"));
 
 app.use("/api/v1", routes);
 
-app.get("/health", (_req, res) => res.send("ok"));
+app.get("/health", (_req, res) =>
+  res.json({ ok: true, mailConfigured: isMailConfigured() })
+);
 
 // 404 + error handlers (after routes)
 app.use((req, _res, next) => next(notFound("Not found")));
@@ -66,6 +69,11 @@ app.use((err, _req, res, _next) => {
 });
 
 db.once("open", () => {
+  if (!isMailConfigured()) {
+    console.warn(
+      "Warning: SMTP is not configured. Contact emails will be skipped."
+    );
+  }
   app.listen(PORT, () => {
     console.log(`API server running on port ${PORT}!`);
   });

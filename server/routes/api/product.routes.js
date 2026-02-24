@@ -1,10 +1,11 @@
 const router = require("express").Router();
 
 const { getProducts } = require("../../controllers/product.controller");
+const { responseCache } = require("../../utils/responseCache");
 
 const wrap = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 
-router.get("/", wrap(getProducts));
+router.get("/", responseCache(600000), wrap(getProducts));
 
 module.exports = router;

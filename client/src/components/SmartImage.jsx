@@ -19,11 +19,22 @@ export default function SmartImage({
 }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentSrc, setCurrentSrc] = useState(src);
+  const proxyBase =
+    import.meta.env.VITE_IMAGE_PROXY || "/api/v1/images/proxy";
 
   useEffect(() => {
-    setCurrentSrc(src);
+    if (!src) {
+      setCurrentSrc(src);
+      setIsLoaded(false);
+      return;
+    }
+    const isAbsolute = /^https?:\/\//i.test(src);
+    const nextSrc = isAbsolute
+      ? `${proxyBase}?url=${encodeURIComponent(src)}`
+      : src;
+    setCurrentSrc(nextSrc);
     setIsLoaded(false);
-  }, [src]);
+  }, [src, proxyBase]);
 
   const handleLoad = (event) => {
     setIsLoaded(true);

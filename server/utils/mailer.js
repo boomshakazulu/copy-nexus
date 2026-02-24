@@ -32,6 +32,8 @@ const getTransport = () => {
 };
 
 const getFrom = () => SMTP_FROM || SMTP_USER || "no-reply@copynexus.local";
+const isConfigured = () =>
+  !!SMTP_HOST && !!SMTP_PORT && !!SMTP_USER && !!SMTP_PASS;
 
 async function sendMail({ to, subject, text, html }) {
   const transport = getTransport();
@@ -52,4 +54,5 @@ async function sendMail({ to, subject, text, html }) {
 module.exports = {
   sendMail,
   getFrom,
+  isConfigured,
 };
