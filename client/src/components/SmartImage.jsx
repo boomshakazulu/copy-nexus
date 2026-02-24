@@ -19,8 +19,21 @@ export default function SmartImage({
 }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentSrc, setCurrentSrc] = useState(src);
-  const proxyBase =
-    import.meta.env.VITE_IMAGE_PROXY || "/api/v1/images/proxy";
+  const rawProxyBase =
+    import.meta.env.VITE_IMAGE_PROXY ||
+    `${import.meta.env.VITE_API_BASE || "/api"}/images/proxy`;
+  const normalizeProxyBase = (value) => {
+    let base = String(value || "/api/v1/images/proxy");
+    base = base.replace(/\/+$/g, "");
+    while (base.includes("/api/v1/v1")) {
+      base = base.replace("/api/v1/v1", "/api/v1");
+    }
+    while (base.includes("/api/v1/api/v1")) {
+      base = base.replace("/api/v1/api/v1", "/api/v1");
+    }
+    return base.replace(/\/{2,}/g, "/");
+  };
+  const proxyBase = normalizeProxyBase(rawProxyBase);
 
   useEffect(() => {
     if (!src) {
