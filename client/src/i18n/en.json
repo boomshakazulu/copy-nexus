@@ -149,7 +149,9 @@
     "filterMultifunction": "Multifunction",
     "filterHighVolume": "High volume",
     "searchPlaceholder": "Search by model number",
-    "loadFailed": "Unable to load copiers."
+    "loadFailed": "Unable to load copiers.",
+    "loading": "Loading copiers...",
+    "empty": "No copiers match your filters."
   },
   "partsPage": {
     "title": "Parts & Accessories",
@@ -249,17 +251,32 @@
     "title": "Get in touch with us",
     "subtitle": "Have a question or need a quote? We’re happy to help and respond quickly.",
     "addressLabel": "Address",
-    "addressValue": "123 Main St, Bogota",
+    "addressValue": "Transversal 74f # 40j-09 sur — Bogotá",
     "phoneLabel": "WhatsApp",
-    "phoneValue": "+57 123 4567880",
+    "phoneValue": "311 869 6632",
     "emailLabel": "Email",
     "emailValue": "info@copynexus.co",
+    "hoursLabel": "Horario",
+    "hoursValue": "Lunes a sábado de 8:00 a.m. a 6:00 p.m.",
     "formTitle": "Contact Form",
     "name": "Name",
     "contactValue": "Email or WhatsApp number",
     "contactPlaceholder": "you@example.com or +57 300 123 4567",
     "message": "Message",
-    "send": "Send Message"
+    "send": "Send Message",
+    "sending": "Sending...",
+    "validationError": "Please complete all required fields.",
+    "submitFailed": "Unable to send your message.",
+    "submitSuccess": "Message sent. We'll be in touch soon."
+  },
+  "errors": {
+    "brand": "Copy Nexus",
+    "title": "Something went wrong",
+    "notFoundTitle": "We couldn't find that page",
+    "genericSubtitle": "Try heading back home or contact us for help.",
+    "codeLabel": "Error code",
+    "ctaHome": "Back to homepage",
+    "ctaContact": "Contact support"
   },
   "auth": {
     "loginTitle": "Login",

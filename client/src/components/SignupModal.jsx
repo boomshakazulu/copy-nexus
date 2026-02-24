@@ -1,7 +1,8 @@
 import { X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { http } from "../utils/axios";
 import { useI18n } from "../i18n";
+import SmartImage from "./SmartImage";
 
 export default function SignupModal({ isOpen, onClose, showLogin }) {
   const { t } = useI18n();
@@ -9,12 +10,49 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [status, setStatus] = useState("idle");
+  const dialogRef = useRef(null);
+  const firstFieldRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
       setStatus("idle");
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const focusTimer = setTimeout(() => {
+      firstFieldRef.current?.focus();
+    }, 0);
+    return () => clearTimeout(focusTimer);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        event.stopPropagation();
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = dialogRef.current?.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable || focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -78,6 +116,10 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
         onClick={onClose}
       >
         <div
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="signup-modal-title"
           className="relative w-full bg-white rounded-lg shadow-lg p-8"
           onClick={(e) => e.stopPropagation()}
         >
@@ -90,14 +132,18 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
         </button>
 
         {/* Logo */}
-        <img
+        <SmartImage
           src="/logo-sas.png"
           alt={t("common.logoAlt")}
-          className="h-20 mx-auto mb-6"
+          className="h-20 w-32 mx-auto mb-6"
+          imgClassName="h-20 w-32 object-contain"
         />
 
         {/* Title */}
-        <h1 className="text-3xl font-bold text-center text-[#00294D] mb-6">
+        <h1
+          id="signup-modal-title"
+          className="text-3xl font-bold text-center text-[#00294D] mb-6"
+        >
           {t("auth.signupTitle")}
         </h1>
 
@@ -121,6 +167,7 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
               onChange={(event) => setEmail(event.target.value)}
               onInput={(e) => e.target.setCustomValidity("")}
               disabled={status === "sent"}
+              ref={firstFieldRef}
             />
           </div>
 

@@ -1,10 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { formatCOP } from "../utils/helpers";
 import { useI18n } from "../i18n";
 import { http } from "../utils/axios";
 import coDepsCities from "../utils/coDepsCities.json";
+import SmartImage from "../components/SmartImage";
 
 const POLICY_VERSION = import.meta.env.VITE_PRIVACY_POLICY_VERSION || "1.0";
 
@@ -13,6 +14,7 @@ export default function CartPage() {
   const { t } = useI18n();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
+  const formRef = useRef(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -65,6 +67,18 @@ export default function CartPage() {
       neighborhood: "",
     }));
   };
+
+  useEffect(() => {
+    if (!showForm) return;
+    if (typeof window === "undefined") return;
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    if (!isMobile) return;
+    const node = formRef.current;
+    if (!node) return;
+    requestAnimationFrame(() => {
+      node.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [showForm]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -219,10 +233,12 @@ export default function CartPage() {
                   className="flex flex-col sm:flex-row gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
                 >
                   <div className="h-24 w-24 rounded-lg bg-[#F8FAFC] grid place-items-center shrink-0">
-                    <img
+                    <SmartImage
                       src={image}
                       alt={item?.name || t("cart.item")}
-                      className="h-16 object-contain"
+                      fallbackSrc="/part.png"
+                      className="h-16"
+                      imgClassName="h-16 object-contain"
                     />
                   </div>
                 <div className="flex-1">
@@ -362,7 +378,10 @@ export default function CartPage() {
       )}
 
       {showForm && (
-        <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-md">
+        <div
+          ref={formRef}
+          className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-md"
+        >
           <h2 className="text-2xl font-extrabold text-[#00294D] mb-2">
             {t("cart.form.title")}
           </h2>

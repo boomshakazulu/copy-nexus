@@ -1,4 +1,5 @@
 import { useI18n } from "../../i18n";
+import SmartImage from "../SmartImage";
 
 export default function CompatibleCopierCard({ copier, checked, onToggle }) {
   const { t } = useI18n();
@@ -21,13 +22,12 @@ export default function CompatibleCopierCard({ copier, checked, onToggle }) {
 
       <div className="flex items-center gap-3 flex-1">
         <div className="h-12 w-12 rounded border border-gray-200 overflow-hidden bg-gray-100 shrink-0">
-          <img
+          <SmartImage
             src={images[0] || "/placeholder.png"}
             alt={name || t("admin.compatibility.imageAlt")}
-            className="h-full w-full object-cover"
-            onError={(e) => {
-              e.currentTarget.src = "/placeholder.png";
-            }}
+            fallbackSrc="/placeholder.png"
+            className="h-full w-full"
+            imgClassName="h-full w-full object-cover"
           />
         </div>
 

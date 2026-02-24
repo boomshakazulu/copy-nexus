@@ -11,17 +11,14 @@ export default function AdminLayout() {
   return (
     <div className="flex justify-center bg-white">
       {/* Card wrapper keeps sidebar & content same height */}
-      <div className="flex w-full bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="flex w-full min-h-screen bg-white rounded-xl shadow-md overflow-hidden">
         {/* Sidebar */}
         <Sidebar isOpen={open} onClose={() => setOpen(false)} />
 
         {/* Main */}
-        <main className="flex-1">
+        <main className="flex-1 min-w-0">
           {/* Mobile top bar to open the drawer */}
-          <div className="md:hidden p-4 border-b border-gray-200 flex items-center justify-between">
-            <span className="text-[#00294D] font-bold">
-              {t("admin.admin")}
-            </span>
+          <div className="md:hidden p-4 border-b border-gray-200 flex items-center gap-3">
             <button
               onClick={() => setOpen(true)}
               className="p-2 rounded hover:bg-gray-100"
@@ -29,6 +26,9 @@ export default function AdminLayout() {
             >
               <Menu className="h-5 w-5" />
             </button>
+            <span className="text-[#00294D] font-bold">
+              {t("admin.admin")}
+            </span>
           </div>
 
           <div className="p-6">

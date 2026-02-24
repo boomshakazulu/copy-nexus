@@ -1,7 +1,56 @@
+import { useState } from "react";
 import { useI18n } from "../i18n";
+import { http } from "../utils/axios";
 
 export default function ContactPage() {
   const { t } = useI18n();
+  const [form, setForm] = useState({
+    name: "",
+    contactMethod: "email",
+    contactValue: "",
+    message: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  const handleChange = (field) => (event) => {
+    setForm((prev) => ({ ...prev, [field]: event.target.value }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setSubmitError("");
+    setSubmitSuccess(false);
+
+    const payload = {
+      name: form.name.trim(),
+      contactMethod: form.contactMethod,
+      contactValue: form.contactValue.trim(),
+      message: form.message.trim(),
+    };
+
+    if (!payload.name || !payload.contactValue || !payload.message) {
+      setSubmitError(t("contact.validationError"));
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await http.post("/contact", payload);
+      setSubmitSuccess(true);
+      setForm({
+        name: "",
+        contactMethod: "email",
+        contactValue: "",
+        message: "",
+      });
+    } catch (_err) {
+      setSubmitError(t("contact.submitFailed"));
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -46,7 +95,14 @@ export default function ContactPage() {
             <h3 className="font-bold text-[#00294D]">
               {t("contact.phoneLabel")}
             </h3>
-            <p className="text-gray-700">{t("contact.phoneValue")}</p>
+            <a
+              href="https://wa.link/40aqd7"
+              className="text-gray-700 hover:underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t("contact.phoneValue")}
+            </a>
           </div>
         </div>
 
@@ -73,6 +129,26 @@ export default function ContactPage() {
             </a>
           </div>
         </div>
+
+        {/* Hours */}
+        <div className="flex items-start gap-4 mt-6">
+          <div className="bg-[#00294D] p-2 rounded-full">
+            <svg
+              className="w-6 h-6 text-white"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M12 1.75A10.25 10.25 0 1022.25 12 10.26 10.26 0 0012 1.75zm0 18.5A8.25 8.25 0 1120.25 12 8.26 8.26 0 0112 20.25zm.75-12.5a.75.75 0 00-1.5 0v4.72c0 .2.08.39.22.53l3.06 3.06a.75.75 0 101.06-1.06l-2.84-2.84z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="font-bold text-[#00294D]">
+              {t("contact.hoursLabel")}
+            </h3>
+            <p className="text-gray-700">{t("contact.hoursValue")}</p>
+          </div>
+        </div>
       </div>
 
       {/* Right side (Form) */}
@@ -80,7 +156,7 @@ export default function ContactPage() {
         <h3 className="text-xl font-semibold mb-6 text-[#00294D]">
           {t("contact.formTitle")}
         </h3>
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm font-medium text-gray-700">
               {t("contact.name")}
@@ -88,6 +164,9 @@ export default function ContactPage() {
             <input
               type="text"
               className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              value={form.name}
+              onChange={handleChange("name")}
+              required
             />
           </div>
           <div>
@@ -96,7 +175,8 @@ export default function ContactPage() {
             </label>
             <select
               className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              defaultValue="email"
+              value={form.contactMethod}
+              onChange={handleChange("contactMethod")}
             >
               <option value="email">{t("common.contactMethods.email")}</option>
               <option value="whatsappText">{t("common.contactMethods.whatsappText")}</option>
@@ -111,6 +191,9 @@ export default function ContactPage() {
               type="text"
               className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
               placeholder={t("contact.contactPlaceholder")}
+              value={form.contactValue}
+              onChange={handleChange("contactValue")}
+              required
             />
           </div>
           <div>
@@ -120,13 +203,25 @@ export default function ContactPage() {
             <textarea
               rows="4"
               className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-            ></textarea>
+              value={form.message}
+              onChange={handleChange("message")}
+              required
+            />
           </div>
+          {submitError && (
+            <p className="text-sm font-semibold text-red-600">{submitError}</p>
+          )}
+          {submitSuccess && (
+            <p className="text-sm font-semibold text-green-600">
+              {t("contact.submitSuccess")}
+            </p>
+          )}
           <button
             type="submit"
-            className="bg-red-500 text-white font-semibold px-6 py-2 rounded-md hover:bg-red-600 transition"
+            className="bg-red-500 text-white font-semibold px-6 py-2 rounded-md hover:bg-red-600 transition disabled:opacity-70 disabled:cursor-not-allowed"
+            disabled={submitting}
           >
-            {t("contact.send")}
+            {submitting ? t("contact.sending") : t("contact.send")}
           </button>
         </form>
       </div>

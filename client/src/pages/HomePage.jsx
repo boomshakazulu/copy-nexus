@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useI18n } from "../i18n";
+import SmartImage from "../components/SmartImage";
 
 export default function HomePage() {
   const { t } = useI18n();
@@ -43,10 +44,12 @@ export default function HomePage() {
 
         {/* Image */}
         <div className="bg-yellow-400 p-4 rounded-md flex-1 max-w-xs">
-          <img
+          <SmartImage
             src="/copier.png"
             alt={t("common.copierImageAlt")}
-            className="w-full h-auto max-h-80 sm:max-h-70 object-contain mx-auto scale-x-[-1]"
+            priority
+            className="mx-auto"
+            imgClassName="w-full h-auto max-h-80 sm:max-h-70 object-contain scale-x-[-1]"
           />
         </div>
       </section>
@@ -59,10 +62,11 @@ export default function HomePage() {
             to={feature.to}
             className="bg-white rounded-xl shadow-lg p-6 text-center"
           >
-            <img
+            <SmartImage
               src={feature.icon}
               alt={feature.title}
-              className="h-20 mx-auto mb-4"
+              className="mx-auto mb-4"
+              imgClassName="h-20"
             />
             <h3 className="text-lg font-bold text-[#00294D] uppercase">
               {feature.title}

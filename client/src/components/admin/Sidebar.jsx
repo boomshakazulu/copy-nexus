@@ -58,11 +58,14 @@ export default function AdminSidebar({ isOpen, onClose }) {
         className={`
           fixed z-50 inset-y-0 left-0 w-64 bg-white shadow md:shadow-none md:static
           border-r border-gray-200 md:border-r
-          flex flex-col p-6
+          flex flex-col p-6 h-full md:h-screen md:sticky md:top-0 overflow-y-auto
           transform transition-transform duration-200 ease-out
-          ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+          ${
+            isOpen
+              ? "translate-x-0 pointer-events-auto"
+              : "-translate-x-full md:translate-x-0 pointer-events-none md:pointer-events-auto"
+          }
         `}
-        aria-hidden={!isOpen && window.innerWidth < 768}
       >
         {/* Close button (mobile) */}
         <button

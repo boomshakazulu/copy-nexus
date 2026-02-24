@@ -126,19 +126,19 @@ export default function Orders() {
   };
 
   return (
-    <div className="bg-white p-6 rounded w-full h-full">
-      <div className="flex justify-between items-center mb-4">
+    <div className="bg-white p-4 sm:p-6 rounded w-full h-full">
+      <div className="flex flex-col gap-4 mb-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-[#00294D]">
           {t("admin.orders.title")}
         </h1>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <button
             type="button"
             onClick={() => {
               setCreateError("");
               setIsCreateOpen(true);
             }}
-            className="inline-flex items-center gap-2 rounded-full bg-[#00294D] px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#003B66]"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#00294D] px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#003B66]"
           >
             <span className="text-lg leading-none">+</span>
             {t("admin.orders.createOrder")}
@@ -146,7 +146,7 @@ export default function Orders() {
           <input
             type="text"
             placeholder={t("admin.orders.searchPlaceholder")}
-            className="border px-4 py-2 rounded text-sm w-full max-w-xs"
+            className="border px-4 py-2 rounded text-sm w-full sm:max-w-xs"
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -181,7 +181,68 @@ export default function Orders() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-gray-200">
-        <table className="min-w-full text-sm text-gray-900">
+        {/* Mobile cards */}
+        <div className="md:hidden divide-y divide-gray-200">
+          {loading ? (
+            <div className="px-4 py-6 text-center text-gray-400 text-sm">
+              {t("admin.orders.loading")}
+            </div>
+          ) : currentOrders.length === 0 ? (
+            <div className="px-4 py-6 text-center text-gray-400 text-sm">
+              {t("admin.orders.noOrders")}
+            </div>
+          ) : (
+            currentOrders.map((order) => (
+              <button
+                key={order._id}
+                type="button"
+                onClick={() => setSelectedOrder(order)}
+                className="w-full text-left px-4 py-4 hover:bg-gray-50"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-500">
+                      {t("admin.dashboard.orderId")}
+                    </p>
+                    <p className="text-sm font-semibold text-[#00294D]">
+                      {order?._id?.slice(-6).toUpperCase()}
+                    </p>
+                  </div>
+                  <span
+                    className={`text-white text-xs font-semibold px-3 py-1 rounded-full inline-block
+                      ${
+                        order.status === "shipped"
+                          ? "bg-[#003B66]"
+                          : order.status === "completed"
+                          ? "bg-[#1B5E20]"
+                          : "bg-[#E53935]"
+                      }
+                    `}
+                  >
+                    {statusLabel(order.status)}
+                  </span>
+                </div>
+                <div className="mt-3 flex flex-col gap-1 text-sm text-gray-700">
+                  <p>
+                    <span className="font-semibold text-gray-900">
+                      {t("admin.dashboard.customer")}:
+                    </span>{" "}
+                    {order?.customer?.name || "-"}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-gray-900">
+                      {t("admin.dashboard.date")}:
+                    </span>{" "}
+                    {formatDate(order?.createdAt)}
+                  </p>
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+
+        {/* Desktop table */}
+        <table className="min-w-full text-sm text-gray-900 hidden md:table">
           <thead className="bg-white font-bold text-left">
             <tr>
               <th className="px-6 py-4">{t("admin.dashboard.orderId")}</th>

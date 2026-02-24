@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useMemo } from "react";
 import { formatCOP } from "../utils/helpers";
 import { useI18n } from "../i18n";
+import SmartImage from "../components/SmartImage";
 
 const PREVIEW_KEY = "productPreview";
 
@@ -57,10 +58,12 @@ export default function ProductPreviewPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-2xl shadow-md p-6">
         <div className="flex flex-col gap-4">
           <div className="relative rounded-xl bg-[#F8FAFC] p-6 flex items-center justify-center">
-            <img
+            <SmartImage
               src={images[0]}
               alt={preview.name}
-              className="h-80 w-full object-contain"
+              fallbackSrc="/copier.png"
+              className="h-80 w-full"
+              imgClassName="h-80 w-full object-contain"
             />
           </div>
           {images.length > 1 && (
@@ -72,10 +75,12 @@ export default function ProductPreviewPage() {
                     index === 0 ? "border-[#00294D]" : "border-gray-200"
                   }`}
                 >
-                  <img
+                  <SmartImage
                     src={img}
                     alt={`${preview.name} ${index + 1}`}
-                    className="h-full w-full object-contain"
+                    fallbackSrc="/copier.png"
+                    className="h-full w-full"
+                    imgClassName="h-full w-full object-contain"
                   />
                 </div>
               ))}

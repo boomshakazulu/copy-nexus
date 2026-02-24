@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { formatCOP } from "../../utils/helpers";
 import RichTextField from "./RichTextField";
 import CompatibleCopierCard from "./CompatibleCopierCard";
+import SmartImage from "../SmartImage";
 import Auth from "../../utils/auth";
 import { useI18n } from "../../i18n";
 
@@ -667,13 +668,12 @@ export default function EditProductModal({
                         title={t("admin.forms.dragToReorder")}
                       >
                         {/* img */}
-                        <img
+                        <SmartImage
                           src={url}
                           alt={`product-${idx}`}
-                          className="h-full w-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.src = "/placeholder.png";
-                          }}
+                          fallbackSrc="/placeholder.png"
+                          className="h-full w-full"
+                          imgClassName="h-full w-full object-cover"
                         />
 
                         {/* primary badge */}

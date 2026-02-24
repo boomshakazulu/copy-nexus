@@ -1,6 +1,7 @@
 import { formatCOP } from "../utils/helpers";
 import { useI18n } from "../i18n";
 import { useCart } from "../context/CartContext";
+import SmartImage from "./SmartImage";
 
 export default function ProductCard({
   _id,
@@ -49,7 +50,13 @@ export default function ProductCard({
     <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
       {/* Image */}
       <div className="mb-4 grid place-items-center rounded-lg bg-[#F8FAFC] p-6">
-        <img src={images[0]} alt={name} className="h-28 object-contain" />
+        <SmartImage
+          src={images?.[0] || "/placeholder.png"}
+          alt={name}
+          fallbackSrc="/placeholder.png"
+          className="h-28"
+          imgClassName="h-28 object-contain"
+        />
       </div>
 
       {/* Title & subtitle */}

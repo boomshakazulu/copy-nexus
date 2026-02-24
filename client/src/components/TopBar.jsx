@@ -3,6 +3,7 @@ import { Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import LoginModal from "./LoginModal";
 import SignupModal from "./SignupModal";
+import SmartImage from "./SmartImage";
 import Auth from "../utils/auth";
 import { useI18n } from "../i18n";
 import { useCart } from "../context/CartContext";
@@ -65,15 +66,17 @@ export default function TopBar() {
       <div className="flex items-center justify-between px-2 sm:px-6 py-2 sm:py-4 max-w-6xl mx-auto">
         {/* Logo */}
         <Link to="/" className="shrink-0">
-          <img
+          <SmartImage
             src="/logo-sas.png"
             alt={t("common.logoAlt")}
-            className="h-16 md:h-20 w-auto object-contain"
+            priority
+            className="h-16 md:h-20"
+            imgClassName="h-16 md:h-20 w-auto object-contain"
           />
         </Link>
-        <div className="flex gap-2 sm:gap-4 md:gap-6 pl-6 sm:pl-0 text-black font-medium text-sm">
-          {/* Top Navigation - always visible */}
-          <nav className="flex gap-2 sm:gap-4 md:gap-6 text-black font-medium text-sm">
+        <div className="flex gap-2 sm:gap-4 md:gap-6 pl-2 sm:pl-0 text-black font-medium text-sm">
+          {/* Top Navigation - desktop only */}
+          <nav className="hidden md:flex gap-2 sm:gap-4 md:gap-6 text-black font-medium text-sm">
             <Link to="/">{t("nav.home")}</Link>
             <Link to="/copiers">{t("nav.copiers")}</Link>
             <Link to="/contact">{t("nav.contact")}</Link>
@@ -151,14 +154,25 @@ export default function TopBar() {
       {/* Side Menu (overlay) */}
       {menuOpen && (
         <div
-          className="fixed inset-0 bg-opacity-50 z-50"
+          className="fixed inset-0 bg-black/50 z-50"
           onClick={() => setMenuOpen(false)}
         >
           <div
-            className="absolute top-17 right-0 w-64 h-full bg-white p-6 shadow-lg"
+            className="absolute top-0 right-0 w-64 max-w-[85vw] h-full bg-white p-6 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <nav className="flex flex-col gap-4 text-black font-medium text-base">
+              <div className="flex flex-col gap-3 border-b border-gray-200 pb-4">
+                <Link to="/" onClick={() => setMenuOpen(false)}>
+                  {t("nav.home")}
+                </Link>
+                <Link to="/copiers" onClick={() => setMenuOpen(false)}>
+                  {t("nav.copiers")}
+                </Link>
+                <Link to="/contact" onClick={() => setMenuOpen(false)}>
+                  {t("nav.contact")}
+                </Link>
+              </div>
               <Link
                 to="/cart"
                 onClick={() => setMenuOpen(false)}

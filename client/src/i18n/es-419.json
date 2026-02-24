@@ -149,7 +149,9 @@
     "filterMultifunction": "Multifuncional",
     "filterHighVolume": "Alto volumen",
     "searchPlaceholder": "Buscar por modelo",
-    "loadFailed": "No se pudieron cargar las copiadoras."
+    "loadFailed": "No se pudieron cargar las copiadoras.",
+    "loading": "Cargando copiadoras...",
+    "empty": "No hay copiadoras que coincidan con los filtros."
   },
   "partsPage": {
     "title": "Partes y accesorios",
@@ -249,17 +251,32 @@
     "title": "Ponte en contacto con nosotros",
     "subtitle": "Tienes una pregunta o necesitas una cotizacion? Estamos para ayudarte y respondemos rapido.",
     "addressLabel": "Direccion",
-    "addressValue": "Calle Principal 123, Bogota",
+    "addressValue": "Transversal 74f # 40j-09 sur — Bogotá",
     "phoneLabel": "WhatsApp",
-    "phoneValue": "+57 123 4567880",
+    "phoneValue": "311 869 6632",
     "emailLabel": "Correo",
     "emailValue": "info@copynexus.co",
+    "hoursLabel": "Horario",
+    "hoursValue": "Lunes a sábado de 8:00 a.m. a 6:00 p.m.",
     "formTitle": "Formulario de contacto",
     "name": "Nombre",
     "contactValue": "Correo o numero de WhatsApp",
     "contactPlaceholder": "tu@ejemplo.com o +57 300 123 4567",
     "message": "Mensaje",
-    "send": "Enviar mensaje"
+    "send": "Enviar mensaje",
+    "sending": "Enviando...",
+    "validationError": "Completa todos los campos requeridos.",
+    "submitFailed": "No se pudo enviar tu mensaje.",
+    "submitSuccess": "Mensaje enviado. Te contactaremos pronto."
+  },
+  "errors": {
+    "brand": "Copy Nexus",
+    "title": "Algo salio mal",
+    "notFoundTitle": "No encontramos esa pagina",
+    "genericSubtitle": "Vuelve al inicio o contactanos para ayudarte.",
+    "codeLabel": "Codigo de error",
+    "ctaHome": "Volver al inicio",
+    "ctaContact": "Contactar soporte"
   },
   "auth": {
     "loginTitle": "Iniciar sesion",

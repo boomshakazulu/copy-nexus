@@ -4,6 +4,7 @@ import { http } from "../utils/axios";
 import { formatCOP } from "../utils/helpers";
 import { useI18n } from "../i18n";
 import { useCart } from "../context/CartContext";
+import SmartImage from "../components/SmartImage";
 
 export default function ProductDetailPage() {
   const { t } = useI18n();
@@ -135,10 +136,13 @@ export default function ProductDetailPage() {
         {/* Carousel */}
         <div className="flex flex-col gap-4">
           <div className="relative rounded-xl bg-[#F8FAFC] p-6 flex items-center justify-center">
-            <img
+            <SmartImage
               src={images[activeImage]}
               alt={copier.name}
-              className="h-80 w-full object-contain"
+              fallbackSrc="/copier.png"
+              priority
+              className="h-80 w-full"
+              imgClassName="h-80 w-full object-contain"
             />
             {images.length > 1 && (
               <>
@@ -181,10 +185,12 @@ export default function ProductDetailPage() {
                       : "border-gray-200"
                   }`}
                 >
-                  <img
+                  <SmartImage
                     src={img}
                     alt={`${copier.name} ${index + 1}`}
-                    className="h-full w-full object-contain"
+                    fallbackSrc="/copier.png"
+                    className="h-full w-full"
+                    imgClassName="h-full w-full object-contain"
                   />
                 </button>
               ))}

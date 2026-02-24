@@ -10,6 +10,7 @@ export default function CopiersPage() {
   const { t } = useI18n();
   const [copiers, setCopiers] = useState([]);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const [copierColorMode, setCopierColorMode] = useState("");
   const [filterMultifunction, setFilterMultifunction] = useState(false);
   const [filterHighVolume, setFilterHighVolume] = useState(false);
@@ -18,6 +19,7 @@ export default function CopiersPage() {
 
   const fetchCopiers = async () => {
     try {
+      setIsLoading(true);
       const copiers = await http.get("/products", {
         params: {
           category: "copier",
@@ -34,6 +36,8 @@ export default function CopiersPage() {
       }
     } catch (err) {
       setError(t("copiers.loadFailed"));
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -99,9 +103,16 @@ export default function CopiersPage() {
       </div>
 
       {/* Copier Grid */}
-      {error ? (
+      {error && (
         <p className="text-sm text-red-600 font-semibold">{error}</p>
-      ) : (
+      )}
+      {!error && isLoading && (
+        <p className="text-sm text-gray-500">{t("copiers.loading")}</p>
+      )}
+      {!error && !isLoading && copiers.length === 0 && (
+        <p className="text-sm text-gray-500">{t("copiers.empty")}</p>
+      )}
+      {!error && !isLoading && copiers.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-5 bg-white rounded-xl shadow-md overflow-hidden">
           {copiers.map((copier) => (
             <Link

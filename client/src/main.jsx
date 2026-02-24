@@ -18,6 +18,7 @@ import PartsAccessoriesPage from "./pages/PartsAccessoriesPage";
 import MaintenancePage from "./pages/MaintenancePage";
 import RequestConfirmationPage from "./pages/RequestConfirmationPage";
 import ProductPreviewPage from "./pages/ProductPreviewPage";
+import ErrorPage from "./pages/ErrorPage";
 
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
@@ -37,7 +38,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-    errorElement: "",
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,
