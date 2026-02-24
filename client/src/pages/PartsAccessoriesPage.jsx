@@ -17,6 +17,13 @@ export default function PartsAccessoriesPage() {
   const [error, setError] = useState("");
   const [isItemsLoading, setIsItemsLoading] = useState(false);
   const [formModel, setFormModel] = useState("");
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const [captchaError, setCaptchaError] = useState("");
+  const captcha = useMemo(() => {
+    const a = Math.floor(Math.random() * 9) + 1;
+    const b = Math.floor(Math.random() * 9) + 1;
+    return { a, b };
+  }, []);
 
   const OTHER_COPIER_ID = "other";
 
@@ -155,6 +162,11 @@ export default function PartsAccessoriesPage() {
             className="grid grid-cols-1 md:grid-cols-2 gap-4"
             onSubmit={(e) => {
               e.preventDefault();
+              if (Number(captchaAnswer) !== captcha.a + captcha.b) {
+                setCaptchaError(t("partsPage.form.captchaError"));
+                return;
+              }
+              setCaptchaError("");
               navigate("/request-confirmation?type=parts");
             }}
           >
@@ -214,6 +226,21 @@ export default function PartsAccessoriesPage() {
                 rows="4"
                 className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
               ></textarea>
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">
+                {t("partsPage.form.captchaLabel", { a: captcha.a, b: captcha.b })}
+              </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={captchaAnswer}
+                onChange={(e) => setCaptchaAnswer(e.target.value)}
+                className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              />
+              {captchaError && (
+                <p className="mt-1 text-xs text-red-600">{captchaError}</p>
+              )}
             </div>
             <div className="md:col-span-2">
               <button
@@ -319,6 +346,11 @@ export default function PartsAccessoriesPage() {
               className="grid grid-cols-1 md:grid-cols-2 gap-4"
               onSubmit={(e) => {
                 e.preventDefault();
+                if (Number(captchaAnswer) !== captcha.a + captcha.b) {
+                  setCaptchaError(t("partsPage.form.captchaError"));
+                  return;
+                }
+                setCaptchaError("");
                 navigate("/request-confirmation?type=parts");
               }}
             >
@@ -378,6 +410,21 @@ export default function PartsAccessoriesPage() {
                   rows="4"
                   className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 ></textarea>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  {t("partsPage.form.captchaLabel", { a: captcha.a, b: captcha.b })}
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={captchaAnswer}
+                  onChange={(e) => setCaptchaAnswer(e.target.value)}
+                  className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                />
+                {captchaError && (
+                  <p className="mt-1 text-xs text-red-600">{captchaError}</p>
+                )}
               </div>
               <div className="md:col-span-2">
                 <button

@@ -45,7 +45,10 @@ async function proxyImage(req, res, next) {
       return buildError(res, response.status, "Image fetch failed");
     }
 
-    const contentType = response.headers.get("content-type") || "image/jpeg";
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.startsWith("image/")) {
+      return buildError(res, 415, "Unsupported content type");
+    }
     res.setHeader("Content-Type", contentType);
     res.setHeader(
       "Cache-Control",

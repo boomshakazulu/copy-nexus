@@ -7,6 +7,17 @@ const { sendMail } = require("../utils/mailer");
 // helpers
 const escapeRegex = (s = "") => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const isEmail = (q = "") => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(q);
+const isValidCaptcha = (captcha) => {
+  if (!captcha || typeof captcha !== "object") return false;
+  const a = Number(captcha.a);
+  const b = Number(captcha.b);
+  const answer = Number(captcha.answer);
+  if (!Number.isFinite(a) || !Number.isFinite(b) || !Number.isFinite(answer)) {
+    return false;
+  }
+  if (a < 1 || a > 9 || b < 1 || b > 9) return false;
+  return a + b === answer;
+};
 
 module.exports = {
   async getOrders(req, res) {
@@ -155,10 +166,13 @@ module.exports = {
   },
 
   async createOrder(req, res) {
-    const { consentMeta, ...payload } = req.body || {};
+    const { consentMeta, captcha, ...payload } = req.body || {};
     const isAdmin = req.user?.role === "admin";
     const suppressEmail = isAdmin || payload?.suppressEmail === true;
     if (payload?.suppressEmail != null) delete payload.suppressEmail;
+    if (!isAdmin && !isValidCaptcha(captcha)) {
+      throw unprocessable("Invalid captcha", { captcha: "Invalid captcha" });
+    }
     const ip = req.ip || req.headers["x-forwarded-for"] || "";
     const userAgent = req.headers["user-agent"] || "";
     const nextConsentMeta = {

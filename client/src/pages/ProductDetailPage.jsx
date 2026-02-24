@@ -23,6 +23,20 @@ export default function ProductDetailPage() {
   const [supportToners, setSupportToners] = useState([]);
   const [supportLoading, setSupportLoading] = useState(false);
   const [supportError, setSupportError] = useState("");
+  const [partsCaptchaAnswer, setPartsCaptchaAnswer] = useState("");
+  const [maintenanceCaptchaAnswer, setMaintenanceCaptchaAnswer] = useState("");
+  const [partsCaptchaError, setPartsCaptchaError] = useState("");
+  const [maintenanceCaptchaError, setMaintenanceCaptchaError] = useState("");
+  const partsCaptcha = useMemo(() => {
+    const a = Math.floor(Math.random() * 9) + 1;
+    const b = Math.floor(Math.random() * 9) + 1;
+    return { a, b };
+  }, []);
+  const maintenanceCaptcha = useMemo(() => {
+    const a = Math.floor(Math.random() * 9) + 1;
+    const b = Math.floor(Math.random() * 9) + 1;
+    return { a, b };
+  }, []);
 
   const images = useMemo(() => {
     if (!copier?.images || copier.images.length === 0) return ["/copier.png"];
@@ -464,6 +478,11 @@ export default function ProductDetailPage() {
                 className="grid grid-cols-1 gap-3"
                 onSubmit={(e) => {
                   e.preventDefault();
+                  if (Number(partsCaptchaAnswer) !== partsCaptcha.a + partsCaptcha.b) {
+                    setPartsCaptchaError(t("product.supportCaptchaError"));
+                    return;
+                  }
+                  setPartsCaptchaError("");
                   navigate("/request-confirmation?type=parts");
                 }}
               >
@@ -524,6 +543,26 @@ export default function ProductDetailPage() {
                     className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t("product.supportCaptchaLabel", {
+                      a: partsCaptcha.a,
+                      b: partsCaptcha.b,
+                    })}
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={partsCaptchaAnswer}
+                    onChange={(e) => setPartsCaptchaAnswer(e.target.value)}
+                    className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  />
+                  {partsCaptchaError && (
+                    <p className="mt-1 text-xs text-red-600">
+                      {partsCaptchaError}
+                    </p>
+                  )}
+                </div>
                 <button
                   type="submit"
                   className="bg-red-500 text-white font-semibold px-6 py-2 rounded-md hover:bg-red-600 transition"
@@ -544,6 +583,14 @@ export default function ProductDetailPage() {
                 className="grid grid-cols-1 gap-3"
                 onSubmit={(e) => {
                   e.preventDefault();
+                  if (
+                    Number(maintenanceCaptchaAnswer) !==
+                    maintenanceCaptcha.a + maintenanceCaptcha.b
+                  ) {
+                    setMaintenanceCaptchaError(t("product.supportCaptchaError"));
+                    return;
+                  }
+                  setMaintenanceCaptchaError("");
                   navigate("/request-confirmation?type=maintenance");
                 }}
               >
@@ -614,6 +661,26 @@ export default function ProductDetailPage() {
                     className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                     placeholder={t("maintenancePage.form.needsPlaceholder")}
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t("product.supportCaptchaLabel", {
+                      a: maintenanceCaptcha.a,
+                      b: maintenanceCaptcha.b,
+                    })}
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={maintenanceCaptchaAnswer}
+                    onChange={(e) => setMaintenanceCaptchaAnswer(e.target.value)}
+                    className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  />
+                  {maintenanceCaptchaError && (
+                    <p className="mt-1 text-xs text-red-600">
+                      {maintenanceCaptchaError}
+                    </p>
+                  )}
                 </div>
                 <button
                   type="submit"

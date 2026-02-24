@@ -86,7 +86,9 @@
     "consent": "I authorize the processing of my personal data in accordance with the",
     "privacyLink": "Privacy Policy",
     "submitFailed": "Unable to submit your request.",
-    "submitSuccess": "Request received. We will contact you shortly."
+    "submitSuccess": "Request received. We will contact you shortly.",
+    "captchaLabel": "What is {a} + {b}?",
+    "captchaHint": "Quick check to prevent spam."
   }
   },
   "orderConfirmation": {
@@ -180,7 +182,9 @@
       "model": "Copier model",
       "modelPlaceholder": "Enter copier model",
       "message": "Part or accessory details",
-      "send": "Send request"
+      "send": "Send request",
+      "captchaLabel": "What is {a} + {b}?",
+      "captchaError": "Please answer the captcha correctly."
     }
   },
   "maintenancePage": {
@@ -209,7 +213,9 @@
       "issuePlaceholder": "Tell us what’s happening with the copier.",
       "needs": "What’s needed",
       "needsPlaceholder": "Parts, service visit, diagnostics, or other details.",
-      "send": "Request quote"
+      "send": "Request quote",
+      "captchaLabel": "What is {a} + {b}?",
+      "captchaError": "Please answer the captcha correctly."
     }
   },
   "product": {
@@ -242,6 +248,9 @@
     "supportEmpty": "No compatible products listed yet.",
     "supportLoading": "Loading compatible products...",
     "supportLoadFailed": "Unable to load compatible products."
+    ,
+    "supportCaptchaLabel": "What is {a} + {b}?",
+    "supportCaptchaError": "Please answer the captcha correctly."
   },
   "productCard": {
     "purchase": "Purchase",

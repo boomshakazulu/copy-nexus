@@ -86,7 +86,9 @@
     "consent": "Autorizo el tratamiento de mis datos personales conforme a la",
     "privacyLink": "Politica de privacidad",
     "submitFailed": "No se pudo enviar la solicitud.",
-    "submitSuccess": "Solicitud recibida. Te contactaremos pronto."
+    "submitSuccess": "Solicitud recibida. Te contactaremos pronto.",
+    "captchaLabel": "Cuanto es {a} + {b}?",
+    "captchaHint": "Verificacion rapida para evitar spam."
   }
   },
   "orderConfirmation": {
@@ -180,7 +182,9 @@
       "model": "Modelo de copiadora",
       "modelPlaceholder": "Ingresa el modelo",
       "message": "Detalles de la parte o accesorio",
-      "send": "Enviar solicitud"
+      "send": "Enviar solicitud",
+      "captchaLabel": "Cuanto es {a} + {b}?",
+      "captchaError": "Responde correctamente la verificacion."
     }
   },
   "maintenancePage": {
@@ -209,7 +213,9 @@
       "issuePlaceholder": "Cuentanos que esta pasando con la copiadora.",
       "needs": "Que necesitas",
       "needsPlaceholder": "Partes, visita de servicio, diagnostico u otros detalles.",
-      "send": "Solicitar cotizacion"
+      "send": "Solicitar cotizacion",
+      "captchaLabel": "Cuanto es {a} + {b}?",
+      "captchaError": "Responde correctamente la verificacion."
     }
   },
   "product": {
@@ -241,7 +247,9 @@
     "supportNoParts": "No hay partes listadas para esta copiadora.",
     "supportEmpty": "Aun no hay productos compatibles.",
     "supportLoading": "Cargando productos compatibles...",
-    "supportLoadFailed": "No se pudieron cargar los productos compatibles."
+    "supportLoadFailed": "No se pudieron cargar los productos compatibles.",
+    "supportCaptchaLabel": "Cuanto es {a} + {b}?",
+    "supportCaptchaError": "Responde correctamente la verificacion."
   },
   "productCard": {
     "purchase": "Compra",

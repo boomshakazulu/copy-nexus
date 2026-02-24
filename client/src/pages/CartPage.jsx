@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { formatCOP } from "../utils/helpers";
 import { useI18n } from "../i18n";
@@ -15,6 +15,11 @@ export default function CartPage() {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const formRef = useRef(null);
+  const captcha = useMemo(() => {
+    const a = Math.floor(Math.random() * 9) + 1;
+    const b = Math.floor(Math.random() * 9) + 1;
+    return { a, b };
+  }, []);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -33,6 +38,7 @@ export default function CartPage() {
     postalCode: "",
     notes: "",
     consent: false,
+    captchaAnswer: "",
   });
   const phoneCountryOptions = [
     { code: "+57", label: "CO (+57)" },
@@ -153,6 +159,11 @@ export default function CartPage() {
       consentMeta: {
         policyVersion: POLICY_VERSION,
       },
+      captcha: {
+        a: captcha.a,
+        b: captcha.b,
+        answer: form.captchaAnswer.trim(),
+      },
     };
 
     setIsSubmitting(true);
@@ -185,6 +196,7 @@ export default function CartPage() {
         postalCode: "",
         notes: "",
         consent: false,
+        captchaAnswer: "",
       });
       navigate("/order-confirmation");
     } catch (err) {
@@ -605,6 +617,22 @@ export default function CartPage() {
                   .
                 </span>
               </label>
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-[#00294D] mb-1">
+                {t("cart.form.captchaLabel", { a: captcha.a, b: captcha.b })}
+              </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={form.captchaAnswer}
+                onChange={handleChange("captchaAnswer")}
+                required
+                className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                {t("cart.form.captchaHint")}
+              </p>
             </div>
 
             {submitError && (
