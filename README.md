@@ -12,12 +12,20 @@ Copy Nexus provides a customer‑facing storefront and an admin back office to m
 ## Screenshots
 
 <!-- Screenshot: Home / Landing -->
+<img width="691" height="661" alt="image" src="https://github.com/user-attachments/assets/72bb2a7c-c317-4124-b186-ad88613cbce4" />
+
 
 <!-- Screenshot: Product Detail (Support section) -->
+<img width="819" height="532" alt="image" src="https://github.com/user-attachments/assets/9f9a5206-27a5-4be3-bfe7-baf010b7c910" />
+
 
 <!-- Screenshot: Cart / Quote Request -->
+<img width="830" height="527" alt="image" src="https://github.com/user-attachments/assets/68642bcf-3777-4701-987f-571187ad0386" />
+
 
 <!-- Screenshot: Admin Dashboard -->
+<img width="829" height="650" alt="image" src="https://github.com/user-attachments/assets/8f11bad6-81b7-4d0c-9ec0-426c51a00a1d" />
+
 
 ---
 
