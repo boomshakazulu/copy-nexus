@@ -102,5 +102,3 @@ server/    # Express API
 
 ---
 
-## License
-This project is provided for portfolio review and demonstration purposes.
