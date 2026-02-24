@@ -17,6 +17,7 @@ export default function Products() {
   const [error, setError] = useState("");
   const [formError, setFormError] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const [items, setItems] = useState({
     data: [],
@@ -27,6 +28,7 @@ export default function Products() {
 
   const fetchProducts = async (category, visibility) => {
     try {
+      setLoading(true);
       const res = await http.get("/products", {
         params: {
           category,
@@ -39,6 +41,8 @@ export default function Products() {
       }
     } catch (_err) {
       setError(t("admin.products.loadFailed"));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -300,7 +304,15 @@ export default function Products() {
 
       {/* …filters + search… */}
 
-      {items.data && (
+      {loading && (
+        <p className="text-sm text-gray-500">{t("admin.products.loading")}</p>
+      )}
+
+      {!loading && !error && items.data?.length === 0 && (
+        <p className="text-sm text-gray-500">{t("admin.products.empty")}</p>
+      )}
+
+      {!loading && items.data && items.data.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.data.map((p) => (
             <button

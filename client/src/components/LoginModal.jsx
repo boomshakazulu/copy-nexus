@@ -13,12 +13,22 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
   const [resetStatus, setResetStatus] = useState("idle");
   const dialogRef = useRef(null);
   const firstFieldRef = useRef(null);
+  const triggerRef = useRef(null);
 
   useEffect(() => {
     if (Auth.loggedIn()) {
       onClose();
     }
   }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (isOpen) {
+      triggerRef.current = document.activeElement;
+    } else if (triggerRef.current?.focus) {
+      triggerRef.current.focus();
+      triggerRef.current = null;
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -108,6 +118,7 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
           role="dialog"
           aria-modal="true"
           aria-labelledby="login-modal-title"
+          aria-describedby="login-modal-description"
           className="relative w-full bg-white rounded-lg shadow-xl p-8"
           onClick={(e) => e.stopPropagation()}
         >
@@ -134,6 +145,9 @@ export default function LoginModal({ isOpen, onClose, showSignup }) {
         >
           {mode === "forgot" ? t("auth.forgotTitle") : t("auth.loginTitle")}
         </h1>
+        <p id="login-modal-description" className="sr-only">
+          {t("auth.loginModalDescription")}
+        </p>
 
         {/* Form */}
         <form onSubmit={handleSubmit}>

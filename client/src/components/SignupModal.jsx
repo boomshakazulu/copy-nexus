@@ -12,10 +12,20 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
   const [status, setStatus] = useState("idle");
   const dialogRef = useRef(null);
   const firstFieldRef = useRef(null);
+  const triggerRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
       setStatus("idle");
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      triggerRef.current = document.activeElement;
+    } else if (triggerRef.current?.focus) {
+      triggerRef.current.focus();
+      triggerRef.current = null;
     }
   }, [isOpen]);
 
@@ -120,6 +130,7 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
           role="dialog"
           aria-modal="true"
           aria-labelledby="signup-modal-title"
+          aria-describedby="signup-modal-description"
           className="relative w-full bg-white rounded-lg shadow-lg p-8"
           onClick={(e) => e.stopPropagation()}
         >
@@ -146,6 +157,9 @@ export default function SignupModal({ isOpen, onClose, showLogin }) {
         >
           {t("auth.signupTitle")}
         </h1>
+        <p id="signup-modal-description" className="sr-only">
+          {t("auth.signupModalDescription")}
+        </p>
 
         {/* Form */}
         <form onSubmit={handleSubmit}>

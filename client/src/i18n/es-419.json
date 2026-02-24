@@ -227,7 +227,21 @@
     "pricePerCopy": "Precio por copia",
     "pricePerScan": "Precio por escaneo",
     "rentalOnlyNote": "Solo aplica a rentas.",
-    "buyNow": "Comprar ahora"
+    "buyNow": "Comprar ahora",
+    "supportTitle": "Soporte para esta copiadora",
+    "supportSubtitle": "Explora partes compatibles y solicita ayuda desde esta pagina.",
+    "supportPartsTitle": "Partes y toner compatibles",
+    "supportMaintenanceTitle": "Solicitud de mantenimiento",
+    "supportMaintenanceSubtitle": "Cuentanos que necesitas y responderemos pronto.",
+    "supportPartsFormTitle": "Solicitar una parte o accesorio",
+    "supportPartsFormSubtitle": "Describe la parte que necesitas y te contactaremos.",
+    "supportToner": "Toner",
+    "supportParts": "Partes",
+    "supportNoToner": "No hay toner listado para esta copiadora.",
+    "supportNoParts": "No hay partes listadas para esta copiadora.",
+    "supportEmpty": "Aun no hay productos compatibles.",
+    "supportLoading": "Cargando productos compatibles...",
+    "supportLoadFailed": "No se pudieron cargar los productos compatibles."
   },
   "productCard": {
     "purchase": "Compra",
@@ -281,7 +295,7 @@
     "ctaHome": "Volver al inicio",
     "ctaContact": "Contactar soporte"
   },
-  "auth": {
+    "auth": {
     "loginTitle": "Iniciar sesion",
     "loginButton": "Iniciar sesion",
     "signupTitle": "Registrarse",
@@ -313,6 +327,8 @@
     "haveAccount": "Ya tienes una cuenta?",
     "signUpLink": "Registrarse",
     "loginLink": "Iniciar sesion",
+    "loginModalDescription": "Inicia sesion en tu cuenta o restablece tu contrasena.",
+    "signupModalDescription": "Crea una cuenta nueva para gestionar tus pedidos.",
     "errors": {
       "invalidCredentials": "Usuario o contrasena invalidos.",
       "loginProblem": "Hubo un problema al iniciar sesion.",
@@ -591,6 +607,8 @@
       "addProduct": "+ Agregar producto",
       "activeTab": "Activos",
       "archivedTab": "Archivados",
+      "loading": "Cargando productos...",
+      "empty": "No se encontraron productos.",
       "loadFailed": "No se pudieron cargar los productos.",
       "saveFailed": "No se pudo guardar el producto.",
       "validationFailed": "Corrige los campos resaltados.",
