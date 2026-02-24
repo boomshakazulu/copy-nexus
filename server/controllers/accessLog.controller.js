@@ -66,4 +66,26 @@ module.exports = {
       filter,
     });
   },
+
+  async createAccessLog(req, res) {
+    const { entityId, entityType = "order", action = "view_id", scope = "admin_order_details" } = req.body || {};
+    if (!entityId) {
+      return res.status(400).json({ message: "entityId is required" });
+    }
+    const actorId = req.user?.id || null;
+    const actorEmail = req.user?.email || "";
+    const ip = req.ip || req.headers["x-forwarded-for"] || "";
+    const userAgent = req.headers["user-agent"] || "";
+    const log = await AccessLog.create({
+      actorId,
+      actorEmail,
+      action,
+      entityType,
+      entityId,
+      ip: Array.isArray(ip) ? ip[0] : ip,
+      userAgent,
+      meta: { scope },
+    });
+    return res.json({ ok: true, id: log._id });
+  },
 };

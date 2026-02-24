@@ -275,9 +275,7 @@ export default function Orders() {
                     {order?._id?.slice(-6).toUpperCase()}
                   </td>
                   <td className="px-6 py-4">{order?.customer?.name}</td>
-                  <td className="px-6 py-4">
-                    {formatDate(order?.createdAt)}
-                  </td>
+                  <td className="px-6 py-4">{formatDate(order?.createdAt)}</td>
                   <td className="px-6 py-4">
                     <span
                       className={`text-white text-xs font-semibold px-3 py-1 rounded-full inline-block
@@ -304,7 +302,6 @@ export default function Orders() {
         <p className="mt-4 text-sm font-semibold text-red-600">{error}</p>
       )}
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="mt-6 flex justify-between items-center text-sm text-[#00294D]">
           <button

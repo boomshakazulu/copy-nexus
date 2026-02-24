@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Order, AccessLog, User } = require("../models");
+const { Order, AccessLog, User, Rental } = require("../models");
 const { policyVersion } = require("../config/privacy");
 const { unprocessable, badRequest, notFound } = require("../utils/httpError");
 const { sendMail } = require("../utils/mailer");
@@ -134,33 +134,11 @@ module.exports = {
     ]);
 
     const nextData = data.map((order) => {
-      const encrypted = order?.customer?.idNumberEncrypted;
-      const full = Order.decryptIdNumber(encrypted);
       if (order?.customer) {
-        order.customer.idNumberFull = full || "";
         delete order.customer.idNumberEncrypted;
       }
       return order;
     });
-
-    // log admin access to full IDs
-    if (nextData.length) {
-      const actorId = req.user?.id || null;
-      const actorEmail = req.user?.email || "";
-      const ip = req.ip || req.headers["x-forwarded-for"] || "";
-      const userAgent = req.headers["user-agent"] || "";
-      const logs = nextData.map((order) => ({
-        actorId,
-        actorEmail,
-        action: "view_id",
-        entityType: "order",
-        entityId: order._id,
-        ip: Array.isArray(ip) ? ip[0] : ip,
-        userAgent,
-        meta: { scope: "admin_orders_list" },
-      }));
-      AccessLog.insertMany(logs, { ordered: false }).catch(() => {});
-    }
 
     return res.json({
       data: nextData,
@@ -324,6 +302,7 @@ module.exports = {
       shippingAddress,
       notes,
       sendUpdateEmail,
+      createRentals,
     } = req.body || {};
 
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
@@ -454,28 +433,8 @@ module.exports = {
 
     await order.save();
     const saved = order.toObject();
-    const encrypted = saved?.customer?.idNumberEncrypted;
-    const full = Order.decryptIdNumber(encrypted);
     if (saved?.customer) {
-      saved.customer.idNumberFull = full || "";
       delete saved.customer.idNumberEncrypted;
-    }
-    // log admin access to full ID on update response
-    if (saved?._id && saved?.customer?.idNumberFull) {
-      const actorId = req.user?.id || null;
-      const actorEmail = req.user?.email || "";
-      const ip = req.ip || req.headers["x-forwarded-for"] || "";
-      const userAgent = req.headers["user-agent"] || "";
-      AccessLog.create({
-        actorId,
-        actorEmail,
-        action: "view_id",
-        entityType: "order",
-        entityId: saved._id,
-        ip: Array.isArray(ip) ? ip[0] : ip,
-        userAgent,
-        meta: { scope: "admin_order_update" },
-      }).catch(() => {});
     }
     if (sendUpdateEmail && saved?.customer?.email) {
       const subject = `Your order was updated`;
@@ -561,6 +520,82 @@ module.exports = {
         html,
       });
     }
+    if (createRentals && (saved?.status === "shipped" || saved?.status === "completed")) {
+      const rentedItems = (saved.items || [])
+        .map((item, index) => ({ item, index }))
+        .filter(({ item }) => !!item?.IsRented);
+      if (rentedItems.length) {
+        const existing = await Rental.findOne({ order: saved._id }).select("_id").lean();
+        if (!existing) {
+          const baseStart = new Date();
+          const dueDate = new Date(baseStart);
+          dueDate.setMonth(dueDate.getMonth() + 1);
+          const rentalDoc = {
+            order: saved._id,
+            items: rentedItems.map(({ item, index }) => ({
+              orderItemIndex: index,
+              product: item.product || null,
+              name: item.name,
+              model: item.model || "",
+              qty: item.qty || 1,
+              monthlyPrice: Number(item.unitAmount) || 0,
+              rentCostPerPrint: Number(item.rentCostPerPrint) || 0,
+              rentCostPerScan: Number(item.rentCostPerScan) || 0,
+            })),
+            startDate: baseStart,
+            dueDate,
+            customer: {
+              name: saved.customer?.name || "",
+              email: saved.customer?.email || "",
+              phone: saved.customer?.phone || "",
+              idType: saved.customer?.idType || "",
+              idNumber: saved.customer?.idNumber || "",
+              preferredContactMethod: saved.customer?.preferredContactMethod || "",
+            },
+            shippingAddress: {
+              streetAddress: saved.shippingAddress?.streetAddress || "",
+              neighborhood: saved.shippingAddress?.neighborhood || "",
+              city: saved.shippingAddress?.city || "",
+              department: saved.shippingAddress?.department || "",
+              postalCode: saved.shippingAddress?.postalCode || "",
+            },
+            notes: saved.notes || "",
+          };
+
+          await Rental.create(rentalDoc);
+        }
+      }
+    }
     return res.json(saved);
+  },
+
+  async getOrderId(req, res) {
+    const { id } = req.query || {};
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      throw badRequest("Valid order id is required");
+    }
+    const order = await Order.findById(id)
+      .select("+customer.idNumberEncrypted")
+      .lean();
+    if (!order) {
+      throw notFound("Order not found");
+    }
+    const encrypted = order?.customer?.idNumberEncrypted;
+    const full = Order.decryptIdNumber(encrypted);
+    const actorId = req.user?.id || null;
+    const actorEmail = req.user?.email || "";
+    const ip = req.ip || req.headers["x-forwarded-for"] || "";
+    const userAgent = req.headers["user-agent"] || "";
+    await AccessLog.create({
+      actorId,
+      actorEmail,
+      action: "view_id",
+      entityType: "order",
+      entityId: order._id,
+      ip: Array.isArray(ip) ? ip[0] : ip,
+      userAgent,
+      meta: { scope: "admin_order_details" },
+    });
+    return res.json({ id: order._id, idNumberFull: full || "" });
   },
 };

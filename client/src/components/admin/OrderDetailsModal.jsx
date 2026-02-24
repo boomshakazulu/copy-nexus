@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useI18n } from "../../i18n";
 import { http } from "../../utils/axios";
+import auth from "../../utils/auth";
 
 const formatMoney = (value, currency = "COP") => {
   const amount = Number.isFinite(value) ? value : 0;
@@ -56,7 +57,9 @@ export default function OrderDetailsModal({
   const [productError, setProductError] = useState("");
   const [editingContact, setEditingContact] = useState(false);
   const [contactDirty, setContactDirty] = useState(false);
+  const [showFullId, setShowFullId] = useState(false);
   const [notes, setNotes] = useState("");
+  const [fullIdValue, setFullIdValue] = useState("");
   const [customerForm, setCustomerForm] = useState({
     name: "",
     email: "",
@@ -90,6 +93,8 @@ export default function OrderDetailsModal({
     setEditingContact(false);
     setContactDirty(false);
     setNotes(order?.notes || "");
+    setShowFullId(false);
+    setFullIdValue("");
     setCustomerForm({
       name: order?.customer?.name || "",
       email: order?.customer?.email || "",
@@ -165,6 +170,13 @@ export default function OrderDetailsModal({
     if (method === "whatsappCall") return t("common.contactMethods.whatsappCall");
     if (method === "whatsappText") return t("common.contactMethods.whatsappText");
     return method || "—";
+  };
+
+  const maskId = (value = "") => {
+    if (!value) return "";
+    const str = String(value);
+    if (str.length <= 4) return "•".repeat(str.length);
+    return `${"•".repeat(Math.max(0, str.length - 4))}${str.slice(-4)}`;
   };
 
   const handleItemChange = (index, field, value) => {
@@ -244,7 +256,7 @@ export default function OrderDetailsModal({
     setCustomQty(1);
   };
 
-  const buildPayload = (sendEmail = false) => {
+  const buildPayload = (sendEmail = false, createRentals = false) => {
     const shouldSendContact = contactDirty;
     return {
       id: order?._id,
@@ -285,15 +297,52 @@ export default function OrderDetailsModal({
       })),
       notes: notes.trim(),
       sendUpdateEmail: !!sendEmail,
+      createRentals: !!createRentals,
     };
   };
 
-  const handleSave = () => {
-    onSave?.(buildPayload(false));
+  const handleSave = async () => {
+    const hasRentalItems = editItems.some((item) => item?.IsRented);
+    const shouldPrompt =
+      hasRentalItems && (status === "shipped" || status === "completed");
+    let createRentals = false;
+    if (shouldPrompt && order?._id) {
+      try {
+        const token = auth.getToken();
+        const res = await http.get("/admin/rental-exists", {
+          params: { orderId: order._id },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res?.data?.exists) {
+          createRentals = window.confirm(t("admin.orders.rentalPrompt"));
+        }
+      } catch (_err) {
+        createRentals = window.confirm(t("admin.orders.rentalPrompt"));
+      }
+    }
+    onSave?.(buildPayload(false, createRentals));
   };
 
-  const handleSaveAndEmail = () => {
-    onSave?.(buildPayload(true));
+  const handleSaveAndEmail = async () => {
+    const hasRentalItems = editItems.some((item) => item?.IsRented);
+    const shouldPrompt =
+      hasRentalItems && (status === "shipped" || status === "completed");
+    let createRentals = false;
+    if (shouldPrompt && order?._id) {
+      try {
+        const token = auth.getToken();
+        const res = await http.get("/admin/rental-exists", {
+          params: { orderId: order._id },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res?.data?.exists) {
+          createRentals = window.confirm(t("admin.orders.rentalPrompt"));
+        }
+      } catch (_err) {
+        createRentals = window.confirm(t("admin.orders.rentalPrompt"));
+      }
+    }
+    onSave?.(buildPayload(true, createRentals));
   };
 
   const handleCreate = () => {
@@ -369,12 +418,43 @@ export default function OrderDetailsModal({
                   <p>{displayCustomer?.name || "—"}</p>
                   <p>{displayCustomer?.email || "—"}</p>
                   <p>{displayCustomer?.phone || "—"}</p>
-                  <p>
-                    {displayCustomer?.idType || "—"}{" "}
-                    {displayCustomer?.idNumberFull ||
-                      displayCustomer?.idNumber ||
-                      ""}
-                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p>
+                      {displayCustomer?.idType || "—"}{" "}
+                      {showFullId
+                        ? fullIdValue || displayCustomer?.idNumber || ""
+                        : maskId(displayCustomer?.idNumber || "")}
+                    </p>
+                    {!!(
+                      displayCustomer?.idNumberFull ||
+                      displayCustomer?.idNumber
+                    ) && (
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const next = !showFullId;
+                          setShowFullId(next);
+                          if (next && order?._id) {
+                            try {
+                              const token = auth.getToken();
+                              const res = await http.get("/admin/order-id", {
+                                headers: { Authorization: `Bearer ${token}` },
+                                params: { id: order._id },
+                              });
+                              setFullIdValue(res?.data?.idNumberFull || "");
+                            } catch (_err) {
+                              // no-op
+                            }
+                          }
+                        }}
+                        className="text-xs font-semibold text-[#00294D] underline"
+                      >
+                        {showFullId
+                          ? t("admin.orders.hideId")
+                          : t("admin.orders.showId")}
+                      </button>
+                    )}
+                  </div>
                   {displayCustomer?.preferredContactMethod && (
                     <p>
                       {t("admin.orders.preferredContact")}:{" "}
